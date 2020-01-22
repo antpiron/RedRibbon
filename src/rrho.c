@@ -70,8 +70,11 @@ rrho_hyper(struct rrho *rrho, size_t i, size_t j, struct rrho_result *res)
 {
   // double stats_hyper_F(long k, long K, long n, long N)
   size_t count = count_intersect(rrho, i, j);
+  double mean = (double)i*(double) j / rrho->n;
 
-  res->pvalue = stats_hyper_F(count, i, j, rrho->n);
+  
+  res->pvalue = 1.0 - stats_hyper_F(count, i, j, rrho->n);
+  res->fdr = (0 == count)?-1:mean / count;
   
   return 0;
 }

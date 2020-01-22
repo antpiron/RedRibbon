@@ -2,7 +2,7 @@ LDADD = ../src/librrho.la
 AM_LDFLAGS = -static
 AM_CFLAGS = -g -O0 -fsanitize=bounds -I$(top_srcdir)/src
 
-check_PROGRAMS = 
+check_PROGRAMS = t-rrho
 
 TESTS = $(check_PROGRAMS)
 
