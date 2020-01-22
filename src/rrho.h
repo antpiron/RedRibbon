@@ -14,6 +14,7 @@ struct rrho_result
 {
   double pvalue;
   double fdr;
+  size_t count;
 };
 
 int rrho_init(struct rrho *rrho, size_t n, double a[n], double b[n]);
