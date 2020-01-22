@@ -72,8 +72,8 @@ rrho_hyper(struct rrho *rrho, size_t i, size_t j, struct rrho_result *res)
   size_t count = count_intersect(rrho, i, j);
   double mean = (double)i*(double) j / rrho->n;
   double symmetric = 2*mean - count;
-  double lower = (count < symmetric)?count:ceil(symmetric);
-  double upper = (count < symmetric)?floor(symmetric):count;
+  long lower = (count < symmetric)?count:ceil(symmetric);
+  long upper = (count < symmetric)?floor(symmetric):count;
 
   
   res->pvalue = stats_hyper_F(lower, i+1, j+1, rrho->n) +
