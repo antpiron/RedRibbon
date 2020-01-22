@@ -15,8 +15,8 @@ main(int argc, char *argv[argc])
 
   for (size_t i = 0 ; i < n ; i++)
     {
-      a[i] = i;// stats_norm_rand((double)i - n/2, sqrt(n));
-      b[i] = i;// stats_norm_rand((double)i - n/2, sqrt(n));
+      a[i] = i; // stats_norm_rand(i, sqrt(n));
+      b[i] = i; // stats_norm_rand(i, sqrt(n));
     }
   
   rrho_init(&rrho, n, a, b);
