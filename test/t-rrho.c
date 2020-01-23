@@ -46,6 +46,8 @@ main(int argc, char *argv[argc])
   //  printf("FDR: %f\n", res.fdr);
   // ERROR_UNDEF_FATAL_FMT(delta >= eps, "FAIL: alg_AX_B_solve() delta != C[%ld]*C[%ld] = %f\n", i, j, delta);
 
+  // TODO: check 0 <= p-value <= 1
+  
   rrho_destroy(&rrho);
 
   return EXIT_SUCCESS;
