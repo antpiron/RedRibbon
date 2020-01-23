@@ -11,7 +11,7 @@ main(int argc, char *argv[argc])
 {
   struct rrho rrho;
   struct rrho_result res;
-  size_t n = 50000;
+  size_t n = 500000;
   double a[n], b[n];
   double diff, rate;
   struct timeb st, et;
@@ -44,7 +44,8 @@ main(int argc, char *argv[argc])
   diff = (et.time - st.time) + (et.millitm - st.millitm) / 1000.0;
   rate = n*n / diff / step / step;
   
-  printf("\nrate = %12.0F rrho/sec", rate);
+  printf("\nDuration = %12.2F sec", diff);
+  printf("\nrate     = %12.0F rrho/sec", rate);
   
   printf("\n");
   return EXIT_SUCCESS;

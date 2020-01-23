@@ -84,7 +84,7 @@ count_intersect(struct rrho *rrho, size_t i, size_t j)
 	bitset_unset(&rrho->bs_a,  rrho->index_a[ii]);
     }
 
-  if (rrho->n_b < i+1)
+  if (rrho->n_b < j+1)
     {
       for (size_t jj = rrho->n_b ; jj < j+1 ; jj++)
 	bitset_set(&rrho->bs_b,  rrho->index_b[jj]);
