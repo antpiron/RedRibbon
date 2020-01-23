@@ -23,6 +23,9 @@ main(int argc, char *argv[argc])
   printf("\na = ");
   for (size_t i = 0 ; i < n ; i++)
     printf("%f\t", rrho.a[i]);
+  printf("\nb = ");
+  for (size_t i = 0 ; i < n ; i++)
+    printf("%f\t", rrho.b[i]);
   printf("\nindex_a = ");
   for (size_t i = 0 ; i < n ; i++)
     printf("%ld\t", rrho.index_a[i]);
