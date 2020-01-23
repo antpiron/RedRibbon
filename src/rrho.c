@@ -29,6 +29,7 @@ rrho_init(struct rrho *rrho, size_t n, double a[n], double b[n])
   rrho->n = n;
   rrho->a = a;
   rrho->b = b;
+  rrho->n_a = rrho->n_b = 0;
 
   rrho->index_a = malloc(sizeof(size_t) * n);
   rrho->index_b = malloc(sizeof(size_t) * n);
@@ -40,27 +41,66 @@ rrho_init(struct rrho *rrho, size_t n, double a[n], double b[n])
 
   qsort_r(rrho->index_b, n, sizeof(rrho->index_b[0]),
 	  indirect_compar_double, rrho->b);
-  
+
+  bitset_init(&rrho->bs_a,n);
+  bitset_init(&rrho->bs_b, n);
+  bitset_init(&rrho->bs_and, n);
+ 
   return 0;
 }
 
+int
+rrho_destroy(struct rrho *rrho)
+{
+
+  free(rrho->index_a);
+  free(rrho->index_b);
+
+  bitset_destroy(&rrho->bs_a);
+  bitset_destroy(&rrho->bs_b);
+  bitset_destroy(&rrho->bs_and);
+ 
+  return 0;
+}
 
 static size_t
 count_intersect(struct rrho *rrho, size_t i, size_t j)
 {
   // TODO: improve performance
   size_t count = 0;
-  struct bitset bs;
   
-  bitset_init(&bs, rrho->n);
-  
-  for (size_t jj = 0 ; jj < j+1 ; jj++)
-    bitset_set(&bs,  rrho->index_b[jj]);
+  // bitset_reset(&rrho->bs_a);
+  // bitset_reset(&rrho->bs_b);
+  // bitset_reset(&rrho->bs_and);
 
-  for (size_t ii = 0 ; ii < i+1 ; ii++)
-    count += bitset_isset(&bs,  rrho->index_a[ii]);
+  if (rrho->n_a < i+1)
+    {
+      for (size_t ii = rrho->n_a ; ii < i+1 ; ii++)
+	bitset_set(&rrho->bs_a,  rrho->index_a[ii]);
+    }
+  else
+    {
+      for (size_t ii = i+1 ; ii < rrho->n_a ; ii++)
+	bitset_unset(&rrho->bs_a,  rrho->index_a[ii]);
+    }
+
+  if (rrho->n_b < i+1)
+    {
+      for (size_t jj = rrho->n_b ; jj < j+1 ; jj++)
+	bitset_set(&rrho->bs_b,  rrho->index_b[jj]);
+    }
+  else
+    {
+      for (size_t jj = j+1 ; jj < rrho->n_b ; jj++)
+	bitset_unset(&rrho->bs_b,  rrho->index_b[jj]);	    
+    }
+   
+  bitset_and(&rrho->bs_and, &rrho->bs_a, &rrho->bs_b);
   
-  bitset_destroy(&bs);
+  count = bitset_ones(&rrho->bs_and);
+
+  rrho->n_a = i+1;
+  rrho->n_b = j+1;
   
   return count;
 }
@@ -84,12 +124,3 @@ rrho_hyper(struct rrho *rrho, size_t i, size_t j, struct rrho_result *res)
   return 0;
 }
 
-int
-rrho_destroy(struct rrho *rrho)
-{
-
-  free(rrho->index_a);
-  free(rrho->index_b);
-  
-  return 0;
-}

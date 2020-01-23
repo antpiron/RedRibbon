@@ -2,12 +2,17 @@
 #define __RRHO_H
 
 #include <stddef.h>
+#include "ale.h"
 
 struct rrho
 {
   size_t n;
   double *a, *b;
   size_t *index_a, *index_b;
+  struct bitset bs_a;
+  struct bitset bs_b;
+  struct bitset bs_and;
+  size_t n_a, n_b;
 };
 
 struct rrho_result
