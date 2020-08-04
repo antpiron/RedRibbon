@@ -15,8 +15,8 @@ main(int argc, char *argv[argc])
 
   for (size_t i = 0 ; i < n ; i++)
     {
-      a[i] = i; // stats_norm_rand(i, sqrt(n));
-      b[i] = i; // stats_norm_rand(i, sqrt(n));
+      a[i] = stats_unif_std_rand();
+      b[i] = stats_unif_std_rand();
     }
   
   rrho_init(&rrho, n, a, b);
@@ -39,7 +39,7 @@ main(int argc, char *argv[argc])
       for (size_t j = 0 ; j < n ; j++)
 	{
 	  rrho_hyper(&rrho, i, j, &res);
-	  printf("%f,%ld\t", res.pvalue, res.count);
+	  printf("%.3f,%2ld  ", res.pvalue, res.count);
 	}
       printf("\n");
     }

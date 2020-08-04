@@ -106,7 +106,7 @@ count_intersect(struct rrho *rrho, size_t i, size_t j)
 }
 
 int
-rrho_hyper(struct rrho *rrho, size_t i, size_t j, struct rrho_result *res)
+rrho_hyper_two_tails(struct rrho *rrho, size_t i, size_t j, struct rrho_result *res)
 {
   // double stats_hyper_F(long k, long K, long n, long N)
   size_t count = count_intersect(rrho, i, j);
@@ -118,6 +118,20 @@ rrho_hyper(struct rrho *rrho, size_t i, size_t j, struct rrho_result *res)
   
   res->pvalue = stats_hyper_F(lower, i+1, j+1, rrho->n) +
     (1.0 - stats_hyper_F(upper, i+1, j+1, rrho->n));
+  // res->fdr = (0 == count)?-1:mean / count;
+  res->count = count;
+  
+  return 0;
+}
+
+int
+rrho_hyper(struct rrho *rrho, size_t i, size_t j, struct rrho_result *res)
+{
+  // double stats_hyper_F(long k, long K, long n, long N)
+  size_t count = count_intersect(rrho, i, j);
+  
+  
+  res->pvalue = 1.0 - stats_hyper_F(count, i+1, j+1, rrho->n);
   // res->fdr = (0 == count)?-1:mean / count;
   res->count = count;
   

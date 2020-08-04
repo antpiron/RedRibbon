@@ -11,7 +11,7 @@ main(int argc, char *argv[argc])
 {
   struct rrho rrho;
   struct rrho_result res;
-  size_t n = 500000;
+  size_t n = 200000;
   double a[n], b[n];
   double diff, rate;
   struct timeb st, et;
