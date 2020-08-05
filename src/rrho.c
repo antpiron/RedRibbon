@@ -108,6 +108,8 @@ count_intersect(struct rrho *rrho, size_t i, size_t j)
 int
 rrho_hyper_two_tails(struct rrho *rrho, size_t i, size_t j, struct rrho_result *res)
 {
+  // try http://showmethevotes.org/2016/12/11/hypergeometric-p-value-computation-for-exit-poll-results-using-excel/
+  //    2*min(stats_hyper_F(count, i+1, j+1, rrho->n), 1.0 - stats_hyper_F(count-1, i+1, j+1, rrho->n),  0.5)
   // double stats_hyper_F(long k, long K, long n, long N)
   size_t count = count_intersect(rrho, i, j);
   double mean = (double) (i+1) * (double) (j+1) / rrho->n;
