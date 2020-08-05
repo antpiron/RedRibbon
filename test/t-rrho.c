@@ -15,8 +15,8 @@ main(int argc, char *argv[argc])
 
   for (size_t i = 0 ; i < n ; i++)
     {
-      a[i] = i ; // stats_unif_std_rand();
-      b[i] = i ; //stats_unif_std_rand();
+      a[i] = stats_norm_rand(i, 1) ; // stats_unif_std_rand();
+      b[i] = stats_norm_rand(i, 1) ; //stats_unif_std_rand();
     }
   
   rrho_init(&rrho, n, a, b);
