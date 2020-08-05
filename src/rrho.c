@@ -127,11 +127,15 @@ rrho_hyper_two_tails(struct rrho *rrho, size_t i, size_t j, struct rrho_result *
 int
 rrho_hyper(struct rrho *rrho, size_t i, size_t j, struct rrho_result *res)
 {
+  // https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2943622/
   // double stats_hyper_F(long k, long K, long n, long N)
   size_t count = count_intersect(rrho, i, j);
-  // double mean = (double) (i+1) * (double) (j+1) / rrho->n;
-  
-  res->pvalue = 1.0 - stats_hyper_F(count, i+1, j+1, rrho->n);
+  double mean = (double) (i+1) * (double) (j+1) / rrho->n;
+
+  if ( count <= mean )
+    res->pvalue = stats_hyper_F(count, i+1, j+1, rrho->n);
+  else
+    res->pvalue = 1.0 - stats_hyper_F(count, i+1, j+1, rrho->n);
   // res->fdr = (0 == count)?-1:mean / count;
   res->count = count;
   
