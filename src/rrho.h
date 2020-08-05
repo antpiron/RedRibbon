@@ -19,6 +19,7 @@ struct rrho_result
 {
   double pvalue;
   double fdr;
+  int direction;
   size_t count;
 };
 

@@ -115,6 +115,10 @@ rrho_hyper_two_tails(struct rrho *rrho, size_t i, size_t j, struct rrho_result *
   long lower = (count < symmetric)?count:ceil(symmetric);
   long upper = (count < symmetric)?floor(symmetric):count;
 
+  if ( (double) count <= mean )
+    res->direction = -1;
+  else
+    res->direction = 1;
   
   res->pvalue = stats_hyper_F(lower, i+1, j+1, rrho->n) +
     (1.0 - stats_hyper_F(upper, i+1, j+1, rrho->n));
@@ -133,9 +137,16 @@ rrho_hyper(struct rrho *rrho, size_t i, size_t j, struct rrho_result *res)
   double mean = (double) (i+1) * (double) (j+1) / rrho->n;
 
   if ( (double) count <= mean )
-    res->pvalue = stats_hyper_F(count, i+1, j+1, rrho->n);
+    {
+      res->pvalue = stats_hyper_F(count, i+1, j+1, rrho->n);
+      res->direction = -1;
+    }
   else
-    res->pvalue = 1.0 - stats_hyper_F(count, i+1, j+1, rrho->n);
+    {
+      // count-1 because we want to include from count to n
+      res->pvalue = 1.0 - stats_hyper_F(count-1, i+1, j+1, rrho->n);
+      res->direction = 1;
+    }
   // res->fdr = (0 == count)?-1:mean / count;
   res->count = count;
   
