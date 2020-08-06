@@ -106,7 +106,7 @@ count_intersect(struct rrho *rrho, size_t i, size_t j)
 }
 
 int
-rrho_hyper_two_tails(struct rrho *rrho, size_t i, size_t j, struct rrho_result *res)
+rrho_hyper_two_tailed_as_r_module(struct rrho *rrho, size_t i, size_t j, struct rrho_result *res)
 {
   // try http://showmethevotes.org/2016/12/11/hypergeometric-p-value-computation-for-exit-poll-results-using-excel/
   //    2*min(stats_hyper_F(count, i+1, j+1, rrho->n), 1.0 - stats_hyper_F(count-1, i+1, j+1, rrho->n),  0.5)
@@ -124,6 +124,38 @@ rrho_hyper_two_tails(struct rrho *rrho, size_t i, size_t j, struct rrho_result *
   
   res->pvalue = stats_hyper_F(lower, i+1, j+1, rrho->n) +
     (1.0 - stats_hyper_F(upper, i+1, j+1, rrho->n));
+  // res->fdr = (0 == count)?-1:mean / count;
+  res->count = count;
+  
+  return 0;
+}
+
+int
+rrho_hyper_two_tailed(struct rrho *rrho, size_t i, size_t j, struct rrho_result *res)
+{
+  // http://showmethevotes.org/2016/12/11/hypergeometric-p-value-computation-for-exit-poll-results-using-excel/
+  //    2*min(stats_hyper_F(count, i+1, j+1, rrho->n), 1.0 - stats_hyper_F(count-1, i+1, j+1, rrho->n),  0.5)
+  // double stats_hyper_F(long k, long K, long n, long N)
+  size_t count = count_intersect(rrho, i, j);
+  double mean = (double) (i+1) * (double) (j+1) / rrho->n;
+  double min_pval = 0.5;
+  double pval;
+  
+
+  if ( (double) count <= mean )
+    res->direction = -1;
+  else
+    res->direction = 1;
+
+  pval = stats_hyper_F(count, i+1, j+1, rrho->n);
+  if ( pval < min_pval )
+    min_pval = pval;
+
+  pval = 1.0 - stats_hyper_F(count-1, i+1, j+1, rrho->n);
+  if  ( pval < min_pval )
+    min_pval = pval;
+  
+  res->pvalue = 2 * min_pval;
   // res->fdr = (0 == count)?-1:mean / count;
   res->count = count;
   

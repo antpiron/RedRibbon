@@ -24,6 +24,8 @@ struct rrho_result
 };
 
 int rrho_init(struct rrho *rrho, size_t n, double a[n], double b[n]);
+int rrho_hyper_two_tailed_as_r_module(struct rrho *rrho, size_t i, size_t j, struct rrho_result *res);
+int rrho_hyper_two_tailed(struct rrho *rrho, size_t i, size_t j, struct rrho_result *res);
 int rrho_hyper(struct rrho *rrho, size_t i, size_t j, struct rrho_result *res);
 int rrho_destroy(struct rrho *rrho);
 
