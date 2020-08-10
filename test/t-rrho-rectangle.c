@@ -10,7 +10,9 @@ main(int argc, char *argv[argc])
 {
   const double eps = 0.00000001;
   struct rrho rrho;
-  struct rrho_result res;
+  size_t mres = 10;
+  size_t nres = 10;
+  double (*res)[nres] = malloc(nres * mres * sizeof(double));
   size_t n = 1024;
   double *a = malloc(n * sizeof(double));
   double *b = malloc(n * sizeof(double));
@@ -24,19 +26,21 @@ main(int argc, char *argv[argc])
   
   rrho_init(&rrho, n, a, b);
   
-  rrho_hyper(&rrho, 0, 0, &res);
+  rrho_rectangle(&rrho, 0, 0, mres, nres,  mres, nres, res, RRHO_HYPER);
   exp = 1.0 / (double) n;
-  ERROR_UNDEF_FATAL_FMT(0 != ale_doublecmp(res.pvalue, exp, eps),
-			"FAIL: rrho_hyper(0,0) pval = %f != %s\n", res.pvalue, exp);
+  ERROR_UNDEF_FATAL_FMT(0 != ale_doublecmp(res[0][0], exp, eps),
+			"FAIL: rrho_rectangle(0,0) pval = %f != %s\n", res[0][0], exp);
 
-  rrho_hyper(&rrho, n-1, n-1, &res);
+  rrho_rectangle(&rrho, n-mres, n-nres, mres, nres, mres, nres, res, RRHO_HYPER);
   exp = 1.0;
-  ERROR_UNDEF_FATAL_FMT(0 != ale_doublecmp(res.pvalue, exp, eps),
-			"FAIL: rrho_hyper(%zu,%zu) pval = %f != %s\n", n-1, n-1, res.pvalue, exp);
+  ERROR_UNDEF_FATAL_FMT(0 != ale_doublecmp(res[mres-1][nres-1], exp, eps),
+			"FAIL: rrho_rectangle(0,0) pval = %f != %s\n", res[mres-1][nres-1], exp);
+
 
   // TODO: check 0 <= p-value <= 1
   
   rrho_destroy(&rrho);
+  free(res);
   free(a);
   free(b);
 

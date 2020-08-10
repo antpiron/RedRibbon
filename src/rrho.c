@@ -170,7 +170,7 @@ rrho_hyper(struct rrho *rrho, size_t i, size_t j, struct rrho_result *res)
   size_t count = count_intersect(rrho, i, j);
   double mean = (double) (i+1) * (double) (j+1) / rrho->n;
 
-  if ( (double) count <= mean )
+  if ( (double) count < mean )
     {
       res->pvalue = stats_hyper_F(count, i+1, j+1, rrho->n);
       res->direction = -1;

@@ -24,12 +24,12 @@ main(int argc, char *argv[argc])
   
   rrho_init(&rrho, n, a, b);
   
-  rrho_hyper(&rrho, 0, 0, &res);
+  rrho_generic(&rrho, 0, 0, &res, RRHO_HYPER);
   exp = 1.0 / (double) n;
   ERROR_UNDEF_FATAL_FMT(0 != ale_doublecmp(res.pvalue, exp, eps),
 			"FAIL: rrho_hyper(0,0) pval = %f != %s\n", res.pvalue, exp);
 
-  rrho_hyper(&rrho, n-1, n-1, &res);
+  rrho_generic(&rrho, n-1, n-1, &res, RRHO_HYPER);
   exp = 1.0;
   ERROR_UNDEF_FATAL_FMT(0 != ale_doublecmp(res.pvalue, exp, eps),
 			"FAIL: rrho_hyper(%zu,%zu) pval = %f != %s\n", n-1, n-1, res.pvalue, exp);
