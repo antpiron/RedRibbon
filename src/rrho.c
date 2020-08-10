@@ -5,6 +5,7 @@
 
 #include "rrho.h"
 #include "ale.h"
+#include "ale/ea.h"
 
 static int
 indirect_compar_double(const void *p1, const void *p2, void *arg)
@@ -207,5 +208,51 @@ rrho_rectangle(struct rrho *rrho, size_t i, size_t j, size_t ilen, size_t jlen,
 	}
     }
   
+  return 0;
+}
+
+
+
+struct params
+{
+  double prob_mutation;
+  double sigma;
+  int mode;
+  struct rrho *rrho;
+};
+
+
+static double
+fitness(struct rrho_coord x,  struct params *param)
+{
+  struct rrho_result res;
+  
+  rrho_generic(param->rrho, x.i, x.j, &res, param->mode);
+    
+  return 1 / (res.pvalue + 1) ;
+}
+
+static void
+mutate(struct rrho_coord *x, struct params *param)
+{
+  (void)param;
+  (void)x;
+}
+
+
+static void
+mate(struct rrho_coord *x, struct rrho_coord m1, struct rrho_coord m2, struct params *param)
+{
+  (void)param;
+  x->i = (m1.i + m2.i)/2;
+  x->j = (m1.j + m2.j)/2;
+}
+  
+EA_INIT(optim,struct rrho_coord,mate,mutate,fitness,struct params *);
+
+int
+rrho_rectangle_min(struct rrho *rrho, size_t i, size_t j, size_t ilen, size_t jlen,
+		   struct rrho_coord *coord, int mode)
+{
   return 0;
 }

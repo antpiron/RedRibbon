@@ -29,10 +29,9 @@ struct rrho_result
   size_t count;
 };
 
-struct rrho_ea_res
+struct rrho_coord
 {
   size_t i, j;
-  struct rrho_result rrho;
 };
 
 int rrho_init(struct rrho *rrho, size_t n, double a[n], double b[n]);
@@ -46,8 +45,8 @@ static inline int rrho_generic(struct rrho *rrho, size_t i, size_t j, struct rrh
 int rrho_rectangle(struct rrho *rrho, size_t i, size_t j, size_t ilen, size_t jlen,
 		   size_t m, size_t n, double dst[m][n],
 		   int mode);
-int rrho_rectangle_min(struct rrho *rrho, size_t i, size_t j, size_t m, size_t n,
-		       struct rrho_ea_res *res, int mode);
+int rrho_rectangle_min(struct rrho *rrho, size_t i, size_t j, size_t ilen, size_t jlen,
+		       struct rrho_coord *coord, int mode);
 
 // inline
 
