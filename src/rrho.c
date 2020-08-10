@@ -187,3 +187,25 @@ rrho_hyper(struct rrho *rrho, size_t i, size_t j, struct rrho_result *res)
   return 0;
 }
 
+int
+rrho_rectangle(struct rrho *rrho, size_t i, size_t j, size_t ilen, size_t jlen,
+		   size_t m, size_t n, double dst[m][n],
+		   int mode)
+{
+  struct rrho_result res;
+  size_t istep = ilen / m;
+  size_t jstep = jlen / n;
+
+  for (size_t y = 0 ; y < m ; y++)
+    {
+      for (size_t x = 0 ; x < n ; x++)
+	{
+	  size_t ii = i + y * istep;
+	  size_t jj = j + x * jstep;
+	  rrho_generic(rrho, ii, jj, &res, mode);
+	  dst[y][x] = copysign(res.pvalue, res.direction);
+	}
+    }
+  
+  return 0;
+}
