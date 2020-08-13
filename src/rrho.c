@@ -218,6 +218,7 @@ struct params
   double prob_mutation;
   double sigma;
   int mode;
+  size_t i, j, ilen, jlen;
   struct rrho *rrho;
 };
 
@@ -248,8 +249,8 @@ static void
 mate(struct rrho_coord *x, struct rrho_coord m1, struct rrho_coord m2, struct params *param)
 {
   (void)param;
-  x->i = (m1.i + m2.i)/2;
-  x->j = (m1.j + m2.j)/2;
+  x->i = round( m1.i + stats_unif_std_rand() * (m2.i - m1.i) );
+  x->j = round( m1.j + stats_unif_std_rand() * (m2.j - m1.j) );
 }
   
 EA_INIT(optim,struct rrho_coord,mate,mutate,fitness,struct params *);
@@ -261,14 +262,15 @@ rrho_rectangle_min(struct rrho *rrho, size_t i, size_t j, size_t ilen, size_t jl
 #define ITER (5000)
   const size_t min_pop_size = 50;
   const size_t max_pop_size = 500;
-  struct params param = {.prob_mutation = 0.1, .sigma = 2.0, .mode = mode, .rrho = rrho};
+  struct params param = {.prob_mutation = 0.1, .sigma = 2.0, .mode = mode, .rrho = rrho,
+			 .i = i, .j = j, .ilen = ilen, .jlen = jlen};
   struct ea_optim ea;
   struct rrho_coord *population = malloc(max_pop_size * sizeof(struct rrho_coord));
 
   for (size_t c = 0 ; c < max_pop_size ; c++)
     {
-      population[c].i = stats_unif_rand(0, ilen);
-      population[c].j = stats_unif_rand(0, jlen);
+      population[c].i = round(stats_unif_rand(i, i+ilen));
+      population[c].j = round(stats_unif_rand(j, j+jlen));
     }
   
   ea_optim_init(&ea, min_pop_size, max_pop_size, population, &param);
