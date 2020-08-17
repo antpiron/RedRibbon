@@ -230,7 +230,18 @@ fitness(struct rrho_coord x,  struct params *param)
   
   rrho_generic(param->rrho, x.i, x.j, &res, param->mode);
     
-  return 1 / (res.pvalue + 1) ;
+  return 1 - res.pvalue;
+}
+
+static size_t
+in_range(size_t x, size_t i, size_t ilen)
+{
+  if ( x < i )
+    return i;
+  if (x >= i + ilen )
+    return i + ilen - 1;
+    
+  return x;
 }
 
 static void
@@ -239,8 +250,10 @@ mutate(struct rrho_coord *x, struct params *param)
   double u = stats_unif_std_rand();
   if (u < param->prob_mutation)
     {
-      x->i += stats_norm_rand(0,param->sigma);
-      x->j += stats_norm_rand(0,param->sigma);
+      size_t i = x->i + stats_norm_rand(0,param->sigma);
+      size_t j = x->j + stats_norm_rand(0,param->sigma);
+      x->i = in_range(i, param->i, param->ilen);
+      x->j = in_range(j, param->j, param->jlen);
     }
 }
 
@@ -249,8 +262,10 @@ static void
 mate(struct rrho_coord *x, struct rrho_coord m1, struct rrho_coord m2, struct params *param)
 {
   (void)param;
-  x->i = round( m1.i + stats_unif_std_rand() * (m2.i - m1.i) );
-  x->j = round( m1.j + stats_unif_std_rand() * (m2.j - m1.j) );
+  size_t i = round( m1.i + stats_unif_std_rand() * (m2.i - m1.i) );
+  size_t j = round( m1.j + stats_unif_std_rand() * (m2.j - m1.j) );
+  x->i = in_range(i, param->i, param->ilen);
+  x->j = in_range(j, param->j, param->jlen);
 }
   
 EA_INIT(optim,struct rrho_coord,mate,mutate,fitness,struct params *);
@@ -260,17 +275,18 @@ rrho_rectangle_min(struct rrho *rrho, size_t i, size_t j, size_t ilen, size_t jl
 		   struct rrho_coord *coord, int mode)
 {
 #define ITER (5000)
+  const size_t max_pop = ilen * jlen;
   const size_t min_pop_size = 50;
   const size_t max_pop_size = 500;
-  struct params param = {.prob_mutation = 0.1, .sigma = 2.0, .mode = mode, .rrho = rrho,
+  struct params param = {.prob_mutation = 0.2, .sigma = 4.0, .mode = mode, .rrho = rrho,
 			 .i = i, .j = j, .ilen = ilen, .jlen = jlen};
   struct ea_optim ea;
   struct rrho_coord *population = malloc(max_pop_size * sizeof(struct rrho_coord));
 
   for (size_t c = 0 ; c < max_pop_size ; c++)
     {
-      population[c].i = round(stats_unif_rand(i, i+ilen));
-      population[c].j = round(stats_unif_rand(j, j+jlen));
+      population[c].i = in_range(round(stats_unif_rand(i, i+ilen)), param.i, param.ilen);
+      population[c].j = in_range(round(stats_unif_rand(j, j+jlen)), param.j, param.jlen);
     }
   
   ea_optim_init(&ea, min_pop_size, max_pop_size, population, &param);
@@ -278,6 +294,12 @@ rrho_rectangle_min(struct rrho *rrho, size_t i, size_t j, size_t ilen, size_t jl
   for (size_t iter = 0 ; iter < ITER ; iter++)
     {
       ea_optim_next_generation(&ea, &param);
+      for (size_t c = 0 ; c < ( (max_pop_size > 5 )?5:max_pop_size ) ; c++)
+	{
+	  size_t index = ea.fitness_index[c];
+	  printf("(%zu, %zu, %e) ", population[c].i, population[c].j, 1-ea.fitness[index]);
+	}
+      printf("\n");
     }
 
   size_t index0 = ea.fitness_index[0];
