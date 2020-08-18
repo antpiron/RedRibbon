@@ -16,7 +16,7 @@ main(int argc, char *argv[argc])
 
   printf("%s: \n", argv[0]);
 
-  for ( size_t n = (1llu << 10)  ; n < (1llu << 17) + 1 ; n = n << 1)
+  for ( size_t n = (1llu << 10)  ; n < (1llu << 18) + 1 ; n = n << 1)
     {
       double *a = malloc(n * sizeof(double));
       double *b = malloc(n * sizeof(double));
