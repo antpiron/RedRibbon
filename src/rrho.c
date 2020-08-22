@@ -228,7 +228,7 @@ fitness(struct rrho_coord x,  struct params *param)
   struct rrho_result res;
   
   rrho_generic(param->rrho, x.i, x.j, &res, param->mode);
-    
+
   return 1 / (res.pvalue + DBL_MIN);
 }
 
