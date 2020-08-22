@@ -8,7 +8,7 @@
 int
 main(int argc, char *argv[argc])
 {
-  const double eps = 0.00000001;
+  const double eps = 1e-3;
   struct rrho rrho;
   struct rrho_result res;
   size_t n = 1024;
@@ -27,12 +27,12 @@ main(int argc, char *argv[argc])
   rrho_hyper(&rrho, 0, 0, &res);
   exp = 1.0 / (double) n;
   ERROR_UNDEF_FATAL_FMT(0 != ale_doublecmp(res.pvalue, exp, eps),
-			"FAIL: rrho_hyper(0,0) pval = %f != %s\n", res.pvalue, exp);
+			"FAIL: rrho_hyper(0,0) pval = %.20e != %.20e\n", res.pvalue, exp);
 
   rrho_hyper(&rrho, n-1, n-1, &res);
   exp = 1.0;
   ERROR_UNDEF_FATAL_FMT(0 != ale_doublecmp(res.pvalue, exp, eps),
-			"FAIL: rrho_hyper(%zu,%zu) pval = %f != %s\n", n-1, n-1, res.pvalue, exp);
+			"FAIL: rrho_hyper(%zu,%zu) pval = %f != %f\n", n-1, n-1, res.pvalue, exp);
 
   // TODO: check 0 <= p-value <= 1
   

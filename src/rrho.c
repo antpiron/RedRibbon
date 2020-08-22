@@ -124,7 +124,7 @@ rrho_hyper_two_tailed_as_r_module(struct rrho *rrho, size_t i, size_t j, struct 
     res->direction = 1;
   
   res->pvalue = stats_hyper_F(lower, i+1, j+1, rrho->n) +
-    (1.0 - stats_hyper_F(upper, i+1, j+1, rrho->n));
+    stats_hyper_tail(upper, i+1, j+1, rrho->n, STATS_UPPER);
   // res->fdr = (0 == count)?-1:mean / count;
   res->count = count;
   
@@ -152,7 +152,7 @@ rrho_hyper_two_tailed(struct rrho *rrho, size_t i, size_t j, struct rrho_result 
   if ( pval < min_pval )
     min_pval = pval;
 
-  pval = 1.0 - stats_hyper_F(count-1, i+1, j+1, rrho->n);
+  pval = stats_hyper_tail(count-1, i+1, j+1, rrho->n, STATS_UPPER);
   if  ( pval < min_pval )
     min_pval = pval;
   
@@ -178,8 +178,7 @@ rrho_hyper(struct rrho *rrho, size_t i, size_t j, struct rrho_result *res)
     }
   else
     {
-      // count-1 because we want to include from count to n
-      res->pvalue = 1.0 - stats_hyper_F(count-1, i+1, j+1, rrho->n);
+      res->pvalue = stats_hyper_tail(count, i+1, j+1, rrho->n, STATS_UPPER);
       res->direction = 1;
     }
   // res->fdr = (0 == count)?-1:mean / count;
@@ -230,7 +229,7 @@ fitness(struct rrho_coord x,  struct params *param)
   
   rrho_generic(param->rrho, x.i, x.j, &res, param->mode);
     
-  return 1 - res.pvalue;
+  return - res.pvalue;
 }
 
 static size_t
@@ -247,12 +246,18 @@ in_range(size_t x, size_t i, size_t ilen)
 static void
 mutate(struct rrho_coord *x, struct params *param)
 {
-  double u = stats_unif_std_rand();
-  if (u < param->prob_mutation)
+  if (stats_unif_std_rand() <= param->prob_mutation)
     {
-      size_t i = x->i + stats_norm_rand(0,param->sigma);
-      size_t j = x->j + stats_norm_rand(0,param->sigma);
+      double sigma = (stats_unif_std_rand() <= 0.5)? param->sigma : param->ilen;
+      double rand = stats_norm_rand(x->i, sigma);
+      size_t i = round(rand);
       x->i = in_range(i, param->i, param->ilen);
+    }
+  if (stats_unif_std_rand() <= param->prob_mutation)
+    {
+      double sigma = (stats_unif_std_rand() <= 0.5)? param->sigma : param->jlen;
+      double rand = stats_norm_rand(x->j, sigma);
+      size_t j = round(rand);
       x->j = in_range(j, param->j, param->jlen);
     }
 }
@@ -262,8 +267,8 @@ static void
 mate(struct rrho_coord *x, struct rrho_coord m1, struct rrho_coord m2, struct params *param)
 {
   (void)param;
-  size_t i = round( m1.i + stats_unif_std_rand() * (m2.i - m1.i) );
-  size_t j = round( m1.j + stats_unif_std_rand() * (m2.j - m1.j) );
+  size_t i = round( m1.i + stats_unif_std_rand() * ( (double) m2.i - (double) m1.i) );
+  size_t j = round( m1.j + stats_unif_std_rand() * ( (double) m2.j - (double) m1.j) );
   x->i = in_range(i, param->i, param->ilen);
   x->j = in_range(j, param->j, param->jlen);
 }
@@ -274,10 +279,10 @@ int
 rrho_rectangle_min(struct rrho *rrho, size_t i, size_t j, size_t ilen, size_t jlen,
 		   struct rrho_coord *coord, int mode)
 {
-#define ITER (5000)
-  const size_t max_pop = ilen * jlen;
+#define ITER (1000)
+  // const size_t max_pop = ilen * jlen;
   const size_t min_pop_size = 50;
-  const size_t max_pop_size = 500;
+  const size_t max_pop_size = 500 + sqrt(rrho->n);
   struct params param = {.prob_mutation = 0.2, .sigma = 4.0, .mode = mode, .rrho = rrho,
 			 .i = i, .j = j, .ilen = ilen, .jlen = jlen};
   struct ea_optim ea;
@@ -285,8 +290,8 @@ rrho_rectangle_min(struct rrho *rrho, size_t i, size_t j, size_t ilen, size_t jl
 
   for (size_t c = 0 ; c < max_pop_size ; c++)
     {
-      population[c].i = in_range(round(stats_unif_rand(i, i+ilen)), param.i, param.ilen);
-      population[c].j = in_range(round(stats_unif_rand(j, j+jlen)), param.j, param.jlen);
+      population[c].i = in_range(floor(stats_unif_rand(i, i+ilen)), param.i, param.ilen);
+      population[c].j = in_range(floor(stats_unif_rand(j, j+jlen)), param.j, param.jlen);
     }
   
   ea_optim_init(&ea, min_pop_size, max_pop_size, population, &param);
@@ -297,7 +302,18 @@ rrho_rectangle_min(struct rrho *rrho, size_t i, size_t j, size_t ilen, size_t jl
       for (size_t c = 0 ; c < ( (max_pop_size > 5 )?5:max_pop_size ) ; c++)
 	{
 	  size_t index = ea.fitness_index[c];
-	  printf("(%zu, %zu, %e) ", population[c].i, population[c].j, 1-ea.fitness[index]);
+	  printf("(%zu, %zu, %e)", population[index].i, population[index].j, fabs(ea.fitness[index]));
+	  if (c+1 < max_pop_size)
+	    {
+	      size_t index1 = ea.fitness_index[c+1];
+	      if ( (fabs(ea.fitness[index])) < (fabs(ea.fitness[index1])) )
+		printf(" < ");
+	      else if ( fabs(ea.fitness[index]) == fabs(ea.fitness[index1]) )
+		printf(" == ");
+	      else
+		printf(" >= ");
+	    }
+		
 	}
       printf("\n");
     }

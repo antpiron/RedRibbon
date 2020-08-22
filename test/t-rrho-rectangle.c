@@ -8,7 +8,7 @@
 int
 main(int argc, char *argv[argc])
 {
-  const double eps = 0.00000001;
+  const double eps = 1e-3;
   struct rrho rrho;
   size_t mres = 10;
   size_t nres = 10;
@@ -29,12 +29,12 @@ main(int argc, char *argv[argc])
   rrho_rectangle(&rrho, 0, 0, mres, nres,  mres, nres, res, RRHO_HYPER);
   exp = 1.0 / (double) n;
   ERROR_UNDEF_FATAL_FMT(0 != ale_doublecmp(res[0][0], exp, eps),
-			"FAIL: rrho_rectangle(0,0) pval = %f != %s\n", res[0][0], exp);
+			"FAIL: rrho_rectangle(0,0) pval = %.20e != %.20e\n", res[0][0], exp);
 
   rrho_rectangle(&rrho, n-mres, n-nres, mres, nres, mres, nres, res, RRHO_HYPER);
   exp = 1.0;
   ERROR_UNDEF_FATAL_FMT(0 != ale_doublecmp(res[mres-1][nres-1], exp, eps),
-			"FAIL: rrho_rectangle(0,0) pval = %f != %s\n", res[mres-1][nres-1], exp);
+			"FAIL: rrho_rectangle(0,0) pval = %.20e != %.20e\n", res[mres-1][nres-1], exp);
 
 
   // TODO: check 0 <= p-value <= 1
