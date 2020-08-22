@@ -281,7 +281,7 @@ rrho_rectangle_min(struct rrho *rrho, size_t i, size_t j, size_t ilen, size_t jl
 {
 #define ITER (200)
   // const size_t max_pop = ilen * jlen;
-  const size_t min_pop_size = 50;
+  const size_t min_pop_size = 100;
   const size_t max_pop_size = 500 + sqrt(rrho->n);
   struct params param = {.prob_mutation = 0.2, .sigma = 4.0, .mode = mode, .rrho = rrho,
 			 .i = i, .j = j, .ilen = ilen, .jlen = jlen};
