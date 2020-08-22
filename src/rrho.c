@@ -1,7 +1,7 @@
 #define _GNU_SOURCE
 #include <string.h>
 #include <stdlib.h>
-
+#include <float.h>
 
 #include "rrho.h"
 #include "ale.h"
@@ -229,7 +229,7 @@ fitness(struct rrho_coord x,  struct params *param)
   
   rrho_generic(param->rrho, x.i, x.j, &res, param->mode);
     
-  return - res.pvalue;
+  return 1 / (res.pvalue + DBL_MIN);
 }
 
 static size_t
@@ -279,7 +279,7 @@ int
 rrho_rectangle_min(struct rrho *rrho, size_t i, size_t j, size_t ilen, size_t jlen,
 		   struct rrho_coord *coord, int mode)
 {
-#define ITER (1000)
+#define ITER (200)
   // const size_t max_pop = ilen * jlen;
   const size_t min_pop_size = 50;
   const size_t max_pop_size = 500 + sqrt(rrho->n);
@@ -302,13 +302,13 @@ rrho_rectangle_min(struct rrho *rrho, size_t i, size_t j, size_t ilen, size_t jl
       for (size_t c = 0 ; c < ( (max_pop_size > 5 )?5:max_pop_size ) ; c++)
 	{
 	  size_t index = ea.fitness_index[c];
-	  printf("(%zu, %zu, %e)", population[index].i, population[index].j, fabs(ea.fitness[index]));
+	  printf("(%zu, %zu, %e)", population[index].i, population[index].j, ea.fitness[index]);
 	  if (c+1 < max_pop_size)
 	    {
 	      size_t index1 = ea.fitness_index[c+1];
-	      if ( (fabs(ea.fitness[index])) < (fabs(ea.fitness[index1])) )
+	      if ( ea.fitness[index] > ea.fitness[index1] )
 		printf(" < ");
-	      else if ( fabs(ea.fitness[index]) == fabs(ea.fitness[index1]) )
+	      else if ( ea.fitness[index] == ea.fitness[index1] )
 		printf(" == ");
 	      else
 		printf(" >= ");
