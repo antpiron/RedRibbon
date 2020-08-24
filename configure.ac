@@ -33,7 +33,7 @@ AC_CHECK_HEADERS([ale.h],,[AC_MSG_ERROR(The ale header is required in order to b
 INCLUDE_R_HEADER_PATH=""
 AC_CHECK_FILES([/usr/share/R/include/R.h /usr/share/R/include/Rinternals.h],
  	       [INCLUDE_R_HEADER_PATH="-I/usr/share/R/include/"
-	        AC_DEFINE([HAVE_R_H], [1], [Defined if you have the R head])],)
+	        AC_DEFINE([HAVE_R_H], [1], [Defined if you have the R header])],)
 AC_SUBST(INCLUDE_R_HEADER_PATH)
 
 # Checks for typedefs, structures, and compiler characteristics.
