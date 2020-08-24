@@ -1,4 +1,4 @@
-LDADD = ../src/librrho.la
+LDADD = $(top_srcdir)/src/librrho.la
 AM_LDFLAGS = -static
 AM_CFLAGS = -g -O0 -fsanitize=bounds -I$(top_srcdir)/src
 

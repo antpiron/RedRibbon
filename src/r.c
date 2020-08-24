@@ -5,18 +5,20 @@
 #include <R.h>
 #include <Rinternals.h>
 #include <Rdefines.h>
+#include <string.h>
 
 #include "rrho.h"
 
 struct rrho_c
 {
-  int i, j, ilen, jlen, mres, nres;
+  int i, j, ilen, jlen, m, n;
   double *a, *b;
-  const char *mode;
+  const char *strmode;
+  int mode;
 };
 
 SEXP
-rrho_r_rectangle(SEXP i, SEXP j, SEXP ilen, SEXP jlen, SEXP mres, SEXP nres, SEXP a, SEXP b, SEXP mode)
+rrho_r_rectangle(SEXP i, SEXP j, SEXP ilen, SEXP jlen, SEXP m, SEXP n, SEXP a, SEXP b, SEXP mode)
 {
   struct rrho rrho;
   int length_a = length(a);
@@ -27,7 +29,7 @@ rrho_r_rectangle(SEXP i, SEXP j, SEXP ilen, SEXP jlen, SEXP mres, SEXP nres, SEX
     error("The vectors a and b should be of equal size.");
   if ( ! isReal(a) )
      error("a is not a real.");
-  if ( ! isReal(jlen) )
+  if ( ! isReal(b) )
      error("b is not a real.");
 
   if ( ! isString(mode) )
@@ -46,21 +48,40 @@ rrho_r_rectangle(SEXP i, SEXP j, SEXP ilen, SEXP jlen, SEXP mres, SEXP nres, SEX
   
   struct rrho_c c =
     {
-     .i = INTEGER(i)[0], .j = INTEGER(j)[0],
+     .i = INTEGER(i)[0] - 1, .j = INTEGER(j)[0] - 1,
      .ilen = INTEGER(ilen)[0], .jlen = INTEGER(jlen)[0],
-     .mres = INTEGER(mres)[0], .nres = INTEGER(nres)[0],
+     .m = INTEGER(m)[0], .n = INTEGER(n)[0],
      .a = REAL(a), .b = REAL(b),
-     .mode = CHAR(STRING_PTR(mode)[0])
+     .strmode = CHAR(STRING_PTR(mode)[0]),
+     .mode = RRHO_HYPER
     };
+
+  if ( c.i < 0 )
+    error("i should be  greater or equal of 1.");
+  if ( c.j < 0 )
+    error("j should be  greater or equal of 1.");
+  if ( c.m > c.ilen )
+    error("m should be less than ilen.");
+  if ( c.n > c.jlen )
+    error("n should be less than jlen.");
+  /* enum {
+      RRHO_HYPER = 0,
+      RRHO_HYPER_TWO_TAILED,
+      RRHO_HYPER_TWO_TAILED_R_MODULE
+      }; */
+  if ( strcmp(c.strmode, "hyper-two-tailed") )
+    c.mode = RRHO_HYPER_TWO_TAILED;
+  else if ( strcmp(c.strmode, "hyper-two-tailed-old") )
+    c.mode = RRHO_HYPER_TWO_TAILED_R_MODULE;
   
   
-  ret = allocMatrix(REALSXP, c.mres, c.nres);
-  PROTECT(ret);
-  double (*array)[c.nres] = (void*) REAL(ret);
+ 
+  ret = PROTECT(allocMatrix(REALSXP, c.m, c.n));
+  double (*array)[c.n] = (void*) REAL(ret);
 
   rrho_init(&rrho, length_a, c.a, c.b);
 
-  rrho_rectangle(&rrho, c.i, c.j, c.ilen, c.jlen, c.mres, c.nres, array, RRHO_HYPER);
+  rrho_rectangle(&rrho, c.i, c.j, c.ilen, c.jlen, c.m, c.n, array, RRHO_HYPER);
 
   rrho_destroy(&rrho);
   
