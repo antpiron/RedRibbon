@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include <stdio.h>
-#include <sys/timeb.h>
+#include <time.h>
 
 #include "ale.h"
 #include "rrho.h"
@@ -12,7 +12,7 @@ main(int argc, char *argv[argc])
   struct rrho rrho;
   struct rrho_result res;
   double diff, rate;
-  struct timeb st, et;
+  struct timespec st, et;
 
   printf("%s: \n", argv[0]);
 
@@ -34,7 +34,7 @@ main(int argc, char *argv[argc])
       rrho_init(&rrho, n, a, b);
       
       
-      ftime(&st);
+      clock_gettime(CLOCK_REALTIME, &st);
       
       for (size_t i = 0 ; i < n ; i += step)
 	{
@@ -46,8 +46,8 @@ main(int argc, char *argv[argc])
 	  // printf("\n");
 	}
       
-      ftime(&et);
-      diff = (et.time - st.time) + (et.millitm - st.millitm) / 1000.0;
+      clock_gettime(CLOCK_REALTIME, &et);
+      diff = (et.tv_sec - st.tv_sec) + (et.tv_nsec - st.tv_nsec) / 1e9d;
       rate = n*n / diff / step / step;
   
       printf("%12.2F sec, %12.0F rrho/sec\n", diff, rate);

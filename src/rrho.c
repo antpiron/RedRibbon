@@ -152,7 +152,7 @@ rrho_hyper_two_tailed(struct rrho *rrho, size_t i, size_t j, struct rrho_result 
   if ( pval < min_pval )
     min_pval = pval;
 
-  pval = stats_hyper_tail(count-1, i+1, j+1, rrho->n, STATS_UPPER);
+  pval = stats_hyper_tail(count, i+1, j+1, rrho->n, STATS_UPPER);
   if  ( pval < min_pval )
     min_pval = pval;
   
@@ -276,8 +276,8 @@ mate(struct rrho_coord *x, struct rrho_coord m1, struct rrho_coord m2, struct pa
 EA_INIT(optim,struct rrho_coord,mate,mutate,fitness,struct params *);
 
 int
-rrho_rectangle_min(struct rrho *rrho, size_t i, size_t j, size_t ilen, size_t jlen,
-		   struct rrho_coord *coord, int mode)
+rrho_rectangle_min_ea(struct rrho *rrho, size_t i, size_t j, size_t ilen, size_t jlen,
+		      struct rrho_coord *coord, int mode)
 {
 #define ITER (200)
   // const size_t max_pop = ilen * jlen;
