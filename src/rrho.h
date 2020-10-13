@@ -46,7 +46,7 @@ int rrho_rectangle(struct rrho *rrho, size_t i, size_t j, size_t ilen, size_t jl
 		   size_t m, size_t n, double dst[m][n],
 		   int mode);
 int rrho_rectangle_min_ea(struct rrho *rrho, size_t i, size_t j, size_t ilen, size_t jlen,
-			  struct rrho_coord *coord, int mode);
+			  struct rrho_coord *coord, int mode, int direction);
 
 // inline
 

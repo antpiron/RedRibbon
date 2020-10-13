@@ -217,6 +217,7 @@ struct params
   double prob_mutation;
   double sigma;
   int mode;
+  int direction;
   size_t i, j, ilen, jlen;
   struct rrho *rrho;
 };
@@ -228,6 +229,8 @@ fitness(struct rrho_coord x,  struct params *param)
   struct rrho_result res;
   
   rrho_generic(param->rrho, x.i, x.j, &res, param->mode);
+  if ( copysign(1, res.direction) != copysign(1, param->direction) )
+    return 0;
 
   return 1 / (res.pvalue + DBL_MIN);
 }
@@ -277,14 +280,14 @@ EA_INIT(optim,struct rrho_coord,mate,mutate,fitness,struct params *);
 
 int
 rrho_rectangle_min_ea(struct rrho *rrho, size_t i, size_t j, size_t ilen, size_t jlen,
-		      struct rrho_coord *coord, int mode)
+		      struct rrho_coord *coord, int mode, int direction)
 {
 #define ITER (200)
   // const size_t max_pop = ilen * jlen;
   const size_t min_pop_size = 100;
   const size_t max_pop_size = 500 + sqrt(rrho->n);
   struct params param = {.prob_mutation = 0.2, .sigma = 4.0, .mode = mode, .rrho = rrho,
-			 .i = i, .j = j, .ilen = ilen, .jlen = jlen};
+			 .i = i, .j = j, .ilen = ilen, .jlen = jlen, .direction = direction};
   struct ea_optim ea;
   struct rrho_coord *population = malloc(max_pop_size * sizeof(struct rrho_coord));
 
