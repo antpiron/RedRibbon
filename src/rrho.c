@@ -6,22 +6,7 @@
 #include "rrho.h"
 #include "ale.h"
 #include "ale/ea.h"
-
-static int
-indirect_compar_double(const void *p1, const void *p2, void *arg)
-{
-  const double *d = arg;
-  const size_t *a = p1;
-  const size_t *b = p2;
-
-  if (d[*a] < d[*b])
-    return -1;
-  else if (d[*a] == d[*b])
-    return 0;
-  
-  return 1;
-}
-
+#include "ale/sort.h"
 
 
 int
@@ -34,14 +19,9 @@ rrho_init(struct rrho *rrho, size_t n, double a[n], double b[n])
 
   rrho->index_a = malloc(sizeof(size_t) * n);
   rrho->index_b = malloc(sizeof(size_t) * n);
-  for (size_t i = 0 ; i < n ; i++)
-    rrho->index_a[i] = rrho->index_b[i] = i;
 
-  qsort_r(rrho->index_a, n, sizeof(rrho->index_a[0]),
-	  indirect_compar_double, rrho->a);
-
-  qsort_r(rrho->index_b, n, sizeof(rrho->index_b[0]),
-	  indirect_compar_double, rrho->b);
+  sort_q_indirect(rrho->index_a, rrho->a, n, sizeof(double), sort_compar_double, NULL);
+  sort_q_indirect(rrho->index_b, rrho->b, n, sizeof(double), sort_compar_double, NULL);
 
   bitset_init(&rrho->bs_a,n);
   bitset_init(&rrho->bs_b, n);
