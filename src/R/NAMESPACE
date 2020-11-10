@@ -1,4 +1,4 @@
 ##useDynLib(RedRibbon, rrho_r_rectangle)
 useDynLib(RedRibbon)
 
-export("rrho_rectangle")
+export("rrho_rectangle", "rrho_ij")

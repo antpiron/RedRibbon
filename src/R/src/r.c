@@ -254,6 +254,7 @@ rrho_r_rrho(SEXP i, SEXP j, SEXP a, SEXP b, SEXP mode)
 
 static const R_CallMethodDef callMethods[]  = {
   {"rrho_r_rectangle", (DL_FUNC) &rrho_r_rectangle, 9},
+  {"rrho_r_rrho", (DL_FUNC) &rrho_r_rrho, 5},
   {NULL, NULL, 0}
 };
 
