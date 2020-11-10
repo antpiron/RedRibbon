@@ -1,0 +1,13 @@
+Package: RedRibbon
+Version: 0.1-1
+Date: 2020-11-10
+Title: A very fast rank-rank hypergeometric overlap implementation
+Authors@R: c(person("Anthony", "Piron",
+	            role = c("aut", "cre"),
+                    email = "anthony.piron@ulb.ac.be"))
+Author: Anthony Piron [aut, cre]
+Maintainer: Anthony Piron <anthony.piron@ulb.ac.be>
+Depends: R (>= 3.1.0)
+Description: This package provides a very fast and accurate
+  rank-rank hypergeometric overlap implementation.
+License: BSD_3_clause
