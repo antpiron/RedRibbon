@@ -11,3 +11,5 @@ Depends: R (>= 3.1.0)
 Description: This package provides a very fast and accurate
   rank-rank hypergeometric overlap implementation.
 License: BSD_3_clause
+Suggests: 
+    testthat

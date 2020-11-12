@@ -2,7 +2,7 @@ AM_CFLAGS = -Wall -Wextra -I$(top_srcdir) $(INCLUDE_R_HEADER_PATH)
 AM_LFLAGS=-R
 
 
-LIBRARY_SOURCES=rrho.c rrho.h r.c
+LIBRARY_SOURCES=rrho.c rrho.h 
 
 lib_LTLIBRARIES = librrho.la 
 #noinst_lib_LTLIBRARIES=libale-debug.la

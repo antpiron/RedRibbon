@@ -19,10 +19,11 @@ struct rrho_c
   const char *strdirection;
   int mode;
   int direction;
+  int log;
 };
 
 SEXP
-rrho_r_rectangle(SEXP i, SEXP j, SEXP ilen, SEXP jlen, SEXP m, SEXP n, SEXP a, SEXP b, SEXP mode)
+rrho_r_rectangle(SEXP i, SEXP j, SEXP ilen, SEXP jlen, SEXP m, SEXP n, SEXP a, SEXP b, SEXP mode, SEXP log_flag)
 {
   struct rrho rrho;
   int length_a = length(a);
@@ -49,6 +50,9 @@ rrho_r_rectangle(SEXP i, SEXP j, SEXP ilen, SEXP jlen, SEXP m, SEXP n, SEXP a, S
   if ( ! isInteger(jlen) )
      error("jlen is not an integer.");
 
+  if ( ! isLogical(log_flag) )
+     error("log_flag is not a boolean.");
+
   
   struct rrho_c c =
     {
@@ -57,7 +61,8 @@ rrho_r_rectangle(SEXP i, SEXP j, SEXP ilen, SEXP jlen, SEXP m, SEXP n, SEXP a, S
      .m = INTEGER(m)[0], .n = INTEGER(n)[0],
      .a = REAL(a), .b = REAL(b),
      .strmode = CHAR(STRING_PTR(mode)[0]),
-     .mode = RRHO_HYPER
+     .mode = RRHO_HYPER,
+     .log = 0
     };
 
   if ( c.i < 0 )
@@ -85,7 +90,7 @@ rrho_r_rectangle(SEXP i, SEXP j, SEXP ilen, SEXP jlen, SEXP m, SEXP n, SEXP a, S
 
   rrho_init(&rrho, length_a, c.a, c.b);
 
-  rrho_rectangle(&rrho, c.i, c.j, c.ilen, c.jlen, c.m, c.n, array, c.mode);
+  rrho_rectangle(&rrho, c.i, c.j, c.ilen, c.jlen, c.m, c.n, array, c.mode, c.log);
 
   rrho_destroy(&rrho);
   
@@ -253,7 +258,8 @@ rrho_r_rrho(SEXP i, SEXP j, SEXP a, SEXP b, SEXP mode)
 }
 
 static const R_CallMethodDef callMethods[]  = {
-  {"rrho_r_rectangle", (DL_FUNC) &rrho_r_rectangle, 9},
+  {"rrho_r_rectangle", (DL_FUNC) &rrho_r_rectangle, 10},
+  {"rrho_r_rectangle_min_ea", (DL_FUNC) &rrho_r_rectangle_min_ea, 8},
   {"rrho_r_rrho", (DL_FUNC) &rrho_r_rrho, 5},
   {NULL, NULL, 0}
 };
