@@ -188,11 +188,37 @@ rrho_rectangle(struct rrho *rrho, size_t i, size_t j, size_t ilen, size_t jlen,
 	  pvalue = res.pvalue;
 	  if (log_flag)
 	    {
-	      if ( 0 == pvalue )
-		pvalue = DBL_MIN;
-	      pvalue = -log(res.pvalue);
+	      if ( pvalue < DBL_MIN )
+		pvalue = 708.3964;
+	      else
+		pvalue = -log(pvalue);
 	    }
 	  dst[y][x] = copysign(pvalue, res.direction);
+	}
+    }
+  
+  return 0;
+}
+
+int
+rrho_rectangle_min(struct rrho *rrho, size_t i, size_t j, size_t ilen, size_t jlen,
+		   struct rrho_coord *coord, int mode, int direction)
+{
+  struct rrho_result res;
+  double pvalue = 1.1;
+  
+  for (size_t  jj = j ; jj < jlen ; jj++)
+    {
+      for (size_t ii = i ; ii < ilen ; ii++)
+	{
+	  rrho_generic(rrho, ii, jj, &res, mode);
+
+	  if ( copysign(1, res.direction) != copysign(1, direction) && res.pvalue < pvalue )
+	    {
+	      pvalue = res.pvalue;
+	      coord->i = ii;
+	      coord->j = jj;
+	    }
 	}
     }
   
