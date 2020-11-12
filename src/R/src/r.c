@@ -62,7 +62,7 @@ rrho_r_rectangle(SEXP i, SEXP j, SEXP ilen, SEXP jlen, SEXP m, SEXP n, SEXP a, S
      .a = REAL(a), .b = REAL(b),
      .strmode = CHAR(STRING_PTR(mode)[0]),
      .mode = RRHO_HYPER,
-     .log = 0
+     .log = LOGICAL(log_flag)[0]
     };
 
   if ( c.i < 0 )
