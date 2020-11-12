@@ -1,4 +1,4 @@
 ##useDynLib(RedRibbon, rrho_r_rectangle)
 useDynLib(RedRibbon)
 
-export("rrho_rectangle", "rrho_ij")
+export("rrho_rectangle", "rrho_rectangle_min_ea", "rrho_ij", "rrho_plot")

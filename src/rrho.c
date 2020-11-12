@@ -188,10 +188,9 @@ rrho_rectangle(struct rrho *rrho, size_t i, size_t j, size_t ilen, size_t jlen,
 	  pvalue = res.pvalue;
 	  if (log_flag)
 	    {
-	      if ( pvalue < DBL_MIN )
+	      pvalue = -log(pvalue);
+	      if ( isinf(pvalue) )
 		pvalue = 708.3964;
-	      else
-		pvalue = -log(pvalue);
 	    }
 	  dst[y][x] = copysign(pvalue, res.direction);
 	}
