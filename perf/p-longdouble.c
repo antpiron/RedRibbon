@@ -17,8 +17,8 @@ main(int argc, char *argv[argc])
   struct timespec st, et;
 
   printf("%s: \n", argv[0]);
-  printf("sizeof(double)      = %d,  DBL_MIN = %e\n", sizeof(double), DBL_MIN);
-  printf("sizeof(long double) = %d, LDBL_MIN = %Le \n", sizeof(long double), LDBL_MIN);
+  printf("sizeof(double)      = %2d,  DBL_MIN = %e\n", sizeof(double), DBL_MIN);
+  printf("sizeof(long double) = %2d, LDBL_MIN = %Le \n", sizeof(long double), LDBL_MIN);
 
   clock_gettime(CLOCK_REALTIME, &st);
 
