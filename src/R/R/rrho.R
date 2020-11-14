@@ -21,10 +21,39 @@ rrho_ij  <- function (i, j, a, b, mode=c("hyper"))
     .Call("rrho_r_rrho", as.integer(i), as.integer(j), as.double(a), as.double(b), as.character(mode))
 }
 
-rrho_plot <- function (a,b)
+newRRHO <- function (self, ...)
+{
+    UseMethod("newRRHO")
+}
+
+newRRHO.data.frame <- function (self)
+{
+    if ( ! "a" %in% colnames(self))
+        stop("Column 'a' is missing!")
+    if ( ! "b" %in% colnames(self))
+        stop("Column 'b' is missing!")
+    
+    structure(
+        list(data = self),
+        class = "rrho"
+    )
+}
+
+newRRHO.numeric <- function (a, b)
+{
+    if (length(a) != length(b))
+        stop("'a' and 'b' parameters should be of same length!")
+    newRRHO(data.frame(a=a, b=b))
+}
+
+rrho_plot <- function (a,b, n.dots=500)
 {
     n <- length(a)
-    rrho <- rrho_rectangle(1,1,n,n, 100, 100, a, b, LOG=TRUE)
+    if (n.dots > n)
+        n.dots  <- n
+    rrho <- rrho_rectangle(1,1, n, n, n.dots, n.dots, a, b, LOG=TRUE)
 
-    ggplot(melt(rrho), aes(Var1,Var2, fill=value)) + geom_raster()
+
+    ggplot(melt(rrho), aes(Var1,Var2, fill=value)) + geom_raster() +
+        scale_fill_gradientn(colours=c('#021893', "#3537ae", "#740699", "#b70b0b", "#990623"))
 }
