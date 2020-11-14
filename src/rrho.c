@@ -93,8 +93,8 @@ rrho_hyper_two_tailed_as_r_module(struct rrho *rrho, size_t i, size_t j, struct 
   //    2*min(stats_hyper_F(count, i+1, j+1, rrho->n), 1.0 - stats_hyper_F(count-1, i+1, j+1, rrho->n),  0.5)
   // double stats_hyper_F(long k, long K, long n, long N)
   size_t count = count_intersect(rrho, i, j);
-  double mean = (double) (i+1) * (double) (j+1) / rrho->n;
-  double symmetric = 2*mean - count;
+  long double mean = (double) (i+1) * (double) (j+1) / rrho->n;
+  long double symmetric = 2*mean - count;
   long lower = (count < symmetric)?count:ceil(symmetric);
   long upper = (count < symmetric)?floor(symmetric):count;
 
@@ -103,8 +103,8 @@ rrho_hyper_two_tailed_as_r_module(struct rrho *rrho, size_t i, size_t j, struct 
   else
     res->direction = 1;
   
-  res->pvalue = stats_hyper_F(lower, i+1, j+1, rrho->n) +
-    stats_hyper_tail(upper, i+1, j+1, rrho->n, STATS_UPPER);
+  res->pvalue = stats_hyper_Fl(lower, i+1, j+1, rrho->n) +
+    stats_hyper_taill(upper, i+1, j+1, rrho->n, STATS_UPPER);
   // res->fdr = (0 == count)?-1:mean / count;
   res->count = count;
   
@@ -118,9 +118,9 @@ rrho_hyper_two_tailed(struct rrho *rrho, size_t i, size_t j, struct rrho_result 
   //    2*min(stats_hyper_F(count, i+1, j+1, rrho->n), 1.0 - stats_hyper_F(count-1, i+1, j+1, rrho->n),  0.5)
   // double stats_hyper_F(long k, long K, long n, long N)
   size_t count = count_intersect(rrho, i, j);
-  double mean = (double) (i+1) * (double) (j+1) / rrho->n;
-  double min_pval = 0.5;
-  double pval;
+  long double mean = (double) (i+1) * (double) (j+1) / rrho->n;
+  long double min_pval = 0.5;
+  long double pval;
   
 
   if ( (double) count <= mean )
@@ -128,11 +128,11 @@ rrho_hyper_two_tailed(struct rrho *rrho, size_t i, size_t j, struct rrho_result 
   else
     res->direction = 1;
 
-  pval = stats_hyper_F(count, i+1, j+1, rrho->n);
+  pval = stats_hyper_Fl(count, i+1, j+1, rrho->n);
   if ( pval < min_pval )
     min_pval = pval;
 
-  pval = stats_hyper_tail(count, i+1, j+1, rrho->n, STATS_UPPER);
+  pval = stats_hyper_taill(count, i+1, j+1, rrho->n, STATS_UPPER);
   if  ( pval < min_pval )
     min_pval = pval;
   
@@ -149,16 +149,16 @@ rrho_hyper(struct rrho *rrho, size_t i, size_t j, struct rrho_result *res)
   // https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2943622/
   // double stats_hyper_F(long k, long K, long n, long N)
   size_t count = count_intersect(rrho, i, j);
-  double mean = (double) (i+1) * (double) (j+1) / rrho->n;
+  long double mean = (double) (i+1) * (double) (j+1) / rrho->n;
 
   if ( (double) count < mean )
     {
-      res->pvalue = stats_hyper_F(count, i+1, j+1, rrho->n);
+      res->pvalue = stats_hyper_Fl(count, i+1, j+1, rrho->n);
       res->direction = -1;
     }
   else
     {
-      res->pvalue = stats_hyper_tail(count, i+1, j+1, rrho->n, STATS_UPPER);
+      res->pvalue = stats_hyper_taill(count, i+1, j+1, rrho->n, STATS_UPPER);
       res->direction = 1;
     }
   // res->fdr = (0 == count)?-1:mean / count;
@@ -175,7 +175,7 @@ rrho_rectangle(struct rrho *rrho, size_t i, size_t j, size_t ilen, size_t jlen,
   struct rrho_result res;
   size_t istep = ilen / m;
   size_t jstep = jlen / n;
-  double pvalue;
+  long double pvalue;
   
   for (size_t y = 0 ; y < m ; y++)
     {
@@ -188,11 +188,13 @@ rrho_rectangle(struct rrho *rrho, size_t i, size_t j, size_t ilen, size_t jlen,
 	  pvalue = res.pvalue;
 	  if (log_flag)
 	    {
-	      pvalue = -log(pvalue);
-	      if ( isinf(pvalue) )
-		pvalue = 708.3964;
+	      pvalue = -logl(pvalue);
+	      if ( isinfl(pvalue) )
+		pvalue = -logl(LDBL_MIN);
+	      if ( isinfl(pvalue) )
+		pvalue = 1.135514e+04;
 	    }
-	  dst[y][x] = copysign(pvalue, res.direction);
+	  dst[y][x] = copysignl(pvalue, res.direction);
 	}
     }
   
@@ -204,7 +206,7 @@ rrho_rectangle_min(struct rrho *rrho, size_t i, size_t j, size_t ilen, size_t jl
 		   struct rrho_coord *coord, int mode, int direction)
 {
   struct rrho_result res;
-  double pvalue = 1.1;
+  long double pvalue = 1.1;
   
   for (size_t  jj = j ; jj < jlen ; jj++)
     {
@@ -240,12 +242,15 @@ static double
 fitness(struct rrho_coord x,  struct params *param)
 {
   struct rrho_result res;
+  long double ret;
   
   rrho_generic(param->rrho, x.i, x.j, &res, param->mode);
   if ( copysign(1, res.direction) != copysign(1, param->direction) )
     return 0;
 
-  return 1 / (res.pvalue + DBL_MIN);
+  ret = -logl(res.pvalue + LDBL_MIN);
+  
+  return (ret < 0)?0:ret;
 }
 
 static size_t

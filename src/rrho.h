@@ -23,8 +23,8 @@ struct rrho
 
 struct rrho_result
 {
-  double pvalue;
-  double fdr;
+  long double pvalue;
+  long double fdr;
   int direction;
   size_t count;
 };
