@@ -100,6 +100,89 @@ rrho_r_rectangle(SEXP i, SEXP j, SEXP ilen, SEXP jlen, SEXP m, SEXP n, SEXP a, S
 }
 
 SEXP
+rrho_r_rectangle_min(SEXP i, SEXP j, SEXP ilen, SEXP jlen, SEXP m, SEXP n, SEXP a, SEXP b, SEXP mode, SEXP direction)
+{
+  struct rrho rrho;
+  int length_a = length(a);
+  int length_b = length(b);
+  struct rrho_coord coord;
+  SEXP ret;
+
+  if ( length_a != length_b )
+    error("The vectors a and b should be of equal size.");
+  if ( ! isReal(a) )
+     error("a is not a real.");
+  if ( ! isReal(b) )
+     error("b is not a real.");
+
+  if ( ! isString(mode) )
+    error("Mode is not a string.");
+  
+  if ( ! isInteger(i) )
+     error("i is not an integer.");
+  if ( ! isInteger(j) )
+     error("j is not an integer.");
+
+  if ( ! isInteger(ilen) )
+     error("ilen is not an integer.");
+  if ( ! isInteger(jlen) )
+     error("jlen is not an integer.");
+
+  if ( ! isString(direction) )
+    error("Direction is not a string.");
+
+
+  
+  struct rrho_c c =
+    {
+     .i = INTEGER(i)[0] - 1, .j = INTEGER(j)[0] - 1,
+     .ilen = INTEGER(ilen)[0], .jlen = INTEGER(jlen)[0],
+     .m = INTEGER(m)[0], .n = INTEGER(n)[0],
+     .a = REAL(a), .b = REAL(b),
+     .strmode = CHAR(STRING_PTR(mode)[0]),
+     .mode = RRHO_HYPER,
+      .strdirection = CHAR(STRING_PTR(direction)[0]),
+    };
+
+  if ( c.i < 0 )
+    error("i should be  greater or equal of 1.");
+  if ( c.j < 0 )
+    error("j should be  greater or equal of 1.");
+  if ( c.m > c.ilen )
+    error("m should be less than ilen.");
+  if ( c.n > c.jlen )
+    error("n should be less than jlen.");
+  /* enum {
+      RRHO_HYPER = 0,
+      RRHO_HYPER_TWO_TAILED,
+      RRHO_HYPER_TWO_TAILED_R_MODULE
+      }; */
+  if ( 0 == strcmp(c.strmode, "hyper-two-tailed") )
+    c.mode = RRHO_HYPER_TWO_TAILED;
+  else if ( 0 == strcmp(c.strmode, "hyper-two-tailed-old") )
+    c.mode = RRHO_HYPER_TWO_TAILED_R_MODULE;
+  
+  if ( 0 !=  strcmp(c.strdirection, "enrichment") )
+    c.direction = -1;
+
+ 
+  ret =  PROTECT(allocVector(INTSXP, 2));
+  long (*array)[c.n] = (void*) INTEGER(ret);
+
+  rrho_init(&rrho, length_a, c.a, c.b);
+
+  rrho_rectangle_min(&rrho, c.i, c.j, c.ilen, c.jlen, c.m, c.n, &coord, c.mode, c.direction);
+  (*array)[0] = coord.i + 1;
+  (*array)[1] = coord.j + 1;
+
+  rrho_destroy(&rrho);
+  
+  UNPROTECT(1);
+  
+  return ret;
+}
+
+SEXP
 rrho_r_rectangle_min_ea(SEXP i, SEXP j, SEXP ilen, SEXP jlen, SEXP a, SEXP b, SEXP mode, SEXP direction)
 // int
 // rrho_r_rectangle_min_ea(struct rrho *rrho, size_t i, size_t j, size_t ilen, size_t jlen,
@@ -164,7 +247,7 @@ rrho_r_rectangle_min_ea(SEXP i, SEXP j, SEXP ilen, SEXP jlen, SEXP a, SEXP b, SE
     c.mode = RRHO_HYPER_TWO_TAILED_R_MODULE;
 
   if ( 0 !=  strcmp(c.strdirection, "enrichment") )
-    c.direction = 1;
+    c.direction = -1;
   
   ret = PROTECT(allocVector(INTSXP, 2));
   long (*array)[c.n] = (void*) INTEGER(ret);
@@ -259,6 +342,7 @@ rrho_r_rrho(SEXP i, SEXP j, SEXP a, SEXP b, SEXP mode)
 
 static const R_CallMethodDef callMethods[]  = {
   {"rrho_r_rectangle", (DL_FUNC) &rrho_r_rectangle, 10},
+  {"rrho_r_rectangle_min", (DL_FUNC) &rrho_r_rectangle_min, 10},
   {"rrho_r_rectangle_min_ea", (DL_FUNC) &rrho_r_rectangle_min_ea, 8},
   {"rrho_r_rrho", (DL_FUNC) &rrho_r_rrho, 5},
   {NULL, NULL, 0}

@@ -13,10 +13,15 @@ main(int argc, char *argv[argc])
   struct rrho_coord coord;
   struct rrho_result res;
   size_t n = 512;
+  size_t n10perc = (n * 10) / 100;
   double *a = malloc(n * sizeof(double));
   double *b = malloc(n * sizeof(double));
   size_t exp_i = n / 2 - 1;
   size_t exp_j = n / 2 - 1;
+  size_t exp_n10perc = (n10perc + 1) / 2;
+  size_t exp_n10perc_i =  n - exp_n10perc;
+  size_t exp_n10perc_j =  n - exp_n10perc;
+
 
   for (size_t i = 0 ; i < n ; i++)
     {
@@ -49,6 +54,24 @@ main(int argc, char *argv[argc])
 			n, n, n_i, n_j, res.pvalue, eps);
 
   
+  for (size_t i = 0 ; i < n ; i++)
+    {
+      a[i] = i; // stats_unif_std_rand();
+      b[i] = (i + n - n10perc) % n; // stats_unif_std_rand();
+    }
+  
+  rrho_init(&rrho, n, a, b);
+  
+  rrho_rectangle_min(&rrho, 0, 0, n, n, n, n, &coord, RRHO_HYPER, 1);
+  rrho_hyper(&rrho, coord.i, coord.j, &res);
+
+
+  ERROR_UNDEF_FATAL_FMT(labs(exp_i - coord.i) >= exp_n10perc_i  || labs(exp_j - coord.j) >= exp_n10perc_j, 
+  			"FAIL: rrho_rectangle_min(0,0,%zu,%zu) coord = (%zu,%zu) != (%zu, %zu)\n",
+			n, n, coord.i, coord.j, exp_i, exp_j);
+  ERROR_UNDEF_FATAL_FMT(res.pvalue >= eps, 
+  			"FAIL: rrho_rectangle_min(0,0,%zu,%zu) pvalue = %Le >= %e\n",
+			n, n, res.pvalue, eps);
 
   rrho_destroy(&rrho);
   free(a);

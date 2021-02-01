@@ -8,6 +8,12 @@ rrho_rectangle  <- function (i, j, i.len, j.len, m, n, a, b, mode=c("hyper"), LO
           as.integer(m), as.integer(n), as.double(a), as.double(b), as.character(mode), as.logical(LOG))
 }
 
+rrho_rectangle_min  <- function (i, j, i.len, j.len, m, n, a, b, mode=c("hyper"), direction)
+{
+    .Call("rrho_r_rectangle_min", as.integer(i), as.integer(j), as.integer(i.len), as.integer(j.len),
+          as.integer(m), as.integer(n), as.double(a), as.double(b), as.character(mode), as.character(direction))
+}
+
 
 rrho_rectangle_min_ea  <- function (i, j, i.len, j.len, a, b, mode=c("hyper"), direction="enrichment")
 {
@@ -54,6 +60,6 @@ rrho_plot <- function (a,b, n.dots=500)
     rrho <- rrho_rectangle(1,1, n, n, n.dots, n.dots, a, b, LOG=TRUE)
 
 
-    ggplot(melt(rrho), aes(Var1,Var2, fill=value)) + geom_raster() +
-        scale_fill_gradientn(colours=c('#021893', "#3537ae", "#740699", "#b70b0b", "#990623"))
+    ggplot2::ggplot(reshape2::melt(rrho),  ggplot2::aes(Var1,Var2, fill=value)) +  ggplot2::geom_raster() +
+         ggplot2::scale_fill_gradientn(colours=c('#021893', "#3537ae", "#740699", "#b70b0b", "#990623"))
 }
