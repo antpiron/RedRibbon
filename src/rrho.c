@@ -167,6 +167,23 @@ rrho_hyper(struct rrho *rrho, size_t i, size_t j, struct rrho_result *res)
   return 0;
 }
 
+static long double
+mylogl(long double x)
+{
+  long double res;
+  
+  res = logl(x);
+  
+  if ( isinfl(res) )
+    res = logl(LDBL_MIN);
+  
+  // LDBL_MIN == 3.36210314311209350626e-4932 (on x86); log = -4928.485
+  if ( isinfl(res) )
+    res = 4928.485;
+
+  return res;
+}
+
 int
 rrho_rectangle(struct rrho *rrho, size_t i, size_t j, size_t ilen, size_t jlen,
 	       size_t m, size_t n, double dst[m][n],
@@ -188,11 +205,7 @@ rrho_rectangle(struct rrho *rrho, size_t i, size_t j, size_t ilen, size_t jlen,
 	  pvalue = res.pvalue;
 	  if (log_flag)
 	    {
-	      pvalue = -logl(pvalue);
-	      if ( isinfl(pvalue) )
-		pvalue = -logl(LDBL_MIN);
-	      if ( isinfl(pvalue) )
-		pvalue = 1.135514e+04;
+	      pvalue = -mylogl(pvalue);
 	    }
 	  dst[y][x] = copysignl(pvalue, res.direction);
 	}
@@ -203,18 +216,22 @@ rrho_rectangle(struct rrho *rrho, size_t i, size_t j, size_t ilen, size_t jlen,
 
 int
 rrho_rectangle_min(struct rrho *rrho, size_t i, size_t j, size_t ilen, size_t jlen,
-		   struct rrho_coord *coord, int mode, int direction)
+		    size_t m, size_t n, struct rrho_coord *coord, int mode, int direction)
 {
   struct rrho_result res;
+  size_t istep = ilen / m;
+  size_t jstep = jlen / n;
   long double pvalue = 1.1;
   
-  for (size_t  jj = j ; jj < jlen ; jj++)
+  for (size_t y = 0 ; y < m ; y++)
     {
-      for (size_t ii = i ; ii < ilen ; ii++)
+      for (size_t x = 0 ; x < n ; x++)
 	{
+	  size_t ii = i + y * istep;
+	  size_t jj = j + x * jstep;
 	  rrho_generic(rrho, ii, jj, &res, mode);
 
-	  if ( copysign(1, res.direction) != copysign(1, direction) && res.pvalue < pvalue )
+	  if ( copysign(1, res.direction) == copysign(1, direction) && res.pvalue < pvalue )
 	    {
 	      pvalue = res.pvalue;
 	      coord->i = ii;
