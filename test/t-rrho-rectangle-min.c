@@ -31,20 +31,22 @@ main(int argc, char *argv[argc])
   
   ERROR_UNDEF_FATAL_FMT(exp_i != coord.i || exp_j != coord.j, 
   			"FAIL: rrho_rectangle_min(0,0,%zu,%zu) coord = (%zu,%zu) != (%zu, %zu)\n",
-			coord.i, coord.j, exp_i, exp_j);
+			n, n, coord.i, coord.j, exp_i, exp_j);
   ERROR_UNDEF_FATAL_FMT(res.pvalue >= eps, 
   			"FAIL: rrho_rectangle_min(0,0,%zu,%zu) pvalue = %Le >= %e\n",
-			res.pvalue, eps);
+			n, n, res.pvalue, eps);
 
-  rrho_rectangle_min(&rrho, 0, 0, n, n, n/2, n/2, &coord, RRHO_HYPER, 1);
+  size_t n_i = 2;
+  size_t n_j = 2; 
+  rrho_rectangle_min(&rrho, 0, 0, n, n, n/n_i, n/n_j, &coord, RRHO_HYPER, 1);
   rrho_hyper(&rrho, coord.i, coord.j, &res);
   
-  ERROR_UNDEF_FATAL_FMT(exp_i != coord.i || exp_j != coord.j, 
-  			"FAIL: rrho_rectangle_min(0,0,%zu,%zu) coord = (%zu,%zu) != (%zu, %zu)\n",
-			coord.i, coord.j, exp_i, exp_j);
+  ERROR_UNDEF_FATAL_FMT( labs(exp_i - coord.i) >= n_i || labs(exp_j - coord.j) >= n_j, 
+  			"FAIL: rrho_rectangle_min(0, 0, %zu, %zu, %zu, %zu) coord = (%zu,%zu) != (%zu, %zu)\n",
+			 n, n, n_i, n_j, coord.i, coord.j, exp_i, exp_j);
   ERROR_UNDEF_FATAL_FMT(res.pvalue >= eps, 
-  			"FAIL: rrho_rectangle_min(0,0,%zu,%zu) pvalue = %Le >= %e\n",
-			res.pvalue, eps);
+  			"FAIL: rrho_rectangle_min(0, 0, %zu, %zu, %zu, %zu) pvalue = %Le >= %e\n",
+			n, n, n_i, n_j, res.pvalue, eps);
 
   
 

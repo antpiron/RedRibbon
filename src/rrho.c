@@ -193,6 +193,11 @@ rrho_rectangle(struct rrho *rrho, size_t i, size_t j, size_t ilen, size_t jlen,
   size_t istep = ilen / m;
   size_t jstep = jlen / n;
   long double pvalue;
+
+  if ( 0 == istep )
+    istep = 1;
+  if ( 0 == jstep )
+    jstep = 1;
   
   for (size_t y = 0 ; y < m ; y++)
     {
@@ -222,6 +227,12 @@ rrho_rectangle_min(struct rrho *rrho, size_t i, size_t j, size_t ilen, size_t jl
   size_t istep = ilen / m;
   size_t jstep = jlen / n;
   long double pvalue = 1.1;
+
+  if ( 0 == istep )
+    istep = 1;
+  if ( 0 == jstep )
+    jstep = 1;
+  
   
   for (size_t y = 0 ; y < m ; y++)
     {
