@@ -12,7 +12,7 @@ main(int argc, char *argv[argc])
   struct rrho rrho;
   struct rrho_coord coord;
   struct rrho_result res;
-  size_t n = 1024;
+  size_t n = 512;
   double *a = malloc(n * sizeof(double));
   double *b = malloc(n * sizeof(double));
   size_t exp_i = n / 2 - 1;
@@ -27,6 +27,16 @@ main(int argc, char *argv[argc])
   rrho_init(&rrho, n, a, b);
   
   rrho_rectangle_min(&rrho, 0, 0, n, n, n, n, &coord, RRHO_HYPER, 1);
+  rrho_hyper(&rrho, coord.i, coord.j, &res);
+  
+  ERROR_UNDEF_FATAL_FMT(exp_i != coord.i || exp_j != coord.j, 
+  			"FAIL: rrho_rectangle_min(0,0,%zu,%zu) coord = (%zu,%zu) != (%zu, %zu)\n",
+			coord.i, coord.j, exp_i, exp_j);
+  ERROR_UNDEF_FATAL_FMT(res.pvalue >= eps, 
+  			"FAIL: rrho_rectangle_min(0,0,%zu,%zu) pvalue = %Le >= %e\n",
+			res.pvalue, eps);
+
+  rrho_rectangle_min(&rrho, 0, 0, n, n, n/2, n/2, &coord, RRHO_HYPER, 1);
   rrho_hyper(&rrho, coord.i, coord.j, &res);
   
   ERROR_UNDEF_FATAL_FMT(exp_i != coord.i || exp_j != coord.j, 
