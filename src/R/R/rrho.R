@@ -78,7 +78,7 @@ newRRHO.numeric <- function (a, b)
     newRRHO(data.frame(a=a, b=b))
 }
 
-setoptions.rrho <- function(self, enrichment_mode=NULL, ggplot_colours = NULL, draw_quadrants = NULL,  draw_minimal_pvalue = NULL)
+setoptions.rrho <- function(self, enrichment_mode=NULL, ggplot_colours = NULL, draw_quadrants = NULL,  draw_minimal_pvalue = NULL, labels = NULL)
 {
     if (! is.null(enrichment_mode) )
         self$enrichment_mode  <- enrichment_mode
@@ -91,13 +91,16 @@ setoptions.rrho <- function(self, enrichment_mode=NULL, ggplot_colours = NULL, d
 
     if (! is.null(draw_minimal_pvalue) )
         self$draw_minimal_pvalue  <- draw_minimal_pvalue
+
+    if (! is.null(labels) )
+        self$labels  <- labels
     
     return(self)
 }
 
 ggplot.rrho <- function (self, n = NULL)
 {
-    len <- length(self.a)
+    len <- length(self$data$a)
 
     if ( is.null(n) )
         n <- max(sqrt(len), 300)
@@ -107,9 +110,9 @@ ggplot.rrho <- function (self, n = NULL)
 
     rrho <- rrho_rectangle(1, 1, len, len, n.i, n.j, self$data$a, self$data$b,  mode=self$enrichment_mode, LOG=TRUE)
 
-    self$gg <-  ggplot2::ggplot(reshape2::melt(rrho),  ggplot2::aes(Var1,Var2, fill=value)) +  ggplot2::geom_raster() +
+    gg <-  ggplot2::ggplot(reshape2::melt(rrho),  ggplot2::aes(Var1,Var2, fill=value)) +  ggplot2::geom_raster() +
         ggplot2::scale_fill_gradientn(colours=self$ggplot_colours)
     
-    return(self)
+    return(gg)
 }
 
