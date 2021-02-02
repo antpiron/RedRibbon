@@ -39,9 +39,9 @@ newRRHO <- function (self, ...)
     UseMethod("newRRHO")
 }
 
-enrichment_mode <- function (self, ...)
+setoptions <- function (self, ...)
 {
-    UseMethod("enrichment_mode")
+    UseMethod("setoptions")
 }
 
 ### S3 Body
@@ -56,12 +56,21 @@ newRRHO.data.frame <- function (df)
     structure(
         list(data = df,
              enrichment_mode = c("hyper"),
-             ggplot_colours = c('#021893', "#3537ae", "#740699", "#b70b0b", "#990623")
+             ggplot_colours = c('#021893', "#3537ae", "#740699", "#b70b0b", "#990623"),
+             draw_quadrants = FALSE,
+             draw_minimal_pvalue = FALSE
              ),
         class = "rrho"
     )
 }
 
+#' Create a rrho S3 object from two vectors of values
+#' 
+#' @param a A vector of float.
+#' @param y A vector of float.
+#' @return A rrho S3 object.
+#' @examples
+#' newRRHO(c(0.5, 0.7,0.3, 0.8), c(0.6,0.6,0.4,0.7))
 newRRHO.numeric <- function (a, b)
 {
     if (length(a) != length(b))
@@ -69,9 +78,19 @@ newRRHO.numeric <- function (a, b)
     newRRHO(data.frame(a=a, b=b))
 }
 
-enrichment_mode.character <- function(self, mode)
+setoptions.rrho <- function(self, enrichment_mode=NULL, ggplot_colours = NULL, draw_quadrants = NULL,  draw_minimal_pvalue = NULL)
 {
-    self$enrichment_mode <- mode
+    if (! is.null(enrichment_mode) )
+        self$enrichment_mode  <- enrichment_mode
+
+    if (! is.null(ggplot_colours) )
+        self$ggplot_colours  <- ggplot_colours
+
+    if (! is.null(draw_quadrants) )
+        self$draw_quadrants  <- draw_quadrants
+
+    if (! is.null(draw_minimal_pvalue) )
+        self$draw_minimal_pvalue  <- draw_minimal_pvalue
     
     return(self)
 }
@@ -86,7 +105,7 @@ ggplot.rrho <- function (self, n = NULL)
     n.i <- n
     n.j <- n
 
-    rrho <- rrho_rectangle(1,1, len, len, n.i, n.j, self$data$a, self$data$b, LOG=TRUE)
+    rrho <- rrho_rectangle(1, 1, len, len, n.i, n.j, self$data$a, self$data$b,  mode=self$enrichment_mode, LOG=TRUE)
 
     self$gg <-  ggplot2::ggplot(reshape2::melt(rrho),  ggplot2::aes(Var1,Var2, fill=value)) +  ggplot2::geom_raster() +
         ggplot2::scale_fill_gradientn(colours=self$ggplot_colours)

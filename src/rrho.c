@@ -348,23 +348,23 @@ rrho_rectangle_min_ea(struct rrho *rrho, size_t i, size_t j, size_t ilen, size_t
   for (size_t iter = 0 ; iter < ITER ; iter++)
     {
       ea_optim_next_generation(&ea, &param);
-      for (size_t c = 0 ; c < ( (max_pop_size > 5 )?5:max_pop_size ) ; c++)
-	{
-	  size_t index = ea.fitness_index[c];
-	  printf("(%zu, %zu, %e)", population[index].i, population[index].j, ea.fitness[index]);
-	  if (c+1 < max_pop_size)
-	    {
-	      size_t index1 = ea.fitness_index[c+1];
-	      if ( ea.fitness[index] > ea.fitness[index1] )
-		printf(" < ");
-	      else if ( ea.fitness[index] == ea.fitness[index1] )
-		printf(" == ");
-	      else
-		printf(" >= ");
-	    }
+      /* for (size_t c = 0 ; c < ( (max_pop_size > 5 )?5:max_pop_size ) ; c++) */
+      /* 	{ */
+      /* 	  size_t index = ea.fitness_index[c]; */
+      /* 	  printf("(%zu, %zu, %e)", population[index].i, population[index].j, ea.fitness[index]); */
+      /* 	  if (c+1 < max_pop_size) */
+      /* 	    { */
+      /* 	      size_t index1 = ea.fitness_index[c+1]; */
+      /* 	      if ( ea.fitness[index] > ea.fitness[index1] ) */
+      /* 		printf(" < "); */
+      /* 	      else if ( ea.fitness[index] == ea.fitness[index1] ) */
+      /* 		printf(" == "); */
+      /* 	      else */
+      /* 		printf(" >= "); */
+      /* 	    } */
 		
-	}
-      printf("\n");
+      /* 	} */
+      /* printf("\n"); */
     }
 
   size_t index0 = ea.fitness_index[0];

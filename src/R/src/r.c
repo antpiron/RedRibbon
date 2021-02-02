@@ -167,13 +167,12 @@ rrho_r_rectangle_min(SEXP i, SEXP j, SEXP ilen, SEXP jlen, SEXP m, SEXP n, SEXP 
 
  
   ret =  PROTECT(allocVector(INTSXP, 2));
-  long (*array)[c.n] = (void*) INTEGER(ret);
 
   rrho_init(&rrho, length_a, c.a, c.b);
 
   rrho_rectangle_min(&rrho, c.i, c.j, c.ilen, c.jlen, c.m, c.n, &coord, c.mode, c.direction);
-  (*array)[0] = coord.i + 1;
-  (*array)[1] = coord.j + 1;
+  INTEGER(ret)[0] = coord.i + 1;
+  INTEGER(ret)[1] = coord.j + 1;
 
   rrho_destroy(&rrho);
   
@@ -250,14 +249,13 @@ rrho_r_rectangle_min_ea(SEXP i, SEXP j, SEXP ilen, SEXP jlen, SEXP a, SEXP b, SE
     c.direction = -1;
   
   ret = PROTECT(allocVector(INTSXP, 2));
-  long (*array)[c.n] = (void*) INTEGER(ret);
 
   rrho_init(&rrho, length_a, c.a, c.b);
 
   rrho_rectangle_min_ea(&rrho, c.i, c.j, c.ilen, c.jlen, &coord, c.mode, c.direction);
   // rrho_rectangle(&rrho, c.i, c.j, c.ilen, c.jlen, c.m, c.n, array, RRHO_HYPER);
-  (*array)[0] = coord.i + 1;
-  (*array)[1] = coord.j + 1;
+  INTEGER(ret)[0] = coord.i + 1;
+  INTEGER(ret)[1] = coord.j + 1;
   
   rrho_destroy(&rrho);
   

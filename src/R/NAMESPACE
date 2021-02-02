@@ -6,9 +6,10 @@ import(ggplot2)
 S3method(newRRHO, data.frame)
 S3method(newRRHO, numeric)
 S3method(ggplot, rrho)
+S3method(setoptions, rrho)
 
 export("rrho_rectangle", "rrho_rectangle_min", "rrho_rectangle_min_ea", "rrho_ij",
-       "newRRHO", "enrichment_mode",
+       "newRRHO", "setoptions",
        "newRRHO.data.frame", "newRRHO.numeric",
        "ggplot.rrho",
-       "enrichment_mode.character")
+       "setoptions.rrho")
