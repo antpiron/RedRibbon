@@ -27,20 +27,37 @@ rrho_ij  <- function (i, j, a, b, mode=c("hyper"))
     .Call("rrho_r_rrho", as.integer(i), as.integer(j), as.double(a), as.double(b), as.character(mode))
 }
 
+
+###############################
+### S3
+###
+
+### S3 Methods
+
 newRRHO <- function (self, ...)
 {
     UseMethod("newRRHO")
 }
 
-newRRHO.data.frame <- function (self)
+enrichment_mode <- function (self, ...)
 {
-    if ( ! "a" %in% colnames(self))
+    UseMethod("enrichment_mode")
+}
+
+### S3 Body
+
+newRRHO.data.frame <- function (df)
+{
+    if ( ! "a" %in% colnames(df))
         stop("Column 'a' is missing!")
-    if ( ! "b" %in% colnames(self))
+    if ( ! "b" %in% colnames(df))
         stop("Column 'b' is missing!")
     
     structure(
-        list(data = self),
+        list(data = df,
+             enrichment_mode = c("hyper"),
+             ggplot_colours = c('#021893', "#3537ae", "#740699", "#b70b0b", "#990623")
+             ),
         class = "rrho"
     )
 }
@@ -52,14 +69,28 @@ newRRHO.numeric <- function (a, b)
     newRRHO(data.frame(a=a, b=b))
 }
 
-rrho_plot <- function (a,b, n.dots=500)
+enrichment_mode.character <- function(self, mode)
 {
-    n <- length(a)
-    if (n.dots > n)
-        n.dots  <- n
-    rrho <- rrho_rectangle(1,1, n, n, n.dots, n.dots, a, b, LOG=TRUE)
-
-
-    ggplot2::ggplot(reshape2::melt(rrho),  ggplot2::aes(Var1,Var2, fill=value)) +  ggplot2::geom_raster() +
-         ggplot2::scale_fill_gradientn(colours=c('#021893', "#3537ae", "#740699", "#b70b0b", "#990623"))
+    self$enrichment_mode <- mode
+    
+    return(self)
 }
+
+ggplot.rrho <- function (self, n = NULL)
+{
+    len <- length(self.a)
+
+    if ( is.null(n) )
+        n <- max(sqrt(len), 300)
+            
+    n.i <- n
+    n.j <- n
+
+    rrho <- rrho_rectangle(1,1, len, len, n.i, n.j, self$data$a, self$data$b, LOG=TRUE)
+
+    self$gg <-  ggplot2::ggplot(reshape2::melt(rrho),  ggplot2::aes(Var1,Var2, fill=value)) +  ggplot2::geom_raster() +
+        ggplot2::scale_fill_gradientn(colours=self$ggplot_colours)
+    
+    return(self)
+}
+
