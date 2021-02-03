@@ -8,7 +8,7 @@ rrho_rectangle  <- function (i, j, i.len, j.len, m, n, a, b, mode=c("hyper"), LO
           as.integer(m), as.integer(n), as.double(a), as.double(b), as.character(mode), as.logical(LOG))
 }
 
-rrho_rectangle_min  <- function (i, j, i.len, j.len, m, n, a, b, mode=c("hyper"), direction)
+rrho_rectangle_min  <- function (i, j, i.len, j.len, m, n, a, b, mode=c("hyper"), direction="enrichment")
 {
     .Call("rrho_r_rectangle_min", as.integer(i), as.integer(j), as.integer(i.len), as.integer(j.len),
           as.integer(m), as.integer(n), as.double(a), as.double(b), as.character(mode), as.character(direction))
@@ -42,6 +42,11 @@ newRRHO <- function (self, ...)
 setoptions <- function (self, ...)
 {
     UseMethod("setoptions")
+}
+
+rectangle_min <- function (self, ...)
+{
+    UseMethod("rectangle_min")
 }
 
 ### S3 Body
@@ -110,9 +115,17 @@ ggplot.rrho <- function (self, n = NULL)
 
     rrho <- rrho_rectangle(1, 1, len, len, n.i, n.j, self$data$a, self$data$b,  mode=self$enrichment_mode, LOG=TRUE)
 
-    gg <-  ggplot2::ggplot(reshape2::melt(rrho),  ggplot2::aes(Var1,Var2, fill=value)) +  ggplot2::geom_raster() +
-        ggplot2::scale_fill_gradientn(colours=self$ggplot_colours)
+    gg <-  ggplot2::ggplot(reshape2::melt(rrho),  ggplot2::aes(Var1,Var2, fill=value)) +
+        ggplot2::geom_raster() +
+        ggplot2::scale_fill_gradientn(colours=self$ggplot_colours, name="-log p.val")
     
     return(gg)
 }
 
+rectangle_min.rrho <- function(self, i, j, i.len, j.len, m, n, direction="enrichment")
+{
+
+    result <- rrho_rectangle_min(i, j, i.len, j.len, m, n, self$data$a, self$data$b, mode=self$enrichment_mode, direction="enrichment")
+
+    return(result)
+}

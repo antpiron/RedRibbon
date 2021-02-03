@@ -74,6 +74,30 @@ main(int argc, char *argv[argc])
 			n, n, res.pvalue, eps);
 
   rrho_destroy(&rrho);
+
+
+  // check imbalance
+  for (size_t i = 0 ; i < n ; i++)
+    {
+      a[i] = i; // stats_unif_std_rand();
+      b[i] = (0 == i % 2) ? i : n/2 * (1 + stats_unif_std_rand()); // stats_unif_std_rand();
+    }
+  
+  rrho_init(&rrho, n, a, b);
+  
+  rrho_rectangle_min(&rrho, 0, 0, n, n, n, n, &coord, RRHO_HYPER, 1);
+  rrho_hyper(&rrho, coord.i, coord.j, &res);
+
+  ERROR_UNDEF_FATAL_FMT(coord.i <= coord.j + n10perc, 
+  			"FAIL: b[i] alternated - rrho_rectangle_min(0,0,%zu,%zu) coord = (%zu <= %zu)\n",
+			n, n, coord.i, coord.j);
+  ERROR_UNDEF_FATAL_FMT(res.pvalue >= eps, 
+  			"FAIL: rrho_rectangle_min(0,0,%zu,%zu) pvalue = %Le >= %e\n",
+			n, n, res.pvalue, eps);
+
+  rrho_destroy(&rrho);
+
+  
   free(a);
   free(b);
 

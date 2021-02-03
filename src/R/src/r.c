@@ -82,18 +82,21 @@ rrho_r_rectangle(SEXP i, SEXP j, SEXP ilen, SEXP jlen, SEXP m, SEXP n, SEXP a, S
     c.mode = RRHO_HYPER_TWO_TAILED;
   else if ( 0 == strcmp(c.strmode, "hyper-two-tailed-old") )
     c.mode = RRHO_HYPER_TWO_TAILED_R_MODULE;
-  
-  
- 
-  ret = PROTECT(allocMatrix(REALSXP, c.m, c.n));
-  double (*array)[c.n] = (void*) REAL(ret);
 
+  double (*c_array)[c.n] = malloc(sizeof(double) * c.m * c.n);
   rrho_init(&rrho, length_a, c.a, c.b);
-
-  rrho_rectangle(&rrho, c.i, c.j, c.ilen, c.jlen, c.m, c.n, array, c.mode, c.log);
-
+  rrho_rectangle(&rrho, c.i, c.j, c.ilen, c.jlen, c.m, c.n, c_array, c.mode, c.log);
   rrho_destroy(&rrho);
+
   
+  // matrix are column-wise in R, so transpose needed
+  ret = PROTECT(allocMatrix(REALSXP, c.m, c.n));
+  double (*array)[c.m] = (void*) REAL(ret);
+
+  alg_transpose(c.m, c.n, c_array, array);
+  
+  free(c_array);
+
   UNPROTECT(1);
   
   return ret;
