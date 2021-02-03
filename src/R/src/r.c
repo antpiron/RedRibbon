@@ -110,6 +110,7 @@ rrho_r_rectangle_min(SEXP i, SEXP j, SEXP ilen, SEXP jlen, SEXP m, SEXP n, SEXP 
   int length_b = length(b);
   struct rrho_coord coord;
   SEXP ret;
+  int err;
 
   if ( length_a != length_b )
     error("The vectors a and b should be of equal size.");
@@ -169,16 +170,23 @@ rrho_r_rectangle_min(SEXP i, SEXP j, SEXP ilen, SEXP jlen, SEXP m, SEXP n, SEXP 
     c.direction = -1;
 
  
-  ret =  PROTECT(allocVector(INTSXP, 2));
 
   rrho_init(&rrho, length_a, c.a, c.b);
-
-  rrho_rectangle_min(&rrho, c.i, c.j, c.ilen, c.jlen, c.m, c.n, &coord, c.mode, c.direction);
-  INTEGER(ret)[0] = coord.i + 1;
-  INTEGER(ret)[1] = coord.j + 1;
-
+  err = rrho_rectangle_min(&rrho, c.i, c.j, c.ilen, c.jlen, c.m, c.n, &coord, c.mode, c.direction);
   rrho_destroy(&rrho);
-  
+
+  if ( 0 == err)
+    {
+      ret =  PROTECT(allocVector(INTSXP, 2));
+      INTEGER(ret)[0] = coord.i + 1;
+      INTEGER(ret)[1] = coord.j + 1;
+    }
+  else
+    {
+      ret =  PROTECT(allocVector(INTSXP, 1));
+      INTEGER(ret)[0] = NA_INTEGER;
+    }
+ 
   UNPROTECT(1);
   
   return ret;

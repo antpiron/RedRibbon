@@ -227,6 +227,7 @@ rrho_rectangle_min(struct rrho *rrho, size_t i, size_t j, size_t ilen, size_t jl
   size_t istep = ilen / m;
   size_t jstep = jlen / n;
   long double pvalue = 1.1;
+  int ret = -1;
 
   if ( 0 == istep )
     istep = 1;
@@ -247,11 +248,12 @@ rrho_rectangle_min(struct rrho *rrho, size_t i, size_t j, size_t ilen, size_t jl
 	      pvalue = res.pvalue;
 	      coord->i = ii;
 	      coord->j = jj;
+	      ret = 0;
 	    }
 	}
     }
   
-  return 0;
+  return ret;
 }
 
 

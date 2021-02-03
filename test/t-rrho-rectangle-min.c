@@ -21,6 +21,7 @@ main(int argc, char *argv[argc])
   size_t exp_n10perc = (n10perc + 1) / 2;
   size_t exp_n10perc_i =  n - exp_n10perc;
   size_t exp_n10perc_j =  n - exp_n10perc;
+  int ret;
 
 
   for (size_t i = 0 ; i < n ; i++)
@@ -95,6 +96,22 @@ main(int argc, char *argv[argc])
   			"FAIL: rrho_rectangle_min(0,0,%zu,%zu) pvalue = %Le >= %e\n",
 			n, n, res.pvalue, eps);
 
+  rrho_destroy(&rrho);
+
+  // check reversed direction
+  for (size_t i = 0 ; i < n ; i++)
+    {
+      a[i] = i; // stats_unif_std_rand();
+      b[i] = n - i - 1; // stats_unif_std_rand();
+    }
+  
+  rrho_init(&rrho, n, a, b);
+  
+  ret = rrho_rectangle_min(&rrho, 0, 0, n, n, n, n, &coord, RRHO_HYPER, -1);
+  ERROR_UNDEF_FATAL_FMT(0 != ret, 
+  			"FAIL: inverted rrho_rectangle_min(0,0,%zu,%zu) ret = %d\n",
+			n, n, ret);
+  
   rrho_destroy(&rrho);
 
   

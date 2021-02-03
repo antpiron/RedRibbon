@@ -57,11 +57,14 @@ newRRHO.data.frame <- function (df)
         stop("Column 'a' is missing!")
     if ( ! "b" %in% colnames(df))
         stop("Column 'b' is missing!")
+
+    colfunc <- colorRampPalette(c("#eb3434", "#eb9334", "#ebeb34", "#49eb34", "#34eba5", "#34b4eb", "#3446eb"))
+    colors  <-  colfunc(1000)
     
     structure(
         list(data = df,
              enrichment_mode = c("hyper"),
-             ggplot_colours = c('#021893', "#3537ae", "#740699", "#b70b0b", "#990623"),
+             ggplot_colours = c(colors, rev(colors)),
              draw_quadrants = FALSE,
              draw_minimal_pvalue = FALSE
              ),
@@ -103,29 +106,59 @@ setoptions.rrho <- function(self, enrichment_mode=NULL, ggplot_colours = NULL, d
     return(self)
 }
 
-ggplot.rrho <- function (self, n = NULL)
+
+
+ggplot.rrho <- function (self, n = NULL, labels = c("a", "b"))
 {
     len <- length(self$data$a)
 
     if ( is.null(n) )
-        n <- max(sqrt(len), 300)
+        n <- max(sqrt(len), 500)
             
     n.i <- n
     n.j <- n
 
     rrho <- rrho_rectangle(1, 1, len, len, n.i, n.j, self$data$a, self$data$b,  mode=self$enrichment_mode, LOG=TRUE)
 
+    max.log <- max(abs(rrho))
+    if (0 == max.log)
+    {
+        min.log  <- -0.001
+        max.log <- 0.001
+    } else
+        min.log <- - max.log
+    ticks <- c(min.log, 0, max.log)
+
+    len.colors <- length(self$ggplot_colours)
+    half.len.colors <- len.colors %/% 2
+    colors.values <- seq(0, len.colors) /  len.colors
     gg <-  ggplot2::ggplot(reshape2::melt(rrho),  ggplot2::aes(Var1,Var2, fill=value)) +
         ggplot2::geom_raster() +
-        ggplot2::scale_fill_gradientn(colours=self$ggplot_colours, name="-log p.val")
+        ## ggplot2::scale_fill_gradientn(colours=self$ggplot_colours, name="-log p.val") +
+        ggplot2::scale_fill_gradientn(colors = self$ggplot_colours, breaks = ticks,
+                                      labels = format(ticks),
+                                      limits=ticks[c(1,3)],
+                                      ##limits=b[c(1,length(colors))],
+                                      name="-log p.val",
+                                      values=colors.values) +
+        xlab(labels[1]) + ylab(labels[2]) +
+        scale_x_continuous(labels = label_percent(accuracy = 1, scale = 100/n.i)) +
+        scale_y_continuous(labels = label_percent(accuracy = 1, scale = 100/n.j) )
     
     return(gg)
 }
 
-rectangle_min.rrho <- function(self, i, j, i.len, j.len, m, n, direction="enrichment")
+rectangle_min.rrho <- function(self, i, j, i.len, j.len, m=NULL, n=NULL, direction="enrichment")
 {
+    len <- length(self$data$a)
+    
+    if ( is.null(m) )
+        m <- max(sqrt(len), 500)
 
-    result <- rrho_rectangle_min(i, j, i.len, j.len, m, n, self$data$a, self$data$b, mode=self$enrichment_mode, direction="enrichment")
+    if ( is.null(n) )
+        n <- max(sqrt(len), 500)
+            
+    result <- rrho_rectangle_min(i, j, i.len, j.len, m, n, self$data$a, self$data$b, mode=self$enrichment_mode, direction=direction)
 
     return(result)
 }
