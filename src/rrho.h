@@ -10,6 +10,13 @@ enum {
       RRHO_HYPER_TWO_TAILED_R_MODULE
 };
 
+enum {
+      RRHO_DOWN_DOWN = 0,
+      RRHO_UP_UP,
+      RRHO_DOWN_UP,
+      RRHO_UP_DOWN
+};
+
 struct rrho
 {
   size_t n;
@@ -41,6 +48,8 @@ int rrho_hyper_two_tailed_as_r_module(struct rrho *rrho, size_t i, size_t j, str
 int rrho_hyper_two_tailed(struct rrho *rrho, size_t i, size_t j, struct rrho_result *res);
 int rrho_hyper(struct rrho *rrho, size_t i, size_t j, struct rrho_result *res);
 static inline int rrho_generic(struct rrho *rrho, size_t i, size_t j, struct rrho_result *res, int mode);
+
+void rrho_intersect(struct rrho *rrho, size_t i, size_t j, struct bitset *bs_res[4]);
 
 int rrho_rectangle(struct rrho *rrho, size_t i, size_t j, size_t ilen, size_t jlen,
 		   size_t m, size_t n, double dst[m][n],

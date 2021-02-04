@@ -44,11 +44,10 @@ rrho_destroy(struct rrho *rrho)
   return 0;
 }
 
-static size_t
-count_intersect(struct rrho *rrho, size_t i, size_t j)
+void
+intersect(struct rrho *rrho, size_t i, size_t j)
 {
   // TODO: improve performance
-  size_t count = 0;
   
   // bitset_reset(&rrho->bs_a);
   // bitset_reset(&rrho->bs_b);
@@ -77,14 +76,48 @@ count_intersect(struct rrho *rrho, size_t i, size_t j)
     }
    
   bitset_and(&rrho->bs_and, &rrho->bs_a, &rrho->bs_b);
-  
-  count = bitset_ones(&rrho->bs_and);
 
   rrho->n_a = i+1;
   rrho->n_b = j+1;
+}
+
+static size_t
+count_intersect(struct rrho *rrho, size_t i, size_t j)
+{
+  size_t count = 0;
+  
+  intersect(rrho, i, j);
+  
+  count = bitset_ones(&rrho->bs_and);
   
   return count;
 }
+
+void
+rrho_intersect(struct rrho *rrho, size_t i, size_t j, struct bitset *bs_res[4])
+{
+  struct bitset not_a, not_b;
+
+  bitset_init(&not_a, rrho->n);
+  bitset_init(&not_b, rrho->n);
+  
+  for (size_t i = 0 ; i < 4 ; i++)
+    bitset_reset(bs_res[i]);
+
+  intersect(rrho, i, j);
+  bitset_cpy(bs_res[RRHO_DOWN_DOWN], &rrho->bs_and);
+
+  bitset_not(&not_a, &rrho->bs_a);
+  bitset_not(&not_b, &rrho->bs_b);
+
+  bitset_and(bs_res[RRHO_DOWN_UP], &rrho->bs_a, &not_b);
+  bitset_and(bs_res[RRHO_UP_DOWN], &not_a, &rrho->bs_b);
+  bitset_and(bs_res[RRHO_UP_UP], &not_a, &not_b);
+
+  // bitset_or
+
+}
+
 
 int
 rrho_hyper_two_tailed_as_r_module(struct rrho *rrho, size_t i, size_t j, struct rrho_result *res)
