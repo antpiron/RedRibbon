@@ -45,7 +45,7 @@ rrho_destroy(struct rrho *rrho)
 }
 
 static void
-intersect(struct rrho *rrho, size_t i, size_t j)
+update_bitsets(struct rrho *rrho, size_t i, size_t j)
 {
   // TODO: improve performance
   
@@ -75,7 +75,7 @@ intersect(struct rrho *rrho, size_t i, size_t j)
 	bitset_unset(&rrho->bs_b,  rrho->index_b[jj]);	    
     }
    
-  bitset_and(&rrho->bs_and, &rrho->bs_a, &rrho->bs_b);
+  // bitset_and(&rrho->bs_and, &rrho->bs_a, &rrho->bs_b);
 
   rrho->n_a = i+1;
   rrho->n_b = j+1;
@@ -86,33 +86,65 @@ count_intersect(struct rrho *rrho, size_t i, size_t j)
 {
   size_t count = 0;
   
-  intersect(rrho, i, j);
-  
+  update_bitsets(rrho, i, j);
+  bitset_and(&rrho->bs_and, &rrho->bs_a, &rrho->bs_b);
+
   count = bitset_ones(&rrho->bs_and);
   
   return count;
 }
 
 void
-rrho_intersect(struct rrho *rrho, size_t i, size_t j, struct bitset *bs_res[4])
+rrho_intersect(struct rrho *rrho, size_t i, size_t j, int directions, struct bitset *bs_res)
 {
   struct bitset not_a, not_b;
 
   bitset_init(&not_a, rrho->n);
   bitset_init(&not_b, rrho->n);
   
-  for (size_t i = 0 ; i < 4 ; i++)
-    bitset_reset(bs_res[i]);
+  bitset_reset(bs_res);
+  
+  if (RRHO_DOWN_DOWN == directions)
+    {
+      update_bitsets(rrho, i, j);
+      bitset_and(bs_res, &rrho->bs_a, &rrho->bs_b);
+    }
+  else if (RRHO_UP_UP == directions)
+    {
+      update_bitsets(rrho, i-1, j-1);
+      
+      bitset_init(&not_a, rrho->n);
+      bitset_init(&not_b, rrho->n);
 
-  intersect(rrho, i, j);
-  bitset_cpy(bs_res[RRHO_DOWN_DOWN], &rrho->bs_and);
+      bitset_not(&not_a, &rrho->bs_a);
+      bitset_not(&not_b, &rrho->bs_b);
+      bitset_and(bs_res, &not_a, &not_b);
 
-  bitset_not(&not_a, &rrho->bs_a);
-  bitset_not(&not_b, &rrho->bs_b);
+      bitset_destroy(&not_a);
+      bitset_destroy(&not_b);
+    }
+  else if (RRHO_DOWN_UP == directions)
+    {
+       update_bitsets(rrho, i, j-1);
 
-  bitset_and(bs_res[RRHO_DOWN_UP], &rrho->bs_a, &not_b);
-  bitset_and(bs_res[RRHO_UP_DOWN], &not_a, &rrho->bs_b);
-  bitset_and(bs_res[RRHO_UP_UP], &not_a, &not_b);
+       bitset_init(&not_b, rrho->n);
+       
+      bitset_not(&not_b, &rrho->bs_b);
+      bitset_and(bs_res, &rrho->bs_a, &not_b);
+
+      bitset_destroy(&not_b);
+    }
+  else if (RRHO_UP_DOWN == directions)
+    {
+      update_bitsets(rrho, i-i, j);
+
+      bitset_init(&not_a, rrho->n);
+      
+      bitset_not(&not_a, &rrho->bs_a); 
+      bitset_and(bs_res, &not_a, &rrho->bs_b);
+
+      bitset_destroy(&not_a);
+    }
 }
 
 

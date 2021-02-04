@@ -49,7 +49,7 @@ int rrho_hyper_two_tailed(struct rrho *rrho, size_t i, size_t j, struct rrho_res
 int rrho_hyper(struct rrho *rrho, size_t i, size_t j, struct rrho_result *res);
 static inline int rrho_generic(struct rrho *rrho, size_t i, size_t j, struct rrho_result *res, int mode);
 
-void rrho_intersect(struct rrho *rrho, size_t i, size_t j, struct bitset *bs_res[4]);
+void rrho_intersect(struct rrho *rrho, size_t i, size_t j, int directions, struct bitset *bs_res);
 
 int rrho_rectangle(struct rrho *rrho, size_t i, size_t j, size_t ilen, size_t jlen,
 		   size_t m, size_t n, double dst[m][n],
