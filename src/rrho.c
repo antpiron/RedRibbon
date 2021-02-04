@@ -113,9 +113,6 @@ rrho_intersect(struct rrho *rrho, size_t i, size_t j, struct bitset *bs_res[4])
   bitset_and(bs_res[RRHO_DOWN_UP], &rrho->bs_a, &not_b);
   bitset_and(bs_res[RRHO_UP_DOWN], &not_a, &rrho->bs_b);
   bitset_and(bs_res[RRHO_UP_UP], &not_a, &not_b);
-
-  // bitset_or
-
 }
 
 
