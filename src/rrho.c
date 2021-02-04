@@ -44,7 +44,7 @@ rrho_destroy(struct rrho *rrho)
   return 0;
 }
 
-void
+static void
 intersect(struct rrho *rrho, size_t i, size_t j)
 {
   // TODO: improve performance
