@@ -42,7 +42,33 @@ main(int argc, char *argv[argc])
   rrho_destroy(&rrho);
   bitset_destroy(&bs_res);
  
+  for (size_t i = 0 ; i < n ; i++)
+    {
+      a[i] = i ; // stats_unif_std_rand();
+      b[i] = n - i - 1; //stats_unif_std_rand();
+    }
+
+  bitset_reset(&bs_res);
+  rrho_init(&rrho, n, a, b);
   
+  rrho_intersect(&rrho, 9, n-10, RRHO_DOWN_UP, &bs_res);
+  count = bitset_ones(&bs_res);
+  ERROR_UNDEF_FATAL_FMT(10 != count,
+			"FAIL: rrho_intersect(10,10, DOWN_UP) = %zu != 10\n", count);
+ 
+  
+  rrho_intersect(&rrho, n-10, 9, RRHO_UP_DOWN, &bs_res);
+  count = bitset_ones(&bs_res);
+  ERROR_UNDEF_FATAL_FMT(10 != count,
+			"FAIL: rrho_intersect(10,10, UP_DOWN) = %zu != 10\n", count);
+ 
+   
+  rrho_destroy(&rrho);
+
+  
+  bitset_destroy(&bs_res);
+ 
+ 
   free(a);
   free(b);
 
