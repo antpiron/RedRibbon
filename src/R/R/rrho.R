@@ -30,7 +30,7 @@ rrho_ij  <- function (i, j, a, b, mode=c("hyper"))
 ## SEXP rrho_r_intersect(SEXP i, SEXP j, SEXP a, SEXP b, SEXP directions)
 rrho_intersect  <- function (i, j, a, b, directions=c("downdown"))
 {
-    .Call("rrho_r_intersect", as.integer(i), as.integer(j), as.double(a), as.double(b), as.character(direction))
+    .Call("rrho_r_intersect", as.integer(i), as.integer(j), as.double(a), as.double(b), as.character(directions))
 }
 
 
@@ -53,6 +53,11 @@ setoptions <- function (self, ...)
 rectangle_min <- function (self, ...)
 {
     UseMethod("rectangle_min")
+}
+
+enrichment <- function (self, ...)
+{
+    UseMethod("enrichment")
 }
 
 ### S3 Body
@@ -95,19 +100,19 @@ newRRHO.numeric <- function (a, b)
 setoptions.rrho <- function(self, enrichment_mode=NULL, ggplot_colours = NULL, draw_quadrants = NULL,  draw_minimal_pvalue = NULL, labels = NULL)
 {
     if (! is.null(enrichment_mode) )
-        self$enrichment_mode  <- enrichment_mode
+        self$enrichment_mode <- enrichment_mode
 
     if (! is.null(ggplot_colours) )
-        self$ggplot_colours  <- ggplot_colours
+        self$ggplot_colours <- ggplot_colours
 
     if (! is.null(draw_quadrants) )
-        self$draw_quadrants  <- draw_quadrants
+        self$draw_quadrants <- draw_quadrants
 
     if (! is.null(draw_minimal_pvalue) )
-        self$draw_minimal_pvalue  <- draw_minimal_pvalue
+        self$draw_minimal_pvalue <- draw_minimal_pvalue
 
     if (! is.null(labels) )
-        self$labels  <- labels
+        self$labels <- labels
     
     return(self)
 }
@@ -167,4 +172,9 @@ rectangle_min.rrho <- function(self, i, j, i.len, j.len, m=NULL, n=NULL, directi
     result <- rrho_rectangle_min(i, j, i.len, j.len, m, n, self$data$a, self$data$b, mode=self$enrichment_mode, direction=direction)
 
     return(result)
+}
+
+enrichment.rrho <- function(self, i, j, directions="downdown")
+{
+    return(rrho_intersect(i, j, self$data$a, self$data$b, directions))
 }

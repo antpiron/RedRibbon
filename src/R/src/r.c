@@ -417,10 +417,11 @@ rrho_r_intersect(SEXP i, SEXP j, SEXP a, SEXP b, SEXP directions)
   ssize_t value = -1;
   for (size_t i = 0 ; ; i++) 
     {
-      ssize_t value = bitset_iterate(&bs_res, value);
+      value = bitset_iterate(&bs_res, value);
       if (value < 0)
 	break;
-      INTEGER(ret)[i] = value;
+      INTEGER(ret)[i] = value + 1;
+      // Rprintf("%d\n", value);
     }
 
   bitset_destroy(&bs_res);

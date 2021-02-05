@@ -15,6 +15,7 @@ main(int argc, char *argv[argc])
   double *a = malloc(n * sizeof(double));
   double *b = malloc(n * sizeof(double));
   size_t count;
+  size_t value;
   struct bitset bs_res;
 
   for (size_t i = 0 ; i < n ; i++)
@@ -31,13 +32,26 @@ main(int argc, char *argv[argc])
   count = bitset_ones(&bs_res);
   ERROR_UNDEF_FATAL_FMT(10 != count,
 			"FAIL: rrho_intersect(10,10, DOWN_DOWN) = %zu != 10\n", count);
-
+  value = -1;
+  for (size_t i = 0 ; i < 10 ; i++)
+    {
+      value = bitset_iterate(&bs_res, value);
+      ERROR_UNDEF_FATAL_FMT(value != i,
+			    "FAIL: rrho_intersect(10,10, DOWN_DOWN) vec[%zu] = %zd != %zu\n", i, value, i);
+    }
   bitset_reset(&bs_res);
   rrho_intersect(&rrho, n - 10, n - 10, RRHO_UP_UP, &bs_res);
   count = bitset_ones(&bs_res);
   ERROR_UNDEF_FATAL_FMT(10 != count,
-			"FAIL: rrho_intersect(10,10, UP_UP) = %zu != 10\n", count);
-  
+			"FAIL: rrho_intersect(n-10,n-10, UP_UP) = %zu != 10\n", count);
+  value = -1;
+  for (ssize_t i = 9 ; i >= 0 ; i--)
+    {
+      value = bitset_iterate(&bs_res, value);
+      ERROR_UNDEF_FATAL_FMT(value != n - i - 1,
+			    "FAIL: rrho_intersect(n-10,n-10, UP_UP) vec[%zu] = %zd != %zu\n", i, value, n-i-1);
+    }
+
    
   rrho_destroy(&rrho);
   bitset_destroy(&bs_res);
