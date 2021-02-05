@@ -124,7 +124,7 @@ ggplot.rrho <- function (self, n = NULL, labels = c("a", "b"))
     len <- length(self$data$a)
 
     if ( is.null(n) )
-        n <- max(sqrt(len), 500)
+        n <- min(max(sqrt(len), 500), len)
             
     n.i <- n
     n.j <- n
