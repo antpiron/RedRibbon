@@ -408,10 +408,11 @@ rrho_r_intersect(SEXP i, SEXP j, SEXP a, SEXP b, SEXP directions)
 
   rrho_init(&rrho, length_a, c.a, c.b);
   bitset_init(&bs_res, length_a);
+  bitset_reset(&bs_res);
   
   rrho_intersect(&rrho, c.i, c.j, c.direction, &bs_res);
   size_t count = bitset_ones(&bs_res);
-  
+  // Rprintf("count ones = %zu ; n = %zu ; buf[last] = %" PRIx64 " \n", count, bs_res.n, bs_res.buf[(1000 + 63) / 64 - 1]);
   ret = PROTECT(allocVector(INTSXP, count));
 
   ssize_t value = -1;
