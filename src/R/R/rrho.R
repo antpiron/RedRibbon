@@ -27,6 +27,12 @@ rrho_ij  <- function (i, j, a, b, mode=c("hyper"))
     .Call("rrho_r_rrho", as.integer(i), as.integer(j), as.double(a), as.double(b), as.character(mode))
 }
 
+## SEXP rrho_r_intersect(SEXP i, SEXP j, SEXP a, SEXP b, SEXP directions)
+rrho_intersect  <- function (i, j, a, b, directions=c("downdown"))
+{
+    .Call("rrho_r_intersect", as.integer(i), as.integer(j), as.double(a), as.double(b), as.character(direction))
+}
+
 
 ###############################
 ### S3
