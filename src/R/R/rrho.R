@@ -162,6 +162,21 @@ ggplot.rrho <- function (self, n = NULL, labels = c("a", "b"))
 rectangle_min.rrho <- function(self, i, j, i.len, j.len, m=NULL, n=NULL, direction="enrichment")
 {
     len <- length(self$data$a)
+   
+    if ( i < 1 || i > len )
+        stop("i outside range [1, n]")
+    if ( j < 1 || j > len )
+        stop("j outside range [1, n]")
+
+    ri <- i + i.len - 1
+    if ( ri < 1 || ri > len )
+        stop("i + i.len - 1 outside range [1, n]")
+    rj <- j + j.len - 1
+    if ( rj < 1 || rj > len )
+        stop("j + j.len - 1 outside range [1, n]")
+
+    
+    len <- length(self$data$a)
     
     if ( is.null(m) )
         m <- max(sqrt(len), 500)
@@ -176,5 +191,12 @@ rectangle_min.rrho <- function(self, i, j, i.len, j.len, m=NULL, n=NULL, directi
 
 enrichment.rrho <- function(self, i, j, directions="downdown")
 {
+    len <- length(self$data$a)
+   
+    if ( i < 1 || i > len )
+        stop("i outside range [1, n]")
+    if ( j < 1 || j > len )
+        stop("j outside range [1, n]")
+    
     return(rrho_intersect(i, j, self$data$a, self$data$b, directions))
 }
