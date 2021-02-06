@@ -279,7 +279,7 @@ rrho_permutation_generic(struct rrho *rrho, size_t i, size_t j, int mode, size_t
 	  rrho_destroy(&rrho_perm);
 	}
    }
-  // TODO: add stop condition
+
   if (stop)
     {
       stats_beta_fit(iter, pvalues, &alpha, &beta);
