@@ -30,6 +30,8 @@ main(int argc, char *argv[argc])
   
   rrho_intersect(&rrho, 9, 9, RRHO_DOWN_DOWN, &bs_res);
   count = bitset_ones(&bs_res);
+  /* for (size_t i = 0 ; i < (bs_res.n + 63) / 64 ; i++) */
+  /*   printf("%zu: %" PRIx64 " %"  PRIx64 " %"  PRIx64 "\n", i, bs_res.buf[i], rrho.bs_a.buf[i], rrho.bs_b.buf[i]); */
   ERROR_UNDEF_FATAL_FMT(10 != count,
 			"FAIL: rrho_intersect(10,10, DOWN_DOWN) = %zu != 10\n", count);
   value = -1;
@@ -39,9 +41,12 @@ main(int argc, char *argv[argc])
       ERROR_UNDEF_FATAL_FMT(value != i,
 			    "FAIL: rrho_intersect(10,10, DOWN_DOWN) vec[%zu] = %zd != %zu\n", i, value, i);
     }
-  bitset_reset(&bs_res);
+
+  // UP UP
   rrho_intersect(&rrho, n - 10, n - 10, RRHO_UP_UP, &bs_res);
   count = bitset_ones(&bs_res);
+  /* for (size_t i = 0 ; i < (bs_res.n + 63) / 64 ; i++) */
+  /*   printf("%2zu: %#018" PRIx64 " %#018"  PRIx64 " %#018"  PRIx64 "\n", i, bs_res.buf[i], rrho.bs_a.buf[i], rrho.bs_b.buf[i]); */
   ERROR_UNDEF_FATAL_FMT(10 != count,
 			"FAIL: rrho_intersect(n-10,n-10, UP_UP) = %zu != 10\n", count);
   value = -1;
@@ -52,17 +57,17 @@ main(int argc, char *argv[argc])
 			    "FAIL: rrho_intersect(n-10,n-10, UP_UP) vec[%zu] = %zd != %zu\n", i, value, n-i-1);
     }
 
-   
   rrho_destroy(&rrho);
   bitset_destroy(&bs_res);
- 
+
+  // DOWN UP
   for (size_t i = 0 ; i < n ; i++)
     {
       a[i] = i ; // stats_unif_std_rand();
       b[i] = n - i - 1; //stats_unif_std_rand();
     }
 
-  bitset_reset(&bs_res);
+  bitset_init(&bs_res, n);
   rrho_init(&rrho, n, a, b);
   
   rrho_intersect(&rrho, 9, n-10, RRHO_DOWN_UP, &bs_res);
@@ -70,7 +75,8 @@ main(int argc, char *argv[argc])
   ERROR_UNDEF_FATAL_FMT(10 != count,
 			"FAIL: rrho_intersect(10,10, DOWN_UP) = %zu != 10\n", count);
  
-  
+
+  // UP DOWN
   rrho_intersect(&rrho, n-10, 9, RRHO_UP_DOWN, &bs_res);
   count = bitset_ones(&bs_res);
   ERROR_UNDEF_FATAL_FMT(10 != count,

@@ -99,9 +99,6 @@ rrho_intersect(struct rrho *rrho, size_t i, size_t j, int directions, struct bit
 {
   struct bitset not_a, not_b;
 
-  bitset_init(&not_a, rrho->n);
-  bitset_init(&not_b, rrho->n);
-  
   bitset_reset(bs_res);
   
   if (RRHO_DOWN_DOWN == directions)
@@ -125,9 +122,9 @@ rrho_intersect(struct rrho *rrho, size_t i, size_t j, int directions, struct bit
     }
   else if (RRHO_DOWN_UP == directions)
     {
-       update_bitsets(rrho, i, j-1);
+      update_bitsets(rrho, i, j-1);
 
-       bitset_init(&not_b, rrho->n);
+      bitset_init(&not_b, rrho->n);
        
       bitset_not(&not_b, &rrho->bs_b);
       bitset_and(bs_res, &rrho->bs_a, &not_b);
