@@ -31,6 +31,7 @@ struct rrho
 struct rrho_result
 {
   long double pvalue;
+  long double pvalue_perm;
   long double fdr;
   int direction;
   size_t count;
@@ -48,6 +49,7 @@ int rrho_hyper_two_tailed_as_r_module(struct rrho *rrho, size_t i, size_t j, str
 int rrho_hyper_two_tailed(struct rrho *rrho, size_t i, size_t j, struct rrho_result *res);
 int rrho_hyper(struct rrho *rrho, size_t i, size_t j, struct rrho_result *res);
 static inline int rrho_generic(struct rrho *rrho, size_t i, size_t j, struct rrho_result *res, int mode);
+int rrho_permutation_generic(struct rrho *rrho, size_t i, size_t j, int mode, size_t niter, struct rrho_result *res);
 
 void rrho_intersect(struct rrho *rrho, size_t i, size_t j, int directions, struct bitset *bs_res);
 

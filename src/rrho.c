@@ -226,6 +226,49 @@ rrho_hyper(struct rrho *rrho, size_t i, size_t j, struct rrho_result *res)
   return 0;
 }
 
+int
+rrho_permutation_generic(struct rrho *rrho, size_t i, size_t j, int mode, size_t niter, struct rrho_result *res)
+{
+  int ret;
+  size_t below = 0;
+  size_t sizeb = sizeof(double) * rrho->n;
+  double *b = malloc(sizeb);
+  double *pvalues = malloc(sizeof(double) * niter);
+  double alpha, beta;
+  size_t iter;
+
+
+  ret = rrho_generic(rrho, i, j, res, mode);
+
+  memcpy(b, rrho->b, sizeb);
+
+  for (iter = 0 ; iter < niter ; iter++)
+    {
+      struct rrho rrho_perm;
+      struct rrho_result res_perm;
+      
+      stats_shuffle(b, rrho->n, sizeof(double));
+
+      rrho_init(&rrho_perm, rrho->n, rrho->a, b);
+
+      rrho_generic(rrho, i, j, &res_perm, mode);
+      below += (res_perm.pvalue <= res->pvalue);
+
+      pvalues[iter] = res_perm.pvalue;
+
+      rrho_destroy(&rrho_perm);
+   }
+
+  stats_beta_fit(iter, pvalues, &alpha, &beta);
+
+  res->pvalue_perm = stats_beta_F(res->pvalue, alpha, beta);
+  
+  free(b);
+  free(pvalues);
+  
+  return ret;
+}
+
 static long double
 mylogl(long double x)
 {
