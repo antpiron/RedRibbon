@@ -226,6 +226,19 @@ rrho_hyper(struct rrho *rrho, size_t i, size_t j, struct rrho_result *res)
   return 0;
 }
 
+static inline
+int
+stop_condition(size_t iter, double pvalue_perm)
+{
+  if (iter < 32)
+    return 1;
+
+  if ( pvalue_perm <= 1.0d / sqrt(iter) )
+    return 1;
+  
+  return 0;
+}
+
 int
 rrho_permutation_generic(struct rrho *rrho, size_t i, size_t j, int mode, size_t niter, struct rrho_result *res)
 {
@@ -235,33 +248,46 @@ rrho_permutation_generic(struct rrho *rrho, size_t i, size_t j, int mode, size_t
   double *b = malloc(sizeb);
   double *pvalues = malloc(sizeof(double) * niter);
   double alpha, beta;
+  double pvalue_perm = 0.0d;
   size_t iter;
+  int stop;
 
 
   ret = rrho_generic(rrho, i, j, res, mode);
 
   memcpy(b, rrho->b, sizeb);
 
-  for (iter = 0 ; iter < niter ; iter++)
+  for (iter = 0, stop = 1 ; iter < niter && stop ; iter++)
     {
       struct rrho rrho_perm;
       struct rrho_result res_perm;
-      
-      stats_shuffle(b, rrho->n, sizeof(double));
 
-      rrho_init(&rrho_perm, rrho->n, rrho->a, b);
-
-      rrho_generic(rrho, i, j, &res_perm, mode);
-      below += (res_perm.pvalue <= res->pvalue);
-
-      pvalues[iter] = res_perm.pvalue;
-
-      rrho_destroy(&rrho_perm);
+      stop = stop_condition(iter, pvalue_perm);
+      if (stop)
+	{
+	  stats_shuffle(b, rrho->n, sizeof(double));
+	  
+	  rrho_init(&rrho_perm, rrho->n, rrho->a, b);
+	  
+	  rrho_generic(rrho, i, j, &res_perm, mode);
+	  
+	  below += (res_perm.pvalue <= res->pvalue);
+	  pvalue_perm = (double) below / (double) (iter + 1);
+	  
+	  pvalues[iter] = res_perm.pvalue;
+	  
+	  rrho_destroy(&rrho_perm);
+	}
    }
+  // TODO: add stop condition
+  if (stop)
+    {
+      stats_beta_fit(iter, pvalues, &alpha, &beta);
 
-  stats_beta_fit(iter, pvalues, &alpha, &beta);
-
-  res->pvalue_perm = stats_beta_F(res->pvalue, alpha, beta);
+      res->pvalue_perm = stats_beta_F(res->pvalue, alpha, beta);
+    }
+  else
+    res->pvalue_perm =  pvalue_perm;
   
   free(b);
   free(pvalues);
