@@ -1,6 +1,6 @@
 #! /usr/bin/env Rscript
 
-context("Rectangle minimum")
+context("Intersect")
 library(RedRibbon)
 
 EPS  <- 0.00001

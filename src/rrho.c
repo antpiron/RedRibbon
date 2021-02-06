@@ -280,6 +280,7 @@ rrho_permutation_generic(struct rrho *rrho, size_t i, size_t j, int mode, size_t
 	}
    }
 
+  // TODO: use long double
   if (stop)
     {
       stats_beta_fit(iter, pvalues, &alpha, &beta);
