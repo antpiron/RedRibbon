@@ -341,7 +341,7 @@ rrho_r_rrho(SEXP i, SEXP j, SEXP a, SEXP b, SEXP mode)
   SET_VECTOR_ELT(ret, 2, fdr);
   SEXP count = PROTECT(Rf_ScalarInteger(res.count));
   SET_VECTOR_ELT(ret, 3, count);
-  
+
   rrho_destroy(&rrho);
   
   UNPROTECT(5);
