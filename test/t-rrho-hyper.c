@@ -27,14 +27,14 @@ main(int argc, char *argv[argc])
   
   rrho_hyper(&rrho, 0, 0, &res);
   exp = 1.0 / (double) n;
-  ERROR_UNDEF_FATAL_FMT(0 != ale_doublecmp(res.pvalue, exp, eps),
+  ERROR_UNDEF_FATAL_FMT(0 != ale_cmp_double(res.pvalue, exp, eps),
 			"FAIL: rrho_hyper(0,0) pval = %.20e != %.20e\n", res.pvalue, exp);
   ERROR_UNDEF_FATAL_FMT(1 != res.count,
 			"FAIL: rrho_hyper(0,0) count = %d != 1\n", res.count);
 
   rrho_hyper(&rrho, n-1, n-1, &res);
   exp = 1.0;
-  ERROR_UNDEF_FATAL_FMT(0 != ale_doublecmp(res.pvalue, exp, eps),
+  ERROR_UNDEF_FATAL_FMT(0 != ale_cmp_double(res.pvalue, exp, eps),
 			"FAIL: rrho_hyper(%zu,%zu) pval = %f != %f\n", n-1, n-1, res.pvalue, exp);
 
   // TODO: check 0 <= p-value <= 1
@@ -58,7 +58,7 @@ main(int argc, char *argv[argc])
 	ERROR_UNDEF_FATAL_FMT(res.count != res2.count || res.count != j+1,
 			      "FAIL: rrho_hyper(%d,%d) count = %d != %.d = rrho_hyper(%d,%d)\n", i, j, 
 			      res.count, res2.count, j, i);
-	ERROR_UNDEF_FATAL_FMT(0 != ale_doublecmp(res.pvalue, res2.pvalue, eps), 
+	ERROR_UNDEF_FATAL_FMT(0 != ale_cmp_double(res.pvalue, res2.pvalue, eps), 
 	 		      "FAIL: rrho_hyper(%d,%d) pval = %.20e != %.20e = rrho_hyper(%d,%d)\n", i, j,  
 	 		      res.pvalue, res2.pvalue, j, i); 
       }
