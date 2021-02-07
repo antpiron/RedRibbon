@@ -228,7 +228,7 @@ rrho_hyper(struct rrho *rrho, size_t i, size_t j, struct rrho_result *res)
 
 static inline
 int
-stop_condition(size_t iter, double pvalue_perm)
+stop_condition(size_t iter, long double pvalue_perm)
 {
   if (iter < 32)
     return 1;
@@ -246,9 +246,9 @@ rrho_permutation_generic(struct rrho *rrho, size_t i, size_t j, int mode, size_t
   size_t below = 0;
   size_t sizeb = sizeof(double) * rrho->n;
   double *b = malloc(sizeb);
-  double *pvalues = malloc(sizeof(double) * niter);
-  double alpha, beta;
-  double pvalue_perm = 0.0d;
+  long double *pvalues = malloc(sizeof(long double) * niter);
+  long double alpha, beta;
+  long double pvalue_perm = 0.0d;
   size_t iter;
   int stop;
 
@@ -272,7 +272,7 @@ rrho_permutation_generic(struct rrho *rrho, size_t i, size_t j, int mode, size_t
 	  rrho_generic(rrho, i, j, &res_perm, mode);
 	  
 	  below += (res_perm.pvalue <= res->pvalue);
-	  pvalue_perm = (double) below / (double) (iter + 1);
+	  pvalue_perm = (long double) below / (long double) (iter + 1);
 	  
 	  pvalues[iter] = res_perm.pvalue;
 	  
@@ -283,9 +283,9 @@ rrho_permutation_generic(struct rrho *rrho, size_t i, size_t j, int mode, size_t
   // TODO: use long double
   if (stop)
     {
-      stats_beta_fit(iter, pvalues, &alpha, &beta);
+      stats_beta_fitl(iter, pvalues, &alpha, &beta);
 
-      res->pvalue_perm = stats_beta_F(res->pvalue, alpha, beta);
+      res->pvalue_perm = stats_beta_Fl(res->pvalue, alpha, beta);
     }
   else
     res->pvalue_perm =  pvalue_perm;
