@@ -233,7 +233,7 @@ stop_condition(size_t iter, long double pvalue_perm)
   if (iter < 32)
     return 1;
 
-  if ( pvalue_perm <= 1.0d / sqrt(iter) )
+  if ( pvalue_perm <= 1.0L / sqrtl(iter) )
     return 1;
   
   return 0;
@@ -269,9 +269,12 @@ rrho_permutation_generic(struct rrho *rrho, size_t i, size_t j, int mode, size_t
 	  
 	  rrho_init(&rrho_perm, rrho->n, rrho->a, b);
 	  
-	  rrho_generic(rrho, i, j, &res_perm, mode);
+	  rrho_generic(&rrho_perm, i, j, &res_perm, mode);
 	  
 	  below += (res_perm.pvalue <= res->pvalue);
+	  // for (size_t i = 0 ; i < 5 ; i++)
+	  //  printf("%e ", rrho_perm.b[i]);
+	  // printf("%Le %Le %zu\n", res_perm.pvalue, res->pvalue, below);
 	  pvalue_perm = (long double) below / (long double) (iter + 1);
 	  
 	  pvalues[iter] = res_perm.pvalue;
@@ -284,11 +287,15 @@ rrho_permutation_generic(struct rrho *rrho, size_t i, size_t j, int mode, size_t
   if (stop)
     {
       stats_beta_fitl(iter, pvalues, &alpha, &beta);
-
+      printf("Beta fit: alpha = %Le, beta = %Le\n", alpha, beta);
+      
       res->pvalue_perm = stats_beta_Fl(res->pvalue, alpha, beta);
     }
   else
-    res->pvalue_perm =  pvalue_perm;
+    {
+      printf("Perm\n");
+      res->pvalue_perm =  pvalue_perm;
+    }
   
   free(b);
   free(pvalues);
