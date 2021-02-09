@@ -50,6 +50,11 @@ setoptions <- function (self, ...)
     UseMethod("setoptions")
 }
 
+quadrants <- function (self, ...)
+{
+    UseMethod("quadrants")
+}
+
 rectangle_min <- function (self, ...)
 {
     UseMethod("rectangle_min")
@@ -69,7 +74,7 @@ newRRHO.data.frame <- function (df)
     if ( ! "b" %in% colnames(df))
         stop("Column 'b' is missing!")
 
-    colfunc <- colorRampPalette(c("#eb3434", "#eb9334", "#ebeb34", "#49eb34", "#34eba5", "#34b4eb", "#3446eb"))
+    colfunc <- grDevices::colorRampPalette(c("#eb3434", "#eb9334", "#ebeb34", "#49eb34", "#34eba5", "#34b4eb", "#3446eb"))
     colors  <-  colfunc(1000)
     
     structure(
@@ -117,9 +122,53 @@ setoptions.rrho <- function(self, enrichment_mode=NULL, ggplot_colours = NULL, d
     return(self)
 }
 
+quadrants.rrho <- function(self, m=NULL, n=NULL,
+                           whole=TRUE, ea=FALSE)
+{
+    len <- length(self$data$a)
 
+    quadrants = list()
+    
+    if (whole)
+    {
+        coord <- rectangle_min(self, 1, 1, len, len, m=m, n=n, direction="enrichment", ea=ea)
+        if (! all(is.na(coord)) )
+        {
+            
+            quadrants$whole <- enrichment(self, coord[1], coord[2])
+            quadrants$whole$i  <- coord[1]
+            quadrants$whole$j  <- coord[2]
+        }
+    } else
+    {
+        a_ltzero <- sum(self$data$a < 0)
+        b_ltzero <- sum(self$data$b < 0)
 
-ggplot.rrho <- function (self, n = NULL, labels = c("a", "b"))
+        coord_downdown <- rectangle_min(self, 1, 1, a_ltzero, b_ltzero, m=m, n=n, direction="enrichment", ea=ea)
+        if (! all(is.na(coord_downdown)) )
+        {
+            
+            quadrants$downdown <- enrichment(self, coord_downdown[1], coord_downdown[2])
+            quadrants$downdown$i  <- coord_downdown[1]
+            quadrants$downdown$j  <- coord_downdown[2]
+        }
+
+        coord_upup <- rectangle_min(self, a_ltzero + 1, b_ltzero + 1, len - a_ltzero, len - b_ltzero,
+                                    m=m, n=n, direction="enrichment", ea=ea)
+        if (! all(is.na(coord_upup)) )
+        {
+            
+            quadrants$upup <- enrichment(self, coord_upup[1], coord_upup[2], directions="upup")
+            quadrants$upup$i  <- coord_upup[1]
+            quadrants$upup$j  <- coord_upup[2]
+        }
+
+    }
+
+    return(quadrants)
+}
+
+ggplot.rrho <- function (self, n = NULL, labels = c("a", "b"), quadrants=TRUE, show.pval=TRUE)
 {
     len <- length(self$data$a)
 
@@ -155,11 +204,30 @@ ggplot.rrho <- function (self, n = NULL, labels = c("a", "b"))
         xlab(labels[1]) + ylab(labels[2]) +
         scale_x_continuous(labels = label_percent(accuracy = 1, scale = 100/n.i)) +
         scale_y_continuous(labels = label_percent(accuracy = 1, scale = 100/n.j) )
+
+    ## find the middle of the plots
+    a_ltzero <- sum(self$data$a < 0)
+    x.ind <- a_ltzero
+    if ( x.ind == 0 )
+        x.ind = n / 2
+
+    b_ltzero <- sum(self$data$b < 0)
+    y.ind <- b_ltzero
+    if ( y.ind == 0 )
+        y.ind = n / 2
+
+    ## plot dotted quadrant lines
+    if (quadrants)
+        gg  <- gg +
+            ggplot2::geom_vline(aes(xintercept = x.ind * n.i / n), 
+                                linetype = "dotted", colour = "gray10",size = 1) +
+            ggplot2::geom_hline(aes(yintercept = y.ind * n.j / n), 
+                                linetype = "dotted", colour = "gray10",size = 1)
     
     return(gg)
 }
 
-rectangle_min.rrho <- function(self, i, j, i.len, j.len, m=NULL, n=NULL, direction="enrichment")
+rectangle_min.rrho <- function(self, i, j, i.len, j.len, m=NULL, n=NULL, direction="enrichment", ea=FALSE)
 {
     len <- length(self$data$a)
    
@@ -170,24 +238,36 @@ rectangle_min.rrho <- function(self, i, j, i.len, j.len, m=NULL, n=NULL, directi
 
     ri <- i + i.len - 1
     if ( ri < 1 || ri > len )
-        stop("i + i.len - 1 outside range [1, n]")
+        stop(paste0("i + i.len = ", i, " + ", i.len, " outside range [1, n]"))
     rj <- j + j.len - 1
     if ( rj < 1 || rj > len )
-        stop("j + j.len - 1 outside range [1, n]")
+        stop("j + j.len outside range [1, n]")
 
-    
-    len <- length(self$data$a)
-    
-    if ( is.null(m) )
-        m <- max(sqrt(len), 500)
+        
 
-    if ( is.null(n) )
-        n <- max(sqrt(len), 500)
-            
-    result <- rrho_rectangle_min(i, j, i.len, j.len, m, n, self$data$a, self$data$b, mode=self$enrichment_mode, direction=direction)
+    if (ea)
+    {
+        result <- rrho_rectangle_min_ea(i, j, i.len, j.len,
+                                        self$data$a, self$data$b,
+                                        mode=self$enrichment_mode, direction=direction)
+    } else
+    {
+        if ( is.null(m) )
+            m <- max(sqrt(len), 500)
+
+        if ( is.null(n) )
+            n <- max(sqrt(len), 500)
+        m <- min(m, i.len)
+        n <- min(n, j.len)
+
+        result <- rrho_rectangle_min(i, j, i.len, j.len, m, n,
+                                     self$data$a, self$data$b,
+                                     mode=self$enrichment_mode, direction=direction)
+    }
 
     return(result)
 }
+
 
 enrichment.rrho <- function(self, i, j, directions="downdown")
 {
@@ -197,6 +277,9 @@ enrichment.rrho <- function(self, i, j, directions="downdown")
         stop("i outside range [1, n]")
     if ( j < 1 || j > len )
         stop("j outside range [1, n]")
+
+    res <- rrho_ij(i, j, self$data$a, self$data$b, mode=self$enrichment_mode)
+    res$positions <- rrho_intersect(i, j, self$data$a, self$data$b, directions)
     
-    return(rrho_intersect(i, j, self$data$a, self$data$b, directions))
+    return(res)
 }
