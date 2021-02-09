@@ -163,6 +163,26 @@ quadrants.rrho <- function(self, m=NULL, n=NULL,
             quadrants$upup$j  <- coord_upup[2]
         }
 
+        coord_updown <- rectangle_min(self, a_ltzero + 1, 1, len - a_ltzero, b_ltzero,
+                                    m=m, n=n, direction="notenrichment", ea=ea)
+        if (! all(is.na(coord_updown)) )
+        {
+            
+            quadrants$updown <- enrichment(self, coord_updown[1], coord_updown[2], directions="updown")
+            quadrants$updown$i  <- coord_updown[1]
+            quadrants$updown$j  <- coord_updown[2]
+        }
+
+        coord_downup <- rectangle_min(self, 1, b_ltzero + 1, a_ltzero, len - b_ltzero,
+                                    m=m, n=n, direction="notenrichment", ea=ea)
+        if (! all(is.na(coord_downup)) )
+        {
+            
+            quadrants$downup <- enrichment(self, coord_downup[1], coord_downup[2], directions="downup")
+            quadrants$downup$i  <- coord_downup[1]
+            quadrants$downup$j  <- coord_downup[2]
+        }
+
     }
 
     return(quadrants)
