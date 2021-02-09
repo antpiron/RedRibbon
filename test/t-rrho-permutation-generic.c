@@ -24,8 +24,9 @@ main(int argc, char *argv[argc])
   
   rrho_init(&rrho, n, a, b);
   
-  rrho_permutation_generic(&rrho, 512, 512, RRHO_HYPER, 16384, &res);
-  exp = 1.0 / (double) n;
+  rrho_permutation_generic(&rrho, 512, 512, RRHO_HYPER, 1000, &res);
+  ERROR_UNDEF_FATAL_FMT(0.01 > res.pvalue_ks,
+			"FAIL: rrho__permutation_generic(512,512) pval_ks = %.20Le <= 0.01\n", res.pvalue_ks);
   ERROR_UNDEF_FATAL_FMT(0 != ale_cmp_doublel(res.pvalue_perm, exp, eps),
 			"FAIL: rrho_hyper(0,0) pval_perm = %.20Le != %.20Le\n", res.pvalue_perm, res.pvalue);
 

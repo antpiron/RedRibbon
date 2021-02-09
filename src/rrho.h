@@ -31,10 +31,12 @@ struct rrho
 struct rrho_result
 {
   long double pvalue;
-  long double pvalue_perm;
-  long double fdr;
   int direction;
   size_t count;
+  long double fdr;
+  long double pvalue_perm;
+  long double pvalue_ks;
+  long double stat_ks;
 };
 
 struct rrho_coord

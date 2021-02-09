@@ -239,6 +239,18 @@ stop_condition(size_t iter, long double pvalue_perm)
   return 0;
 }
 
+struct beta_params
+{
+  long double alpha, beta;
+};
+
+static long double
+beta_cdfl(long double x, void *cls)
+{
+  struct beta_params *params = cls;
+  return stats_beta_Fl(x, params->alpha, params->beta);
+}
+
 int
 rrho_permutation_generic(struct rrho *rrho, size_t i, size_t j, int mode, size_t niter, struct rrho_result *res)
 {
@@ -247,10 +259,10 @@ rrho_permutation_generic(struct rrho *rrho, size_t i, size_t j, int mode, size_t
   size_t sizeb = sizeof(double) * rrho->n;
   double *b = malloc(sizeb);
   long double *pvalues = malloc(sizeof(long double) * niter);
-  long double alpha, beta;
   long double pvalue_perm = 0.0d;
   size_t iter;
   int stop;
+  struct beta_params bparams;
 
 
   ret = rrho_generic(rrho, i, j, res, mode);
@@ -283,18 +295,19 @@ rrho_permutation_generic(struct rrho *rrho, size_t i, size_t j, int mode, size_t
 	}
    }
 
-  // TODO: use long double
   if (stop)
     {
-      stats_beta_fitl(iter, pvalues, &alpha, &beta);
-      printf("Beta fit: alpha = %Le, beta = %Le\n", alpha, beta);
-      
-      res->pvalue_perm = stats_beta_Fl(res->pvalue, alpha, beta);
+      stats_beta_fitl(iter, pvalues, &bparams.alpha, &bparams.beta);
+      stats_ks_testl(iter, pvalues, beta_cdfl, &bparams, &res->pvalue_ks, &res->stat_ks);
+      printf("Beta fit: alpha = %Le, beta = %Le, pvalue_ks = %Le\n", bparams.alpha, bparams.beta, res->pvalue_ks);
+
+      res->pvalue_perm = stats_beta_Fl(res->pvalue, bparams.alpha, bparams.beta);
     }
   else
     {
       printf("Perm\n");
       res->pvalue_perm =  pvalue_perm;
+      res->pvalue_ks = -1; res->stat_ks = -1;
     }
   
   free(b);
