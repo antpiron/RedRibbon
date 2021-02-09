@@ -12,7 +12,6 @@ rr <- newRRHO(a, b)
 
 quad <- quadrants(rr, m=1000, n=1000)
 
-print(quad)
 test_that(paste("Testing whole quadrants"), {
     expect(is.list(quad), paste("type(quad) = ", typeof(quad)))
     expect(is.list(quad$whole),  paste("type(quad$whole) = ", typeof(quad$whole)))
@@ -22,8 +21,22 @@ test_that(paste("Testing whole quadrants"), {
 })
 
 quad <- quadrants(rr, whole=FALSE, m=1000, n=1000)
+test_that(paste("Testing quadrants"), {
+    expect(is.list(quad), paste("type(quad) = ", typeof(quad)))
+    expect(is.list(quad$downdown),  paste("type(quad$downdown) = ", typeof(quad$downdown)))
+    expect(is.list(quad$upup),  paste("type(quad$upup) = ", typeof(quad$upup)))
+    
+    expect(quad$downdown$i == 449,  paste("quad$downdown$i = ", quad$downdown$i, "!= 449"))
+    expect(quad$downdown$j == 449,  paste("quad$downdown$j = ", quad$downdown$j, "!= 449"))
+    expect(length(quad$downdown$positions) == 449,
+           paste("length(quaddowndown$positions) = ", length(quad$downdown$positions), "!= 449"))
+    
+    expect(quad$upup$i == 500,  paste("quad$upup$i = ", quad$upup$i, "!= 500"))
+    expect(quad$upup$j == 500,  paste("quad$upup$j = ", quad$upup$j, "!= 500"))
+    expect(length(quad$upup$positions) == 501,
+           paste("length(quadupup$positions) = ", length(quad$upup$positions), "!= 501"))
+})
 
-print(quad)
 
 
 #> Test passed
