@@ -18,6 +18,8 @@ test_that(paste("Testing whole quadrants"), {
     expect(quad$whole$i == 500,  paste("quad$whole$i = ", quad$whole$i, "!= 500"))
     expect(quad$whole$j == 500,  paste("quad$whole$j = ", quad$whole$j, "!= 500"))
     expect(length(quad$whole$positions) == 500,  paste("length(quad$whole$positions) = ", length(quad$whole$positions), "!= 500"))
+    expect(all(quad$whole$positions > 0 & quad$whole$positions < 501),
+           paste("all(quad$whole$positions > 0 & quad$whole$positions < 501)"))
 })
 
 quad <- quadrants(rr, whole=FALSE, m=1000, n=1000)
@@ -30,11 +32,15 @@ test_that(paste("Testing quadrants"), {
     expect(quad$downdown$j == 449,  paste("quad$downdown$j = ", quad$downdown$j, "!= 449"))
     expect(length(quad$downdown$positions) == 449,
            paste("length(quaddowndown$positions) = ", length(quad$downdown$positions), "!= 449"))
+    expect(all(quad$downdown$positions > 0 & quad$downdown$positions < 500),
+           paste("all(quad$downdown$positions > 0 & quad$downdown$positions < 501)"))
     
     expect(quad$upup$i == 500,  paste("quad$upup$i = ", quad$upup$i, "!= 500"))
     expect(quad$upup$j == 500,  paste("quad$upup$j = ", quad$upup$j, "!= 500"))
     expect(length(quad$upup$positions) == 501,
            paste("length(quadupup$positions) = ", length(quad$upup$positions), "!= 501"))
+    expect(all(quad$upup$positions > 499 & quad$upup$positions < 1001),
+           paste("all(quad$upup$positions > 500 & quad$upup$positions < 1001)"))
 })
 
 a <- as.double(1:1000) - 500 - 1
