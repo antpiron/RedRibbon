@@ -123,7 +123,7 @@ setoptions.rrho <- function(self, enrichment_mode=NULL, ggplot_colours = NULL, d
 }
 
 quadrants.rrho <- function(self, m=NULL, n=NULL,
-                           whole=TRUE, ea=FALSE)
+                           whole=TRUE, ea=FALSE, threshold=0.05)
 {
     len <- length(self$data$a)
 
@@ -147,40 +147,52 @@ quadrants.rrho <- function(self, m=NULL, n=NULL,
         coord_downdown <- rectangle_min(self, 1, 1, a_ltzero, b_ltzero, m=m, n=n, direction="enrichment", ea=ea)
         if (! all(is.na(coord_downdown)) )
         {
-            
-            quadrants$downdown <- enrichment(self, coord_downdown[1], coord_downdown[2])
-            quadrants$downdown$i  <- coord_downdown[1]
-            quadrants$downdown$j  <- coord_downdown[2]
+            downdown <- enrichment(self, coord_downdown[1], coord_downdown[2])
+            if (downdown$direction > 0 && downdown$pvalue <= threshold)
+            {
+                quadrants$downdown <- enrichment(self, coord_downdown[1], coord_downdown[2])
+                quadrants$downdown$i  <- coord_downdown[1]
+                quadrants$downdown$j  <- coord_downdown[2]
+            }
         }
 
         coord_upup <- rectangle_min(self, a_ltzero + 1, b_ltzero + 1, len - a_ltzero, len - b_ltzero,
                                     m=m, n=n, direction="enrichment", ea=ea)
         if (! all(is.na(coord_upup)) )
         {
-            
-            quadrants$upup <- enrichment(self, coord_upup[1], coord_upup[2], directions="upup")
-            quadrants$upup$i  <- coord_upup[1]
-            quadrants$upup$j  <- coord_upup[2]
+            upup <- enrichment(self, coord_upup[1], coord_upup[2], directions="upup")
+            if (upup$direction > 0 && upup$pvalue <= threshold)
+            {
+                quadrants$upup <- upup
+                quadrants$upup$i  <- coord_upup[1]
+                quadrants$upup$j  <- coord_upup[2]
+            }
         }
 
         coord_updown <- rectangle_min(self, a_ltzero + 1, 1, len - a_ltzero, b_ltzero,
                                     m=m, n=n, direction="notenrichment", ea=ea)
         if (! all(is.na(coord_updown)) )
         {
-            
-            quadrants$updown <- enrichment(self, coord_updown[1], coord_updown[2], directions="updown")
-            quadrants$updown$i  <- coord_updown[1]
-            quadrants$updown$j  <- coord_updown[2]
+            updown <- enrichment(self, coord_updown[1], coord_updown[2], directions="updown")
+            if (updown$direction < 0 && updown$pvalue <= threshold)
+            {
+                quadrants$updown <- updown
+                quadrants$updown$i  <- coord_updown[1]
+                quadrants$updown$j  <- coord_updown[2]
+            }
         }
 
         coord_downup <- rectangle_min(self, 1, b_ltzero + 1, a_ltzero, len - b_ltzero,
                                     m=m, n=n, direction="notenrichment", ea=ea)
         if (! all(is.na(coord_downup)) )
         {
-            
-            quadrants$downup <- enrichment(self, coord_downup[1], coord_downup[2], directions="downup")
-            quadrants$downup$i  <- coord_downup[1]
-            quadrants$downup$j  <- coord_downup[2]
+            downup <- enrichment(self, coord_downup[1], coord_downup[2], directions="downup")
+            if (downup$direction < 0 && downup$pvalue <= threshold)
+            {
+                quadrants$downup <-downup
+                quadrants$downup$i  <- coord_downup[1]
+                quadrants$downup$j  <- coord_downup[2]
+            }
         }
 
     }
@@ -188,7 +200,8 @@ quadrants.rrho <- function(self, m=NULL, n=NULL,
     return(quadrants)
 }
 
-ggplot.rrho <- function (self, n = NULL, labels = c("a", "b"), quadrants=TRUE, show.pval=TRUE)
+ggplot.rrho <- function (self, n = NULL, labels = c("a", "b"), show.quadrants=TRUE, quadrants=NULL, show.pval=TRUE,
+                         repel.force=150, base_size=20)
 {
     len <- length(self$data$a)
 
@@ -226,23 +239,54 @@ ggplot.rrho <- function (self, n = NULL, labels = c("a", "b"), quadrants=TRUE, s
         scale_y_continuous(labels = label_percent(accuracy = 1, scale = 100/n.j) )
 
     ## find the middle of the plots
-    a_ltzero <- sum(self$data$a < 0)
-    x.ind <- a_ltzero
-    if ( x.ind == 0 )
-        x.ind = n / 2
-
-    b_ltzero <- sum(self$data$b < 0)
-    y.ind <- b_ltzero
-    if ( y.ind == 0 )
-        y.ind = n / 2
-
-    ## plot dotted quadrant lines
-    if (quadrants)
-        gg  <- gg +
-            ggplot2::geom_vline(aes(xintercept = x.ind * n.i / n), 
-                                linetype = "dotted", colour = "gray10",size = 1) +
-            ggplot2::geom_hline(aes(yintercept = y.ind * n.j / n), 
-                                linetype = "dotted", colour = "gray10",size = 1)
+    if (show.quadrants || show.pval)
+    {
+        a_ltzero <- sum(self$data$a < 0)
+        x.ind <- a_ltzero
+        if ( x.ind == 0 )
+            x.ind = len / 2
+        
+        b_ltzero <- sum(self$data$b < 0)
+        y.ind <- b_ltzero
+        if ( y.ind == 0 )
+            y.ind = len / 2
+        
+        ## plot dotted quadrant lines
+        if (show.quadrants)
+        {
+            print(x.ind)
+            print( n.i)
+            print(n)
+            print(x.ind * n.i / n)
+            gg  <- gg +
+                ggplot2::geom_vline(aes(xintercept = x.ind * n.i / len), 
+                                    linetype = "dotted", colour = "gray10",size = 1) +
+                ggplot2::geom_hline(aes(yintercept = y.ind * n.j / len), 
+                                    linetype = "dotted", colour = "gray10",size = 1)
+        }
+        
+        ## plot pvalue
+        if (show.pval)
+        {
+            if (! is.null(quadrants) )
+            {
+            pval_size  <- as.integer(base_size * 1/5)
+            quadrants_df <- as.data.frame(
+                do.call(rbind, lapply(quadrants,
+                                      function (quadrant) data.frame(i=quadrant$i, j=quadrant$i,
+                                                                     pvalue=quadrant$pvalue, value=quadrant$pvalue))))
+            print(quadrants_df)
+            gg <- gg +
+                ggrepel::geom_text_repel(data=quadrants_df,
+                                         aes(x=i * n.i / len, y=j * n.j / len,
+                                             label=formatC(pvalue,
+                                                           format = "e", digits = 1),
+                                             colour = "gray"),
+                                         hjust=1, vjust=1, colour = "black",
+                                         force = repel.force, show.legend = FALSE, size = pval_size)
+            }
+        }
+    }
     
     return(gg)
 }

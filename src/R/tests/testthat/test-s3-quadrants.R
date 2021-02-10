@@ -37,6 +37,27 @@ test_that(paste("Testing quadrants"), {
            paste("length(quadupup$positions) = ", length(quad$upup$positions), "!= 501"))
 })
 
+a <- as.double(1:1000) - 500
+b <- as.double(1000:1) - 500
+
+rr <- newRRHO(a, b)
+
+quad <- quadrants(rr, whole=FALSE, m=1000, n=1000)
+test_that(paste("Testing quadrants"), {
+    expect(is.list(quad), paste("type(quad) = ", typeof(quad)))
+    expect(is.list(quad$updown),  paste("type(quad$updown) = ", typeof(quad$updown)))
+    expect(is.list(quad$downup),  paste("type(quad$downup) = ", typeof(quad$downup)))
+    
+    expect(quad$downup$i == 499,  paste("quad$downup$i = ", quad$downup$i, "!= 499"))
+    expect(quad$downup$j == 501,  paste("quad$downup$j = ", quad$downup$j, "!= 501"))
+    expect(length(quad$downup$positions) == 499,
+           paste("length(quaddownup$positions) = ", length(quad$downup$positions), "!= 499"))
+    
+    expect(quad$updown$i == 501,  paste("quad$updown$i = ", quad$updown$i, "!= 501"))
+    expect(quad$updown$j == 499,  paste("quad$updown$j = ", quad$updown$j, "!= 499"))
+    expect(length(quad$updown$positions) == 499,
+           paste("length(quadupdown$positions) = ", length(quad$updown$positions), "!= 499"))
+})
 
 
 #> Test passed
