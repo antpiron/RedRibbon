@@ -339,21 +339,16 @@ rrho_rectangle(struct rrho *rrho, size_t i, size_t j, size_t ilen, size_t jlen,
 	       int mode, int log_flag)
 {
   struct rrho_result res;
-  size_t istep = ilen / m;
-  size_t jstep = jlen / n;
-  long double pvalue;
-
-  if ( 0 == istep )
-    istep = 1;
-  if ( 0 == jstep )
-    jstep = 1;
+  double istep = (double) ilen / (double) m;
+  double jstep = (double) jlen / (double) n;
+  long double pvalue;      
   
   for (size_t y = 0 ; y < m ; y++)
     {
       for (size_t x = 0 ; x < n ; x++)
 	{
-	  size_t ii = i + y * istep;
-	  size_t jj = j + x * jstep;
+	  size_t ii = round(i + y * istep);
+	  size_t jj = round(j + x * jstep);
 	  rrho_generic(rrho, ii, jj, &res, mode);
 
 	  pvalue = res.pvalue;
@@ -373,23 +368,17 @@ rrho_rectangle_min(struct rrho *rrho, size_t i, size_t j, size_t ilen, size_t jl
 		    size_t m, size_t n, struct rrho_coord *coord, int mode, int direction)
 {
   struct rrho_result res;
-  size_t istep = ilen / m;
-  size_t jstep = jlen / n;
+  double istep = (double) ilen / (double) m;
+  double jstep = (double) jlen / (double) n;
   long double pvalue = 1.1;
   int ret = -1;
 
-  if ( 0 == istep )
-    istep = 1;
-  if ( 0 == jstep )
-    jstep = 1;
-  
-  
   for (size_t y = 0 ; y < m ; y++)
     {
       for (size_t x = 0 ; x < n ; x++)
 	{
-	  size_t ii = i + y * istep;
-	  size_t jj = j + x * jstep;
+	  size_t ii = round(i + y * istep);
+	  size_t jj = round(j + x * jstep);
 	  rrho_generic(rrho, ii, jj, &res, mode);
 
 	  if ( copysign(1, res.direction) == copysign(1, direction) && res.pvalue < pvalue )
