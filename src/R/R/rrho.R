@@ -237,10 +237,18 @@ ggplot.rrho <- function (self, n = NULL, labels = c("a", "b"), show.quadrants=TR
         xlab(labels[1]) + ylab(labels[2]) +
         scale_x_continuous(labels = label_percent(accuracy = 1, scale = 100/n.i)) +
         scale_y_continuous(labels = label_percent(accuracy = 1, scale = 100/n.j) ) +
+        ## ggplot2::theme_bw() +
         ggplot2::theme(axis.title=element_text(size=base_size,face="bold"),
                        legend.title = element_text(size = base_size * 7 / 10),
                        legend.text = element_text(size = base_size * 1 / 2),
-                       )
+                       ) +
+        ggplot2::theme(axis.text.x=ggplot2::element_blank(),
+                       axis.ticks.x=ggplot2::element_blank(),
+                       axis.text.y=ggplot2::element_blank(),
+                       axis.ticks.y=ggplot2::element_blank(),
+                       panel.grid.major = ggplot2::element_blank(),
+                       panel.grid.minor = ggplot2::element_blank(),
+                       panel.background = ggplot2::element_blank())
 
     ## find the middle of the plots
     if (show.quadrants || show.pval)
@@ -258,10 +266,6 @@ ggplot.rrho <- function (self, n = NULL, labels = c("a", "b"), show.quadrants=TR
         ## plot dotted quadrant lines
         if (show.quadrants)
         {
-            print(x.ind)
-            print( n.i)
-            print(n)
-            print(x.ind * n.i / n)
             gg  <- gg +
                 ggplot2::geom_vline(aes(xintercept = x.ind * n.i / len), 
                                     linetype = "dotted", colour = "gray10",size = 1) +
