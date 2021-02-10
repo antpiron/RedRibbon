@@ -236,7 +236,11 @@ ggplot.rrho <- function (self, n = NULL, labels = c("a", "b"), show.quadrants=TR
                                       values=colors.values) +
         xlab(labels[1]) + ylab(labels[2]) +
         scale_x_continuous(labels = label_percent(accuracy = 1, scale = 100/n.i)) +
-        scale_y_continuous(labels = label_percent(accuracy = 1, scale = 100/n.j) )
+        scale_y_continuous(labels = label_percent(accuracy = 1, scale = 100/n.j) ) +
+        ggplot2::theme(axis.title=element_text(size=base_size,face="bold"),
+                       legend.title = element_text(size = base_size * 7 / 10),
+                       legend.text = element_text(size = base_size * 1 / 2),
+                       )
 
     ## find the middle of the plots
     if (show.quadrants || show.pval)
@@ -273,9 +277,8 @@ ggplot.rrho <- function (self, n = NULL, labels = c("a", "b"), show.quadrants=TR
             pval_size  <- as.integer(base_size * 1/5)
             quadrants_df <- as.data.frame(
                 do.call(rbind, lapply(quadrants,
-                                      function (quadrant) data.frame(i=quadrant$i, j=quadrant$i,
+                                      function (quadrant) data.frame(i=quadrant$i, j=quadrant$j,
                                                                      pvalue=quadrant$pvalue, value=quadrant$pvalue))))
-            print(quadrants_df)
             gg <- gg +
                 ggrepel::geom_text_repel(data=quadrants_df,
                                          aes(x=i * n.i / len, y=j * n.j / len,

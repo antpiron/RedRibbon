@@ -133,7 +133,7 @@ rrho_intersect(struct rrho *rrho, size_t i, size_t j, int directions, struct bit
     }
   else if (RRHO_UP_DOWN == directions)
     {
-      update_bitsets(rrho, i-i, j);
+      update_bitsets(rrho, i-1, j);
 
       bitset_init(&not_a, rrho->n);
       

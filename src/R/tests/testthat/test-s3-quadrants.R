@@ -37,8 +37,8 @@ test_that(paste("Testing quadrants"), {
            paste("length(quadupup$positions) = ", length(quad$upup$positions), "!= 501"))
 })
 
-a <- as.double(1:1000) - 500
-b <- as.double(1000:1) - 500
+a <- as.double(1:1000) - 500 - 1
+b <-rev(a)
 
 rr <- newRRHO(a, b)
 
@@ -60,4 +60,4 @@ test_that(paste("Testing quadrants"), {
 })
 
 
-#> Test passed
+
