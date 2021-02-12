@@ -32,7 +32,7 @@ main(int argc, char *argv[argc])
   
   rrho_init(&rrho, n, a, b);
   
-  rrho_rectangle_min(&rrho, 0, 0, n, n, n, n, &coord, RRHO_HYPER, 1);
+  rrho_rectangle_min(&rrho, 0, 0, n, n, n, n, RRHO_HYPER, 1, &coord);
   rrho_hyper(&rrho, coord.i, coord.j, &res);
   
   ERROR_UNDEF_FATAL_FMT(exp_i != coord.i || exp_j != coord.j, 
@@ -44,7 +44,7 @@ main(int argc, char *argv[argc])
 
   size_t n_i = 2;
   size_t n_j = 2; 
-  rrho_rectangle_min(&rrho, 0, 0, n, n, n/n_i, n/n_j, &coord, RRHO_HYPER, 1);
+  rrho_rectangle_min(&rrho, 0, 0, n, n, n/n_i, n/n_j, RRHO_HYPER, 1, &coord);
   rrho_hyper(&rrho, coord.i, coord.j, &res);
   
   ERROR_UNDEF_FATAL_FMT( labs(exp_i - coord.i) >= n_i || labs(exp_j - coord.j) >= n_j, 
@@ -63,7 +63,7 @@ main(int argc, char *argv[argc])
   
   rrho_init(&rrho, n, a, b);
   
-  rrho_rectangle_min(&rrho, 0, 0, n, n, n, n, &coord, RRHO_HYPER, 1);
+  rrho_rectangle_min(&rrho, 0, 0, n, n, n, n, RRHO_HYPER, 1, &coord);
   rrho_hyper(&rrho, coord.i, coord.j, &res);
 
 
@@ -86,7 +86,7 @@ main(int argc, char *argv[argc])
   
   rrho_init(&rrho, n, a, b);
   
-  rrho_rectangle_min(&rrho, 0, 0, n, n, n, n, &coord, RRHO_HYPER, 1);
+  rrho_rectangle_min(&rrho, 0, 0, n, n, n, n, RRHO_HYPER, 1, &coord);
   rrho_hyper(&rrho, coord.i, coord.j, &res);
 
   ERROR_UNDEF_FATAL_FMT(coord.i <= coord.j + n10perc, 
@@ -107,7 +107,7 @@ main(int argc, char *argv[argc])
   
   rrho_init(&rrho, n, a, b);
   
-  ret = rrho_rectangle_min(&rrho, 0, 0, n, n, n, n, &coord, RRHO_HYPER, -1);
+  ret = rrho_rectangle_min(&rrho, 0, 0, n, n, n, n, RRHO_HYPER_TWO_TAILED, -1, &coord);
   ERROR_UNDEF_FATAL_FMT(0 != ret, 
   			"FAIL: inverted rrho_rectangle_min(0,0,%zu,%zu) ret = %d\n",
 			n, n, ret);

@@ -165,6 +165,10 @@ rrho_hyper_two_tailed_as_r_module(struct rrho *rrho, size_t i, size_t j, struct 
   res->pvalue = stats_hyper_Fl(lower, i+1, j+1, rrho->n) +
     stats_hyper_taill(upper, i+1, j+1, rrho->n, STATS_UPPER);
   // res->fdr = (0 == count)?-1:mean / count;
+  
+  if (res->pvalue > 1)
+    res->pvalue = 1;
+
   res->count = count;
   
   return 0;
@@ -196,6 +200,10 @@ rrho_hyper_two_tailed(struct rrho *rrho, size_t i, size_t j, struct rrho_result 
     min_pval = pval;
   
   res->pvalue = 2 * min_pval;
+  
+  if (res->pvalue > 1)
+    res->pvalue = 1;
+
   // res->fdr = (0 == count)?-1:mean / count;
   res->count = count;
   
@@ -208,113 +216,18 @@ rrho_hyper(struct rrho *rrho, size_t i, size_t j, struct rrho_result *res)
   // https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2943622/
   // double stats_hyper_F(long k, long K, long n, long N)
   size_t count = count_intersect(rrho, i, j);
-  long double mean = (double) (i+1) * (double) (j+1) / rrho->n;
 
-  if ( (double) count < mean )
-    {
-      res->pvalue = stats_hyper_Fl(count, i+1, j+1, rrho->n);
-      res->direction = -1;
-    }
-  else
-    {
-      res->pvalue = stats_hyper_taill(count, i+1, j+1, rrho->n, STATS_UPPER);
-      res->direction = 1;
-    }
+  res->pvalue = stats_hyper_taill(count, i+1, j+1, rrho->n, STATS_UPPER);
+  res->direction = 1;
+
+  if (res->pvalue > 1)
+    res->pvalue = 1;
   // res->fdr = (0 == count)?-1:mean / count;
   res->count = count;
   
   return 0;
 }
 
-static inline
-int
-stop_condition(size_t iter, long double pvalue_perm)
-{
-  if (iter < 32)
-    return 1;
-
-  if ( pvalue_perm <= 1.0L / sqrtl(iter) )
-    return 1;
-  
-  return 0;
-}
-
-struct beta_params
-{
-  long double alpha, beta;
-};
-
-static long double
-beta_cdfl(long double x, void *cls)
-{
-  struct beta_params *params = cls;
-  return stats_beta_Fl(x, params->alpha, params->beta);
-}
-
-int
-rrho_permutation_generic(struct rrho *rrho, size_t i, size_t j, int mode, size_t niter, struct rrho_result *res)
-{
-  int ret;
-  size_t below = 0;
-  size_t sizeb = sizeof(double) * rrho->n;
-  double *b = malloc(sizeb);
-  long double *pvalues = malloc(sizeof(long double) * niter);
-  long double pvalue_perm = 0.0d;
-  size_t iter;
-  int stop;
-  struct beta_params bparams;
-
-
-  ret = rrho_generic(rrho, i, j, res, mode);
-
-  memcpy(b, rrho->b, sizeb);
-
-  for (iter = 0, stop = 1 ; iter < niter && stop ; iter++)
-    {
-      struct rrho rrho_perm;
-      struct rrho_result res_perm;
-
-      stop = stop_condition(iter, pvalue_perm);
-      if (stop)
-	{
-	  stats_shuffle(b, rrho->n, sizeof(double));
-	  
-	  rrho_init(&rrho_perm, rrho->n, rrho->a, b);
-	  
-	  rrho_generic(&rrho_perm, i, j, &res_perm, mode);
-	  
-	  below += (res_perm.pvalue <= res->pvalue);
-	  // for (size_t i = 0 ; i < 5 ; i++)
-	  //  printf("%e ", rrho_perm.b[i]);
-	  // printf("%Le %Le %zu\n", res_perm.pvalue, res->pvalue, below);
-	  pvalue_perm = (long double) below / (long double) (iter + 1);
-	  
-	  pvalues[iter] = res_perm.pvalue;
-	  
-	  rrho_destroy(&rrho_perm);
-	}
-   }
-
-  if (stop)
-    {
-      stats_beta_fitl(iter, pvalues, &bparams.alpha, &bparams.beta);
-      stats_ks_testl(iter, pvalues, beta_cdfl, &bparams, &res->pvalue_ks, &res->stat_ks);
-      printf("Beta fit: alpha = %Le, beta = %Le, pvalue_ks = %Le\n", bparams.alpha, bparams.beta, res->pvalue_ks);
-
-      res->pvalue_perm = stats_beta_Fl(res->pvalue, bparams.alpha, bparams.beta);
-    }
-  else
-    {
-      printf("Perm\n");
-      res->pvalue_perm =  pvalue_perm;
-      res->pvalue_ks = -1; res->stat_ks = -1;
-    }
-  
-  free(b);
-  free(pvalues);
-  
-  return ret;
-}
 
 static long double
 mylogl(long double x)
@@ -335,8 +248,7 @@ mylogl(long double x)
 
 int
 rrho_rectangle(struct rrho *rrho, size_t i, size_t j, size_t ilen, size_t jlen,
-	       size_t m, size_t n, double dst[m][n],
-	       int mode, int log_flag)
+	       size_t m, size_t n, int mode, int log_flag, double dst[m][n])
 {
   struct rrho_result res;
   double istep = (double) ilen / (double) m;
@@ -349,7 +261,15 @@ rrho_rectangle(struct rrho *rrho, size_t i, size_t j, size_t ilen, size_t jlen,
 	{
 	  size_t ii = round(i + y * istep);
 	  size_t jj = round(j + x * jstep);
-	  rrho_generic(rrho, ii, jj, &res, mode);
+
+	  /* Let be safe */
+	  if (ii >= rrho->n)
+	    ii = rrho->n - 1;
+	  
+	  if (jj >= rrho->n)
+	    jj = rrho->n - 1;
+	  
+	  rrho_generic(rrho, ii, jj, mode, &res);
 
 	  pvalue = res.pvalue;
 	  if (log_flag)
@@ -365,7 +285,7 @@ rrho_rectangle(struct rrho *rrho, size_t i, size_t j, size_t ilen, size_t jlen,
 
 int
 rrho_rectangle_min(struct rrho *rrho, size_t i, size_t j, size_t ilen, size_t jlen,
-		    size_t m, size_t n, struct rrho_coord *coord, int mode, int direction)
+		    size_t m, size_t n, int mode, int direction, struct rrho_coord *coord)
 {
   struct rrho_result res;
   double istep = (double) ilen / (double) m;
@@ -379,7 +299,15 @@ rrho_rectangle_min(struct rrho *rrho, size_t i, size_t j, size_t ilen, size_t jl
 	{
 	  size_t ii = round(i + y * istep);
 	  size_t jj = round(j + x * jstep);
-	  rrho_generic(rrho, ii, jj, &res, mode);
+
+	  /* Let be safe */
+	  if (ii >= rrho->n)
+	    ii = rrho->n - 1;
+	  
+	  if (jj >= rrho->n)
+	    jj = rrho->n - 1;
+
+	  rrho_generic(rrho, ii, jj, mode, &res);
 
 	  if ( copysign(1, res.direction) == copysign(1, direction) && res.pvalue < pvalue )
 	    {
@@ -392,6 +320,84 @@ rrho_rectangle_min(struct rrho *rrho, size_t i, size_t j, size_t ilen, size_t jl
     }
   
   return ret;
+}
+
+static inline
+int
+stop_condition(size_t iter, size_t below)
+{
+  if (iter < 32 || below < 5)
+    return 0;
+
+  long double  pvalue_perm = (long double) below / (long double) iter;
+  if ( pvalue_perm <= 1.0L / sqrtl(iter) )
+    return 0;
+  
+  return 1;
+}
+
+struct beta_params
+{
+  long double alpha, beta;
+};
+
+static long double
+beta_cdfl(long double x, void *cls)
+{
+  struct beta_params *params = cls;
+  return stats_beta_Fl(x, params->alpha, params->beta);
+}
+
+int
+rrho_permutation_generic(struct rrho *rrho, size_t i, size_t j, size_t ilen, size_t jlen,
+			 size_t m, size_t n, int mode, int direction, int algorithm,
+			 size_t niter, long double pvalue, struct rrho_permutation_result *res_perm)
+{
+  int ret;
+  size_t sizeb = sizeof(double) * rrho->n;
+  double *b = malloc(sizeb);
+  long double *pvalues = malloc(sizeof(long double) * niter);
+  long double threshold;
+  size_t iter;
+  struct rrho_coord coord;
+  struct rrho_result res;
+  struct beta_params bparams;
+
+  
+  memcpy(b, rrho->b, sizeb);
+
+  for (iter = 0 ; iter < niter ; iter++)
+    {
+      struct rrho rrho_perm;
+
+      stats_shuffle(b, rrho->n, sizeof(double));
+      
+      rrho_init(&rrho_perm, rrho->n, rrho->a, b);
+      
+      ret = rrho_rectangle_min_generic(&rrho_perm, i, j, ilen, jlen, m, n, mode, direction, algorithm, &coord);
+      if (ret < 0)
+	res.pvalue = 1;
+      else
+	rrho_generic(&rrho_perm, coord.i, coord.j, mode, &res);
+ 	  
+      pvalues[iter] = res.pvalue;
+      
+      rrho_destroy(&rrho_perm);
+    }
+
+  stats_beta_fitl(iter, pvalues, &bparams.alpha, &bparams.beta);
+  stats_ks_testl(iter, pvalues, beta_cdfl, &bparams, &res_perm->pvalue_ks, &res_perm->stat_ks);
+ 
+  threshold = stats_beta_F_inv(0.05, bparams.alpha, bparams.beta);
+  
+  res_perm->pvalue = pvalue * 0.05 / threshold;
+  if (res_perm->pvalue > 1)
+    res_perm->pvalue = 1;
+  
+  free(b);
+  free(pvalues);
+  
+  return 0;
 }
 
 
@@ -412,7 +418,7 @@ fitness(struct rrho_coord x,  struct params *param)
   struct rrho_result res;
   long double ret;
   
-  rrho_generic(param->rrho, x.i, x.j, &res, param->mode);
+  rrho_generic(param->rrho, x.i, x.j, param->mode, &res);
   if ( copysign(1, res.direction) != copysign(1, param->direction) )
     return 0;
 
@@ -466,7 +472,7 @@ EA_INIT(optim,struct rrho_coord,mate,mutate,fitness,struct params *);
 
 int
 rrho_rectangle_min_ea(struct rrho *rrho, size_t i, size_t j, size_t ilen, size_t jlen,
-		      struct rrho_coord *coord, int mode, int direction)
+		      int mode, int direction, struct rrho_coord *coord)
 {
 #define ITER (200)
   // const size_t max_pop = ilen * jlen;
