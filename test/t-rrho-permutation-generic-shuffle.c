@@ -35,11 +35,12 @@ main(int argc, char *argv[argc])
   rrho_generic(&rrho, coord.i, coord.j, RRHO_HYPER, &res);
   
   rrho_permutation_generic(&rrho, 0, 0, n, n, n, n, RRHO_HYPER, 1, RRHO_CLASSIC, NITER, res.pvalue, &res_perm);
-  printf("shuffle pvalue = %Le, pvalue_perm = %Le, pvalue_ks = %Le\n", res.pvalue, res_perm.pvalue, res_perm.pvalue_ks);
-  ERROR_UNDEF_FATAL_FMT(res_perm.pvalue_ks <= 0.01,
-			"FAIL: shuffle rrho_permutation_generic(%d,%d) pval_ks = %.20Le <= 0.01\n", n, n, res_perm.pvalue_ks);
+  printf("shuffled pvalue = %Le, pvalue_perm = %Le, pvalue_ks = %Le\n", res.pvalue, res_perm.pvalue, res_perm.pvalue_ks);
+  ERROR_UNDEF_FATAL_FMT(res_perm.pvalue < res.pvalue,
+			"FAIL: shuffled rrho_permutation_generic(%d,%d) pvalue_perm = %.20Lf < %Lf = pvalue (pvalue_ks = %Lf)\n",
+			n, n, res_perm.pvalue, res.pvalue, res_perm.pvalue_ks);
   ERROR_UNDEF_FATAL_FMT(res_perm.pvalue <= 0.05,
-			"FAIL: shuffle rrho_permutation_generic(%d,%d) pval = %.20Le <= 0.05\n", n, n, res_perm.pvalue);
+			"FAIL: shuffled rrho_permutation_generic(%d,%d) pval = %.20Le <= 0.05\n", n, n, res_perm.pvalue);
   
   rrho_destroy(&rrho);
   free(a);
