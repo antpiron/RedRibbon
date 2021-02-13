@@ -353,42 +353,45 @@ rrho_permutation_generic(struct rrho *rrho, size_t i, size_t j, size_t ilen, siz
 			 void *params, int mode, int direction, int algorithm,
 			 size_t niter, long double pvalue, struct rrho_permutation_result *res_perm)
 {
-  int ret;
-  size_t sizeb = sizeof(double) * rrho->n;
-  double *b = malloc(sizeb);
   long double *pvalues = malloc(sizeof(long double) * niter);
   long double threshold;
   const long double alpha = 0.05;
   const long double alpha_ks = 0.05;
-  size_t iter;
-  struct rrho_coord coord;
-  struct rrho_result res;
   struct beta_params bparams;
 
-  
-  memcpy(b, rrho->b, sizeb);
-
-  for (iter = 0 ; iter < niter ; iter++)
-    {
-      struct rrho rrho_perm;
-
-      stats_shuffle(b, rrho->n, sizeof(double));
-      
-      rrho_init(&rrho_perm, rrho->n, rrho->a, b);
-      
-      ret = rrho_rectangle_min_generic(&rrho_perm, i, j, ilen, jlen, params, mode, direction, algorithm, &coord);
-      if (ret < 0)
-	res.pvalue = 1;
-      else
+#pragma omp parallel
+  {
+    size_t sizeb = sizeof(double) * rrho->n;
+    double *b = malloc(sizeb);
+    memcpy(b, rrho->b, sizeb);
+    
+#pragma omp for
+    for (size_t iter = 0 ; iter < niter ; iter++)
+      {
+	struct rrho rrho_perm;
+	struct rrho_coord coord;
+	struct rrho_result res;
+	int ret;
+	
+	stats_shuffle(b, rrho->n, sizeof(double));
+	
+	rrho_init(&rrho_perm, rrho->n, rrho->a, b);
+	
+	ret = rrho_rectangle_min_generic(&rrho_perm, i, j, ilen, jlen, params, mode, direction, algorithm, &coord);
+	if (ret < 0)
+	  res.pvalue = 1;
+	else
 	rrho_generic(&rrho_perm, coord.i, coord.j, mode, &res);
- 	  
-      pvalues[iter] = res.pvalue;
-      
-      rrho_destroy(&rrho_perm);
-    }
+	
+	pvalues[iter] = res.pvalue;
+	
+	rrho_destroy(&rrho_perm);
+      }
+    free(b);
+  }
 
-  stats_beta_fitl(iter, pvalues, &bparams.alpha, &bparams.beta);
-  stats_ks_testl(iter, pvalues, beta_cdfl, &bparams, &res_perm->pvalue_ks, &res_perm->stat_ks);
+  stats_beta_fitl(niter, pvalues, &bparams.alpha, &bparams.beta);
+  stats_ks_testl(niter, pvalues, beta_cdfl, &bparams, &res_perm->pvalue_ks, &res_perm->stat_ks);
 
   if (res_perm->stat_ks > alpha_ks)
     {
@@ -396,7 +399,7 @@ rrho_permutation_generic(struct rrho *rrho, size_t i, size_t j, size_t ilen, siz
     }
   else
     {
-      size_t *index = malloc(sizeof(size_t) * iter);
+      size_t *index = malloc(sizeof(size_t) * niter);
       size_t quantile = floorl(alpha * niter);
 
       if (quantile >= niter)
@@ -413,7 +416,6 @@ rrho_permutation_generic(struct rrho *rrho, size_t i, size_t j, size_t ilen, siz
   if (res_perm->pvalue > 1)
     res_perm->pvalue = 1;
   
-  free(b);
   free(pvalues);
   
   return 0;

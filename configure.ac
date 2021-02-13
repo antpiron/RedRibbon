@@ -14,6 +14,7 @@ AC_CONFIG_HEADERS([config.h])
 AC_PROG_CC
 # AC_PROG_CC_C11
 ALE_AC_PROG_CC_C11
+AC_OPENMP
 
 AC_CHECK_LIB([m],[cos])
 
@@ -40,6 +41,8 @@ AC_SEARCH_LIBS([stats_hyper_F], [ale],,[AC_MSG_ERROR([
  libale not found
 -------------------------])])
 
+AM_CFLAGS="$AM_CFLAGS $OPENMP_CFLAGS"
+AC_SUBST([AM_CFLAGS])
 
 AC_CONFIG_FILES([Makefile src/Makefile test/Makefile perf/Makefile])
 AC_OUTPUT

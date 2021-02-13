@@ -1,4 +1,4 @@
-AM_CFLAGS = -Wall -Wextra -I$(top_srcdir) $(INCLUDE_R_HEADER_PATH)
+AM_CFLAGS = $(OPENMP_CFLAGS) -Wall -Wextra -I$(top_srcdir) $(INCLUDE_R_HEADER_PATH) 
 AM_LFLAGS=-R
 
 
