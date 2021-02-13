@@ -31,7 +31,7 @@ main(int argc, char *argv[argc])
  
   rrho_init(&rrho, n, a, b);
   
-  rrho_rectangle_min_ea(&rrho, 0, 0, mres, nres, RRHO_HYPER, 1, &res);
+  rrho_rectangle_min_ea(&rrho, 0, 0, mres, nres, NULL, RRHO_HYPER, 1, &res);
   ERROR_UNDEF_FATAL_FMT(exp_i != res.i,
 			"FAIL: rrho_rectangle_min() i = %zu != %zu\n", res.i, exp_i);
   ERROR_UNDEF_FATAL_FMT(exp_j != res.j,

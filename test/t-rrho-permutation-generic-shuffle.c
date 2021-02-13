@@ -20,7 +20,8 @@ main(int argc, char *argv[argc])
   double *b = malloc(n * sizeof(double));
   struct rrho_coord coord;
   long double exp;
-
+  struct rrho_rectangle_params params = { .m = n, .n = n };
+  
   for (size_t i = 0 ; i < n ; i++)
     {
       a[i] = i ; // stats_unif_std_rand();
@@ -31,14 +32,15 @@ main(int argc, char *argv[argc])
 
   rrho_init(&rrho, n, a, b);
 
-  rrho_rectangle_min_generic(&rrho, 0, 0, n, n, n, n, RRHO_HYPER, 1, RRHO_CLASSIC, &coord);
+  rrho_rectangle_min_generic(&rrho, 0, 0, n, n, &params, RRHO_HYPER, 1, RRHO_CLASSIC, &coord);
   rrho_generic(&rrho, coord.i, coord.j, RRHO_HYPER, &res);
   
-  rrho_permutation_generic(&rrho, 0, 0, n, n, n, n, RRHO_HYPER, 1, RRHO_CLASSIC, NITER, res.pvalue, &res_perm);
+  rrho_permutation_generic(&rrho, 0, 0, n, n, &params, RRHO_HYPER, 1, RRHO_CLASSIC, NITER, res.pvalue, &res_perm);
   printf("shuffled pvalue = %Le, pvalue_perm = %Le, pvalue_ks = %Le\n", res.pvalue, res_perm.pvalue, res_perm.pvalue_ks);
   ERROR_UNDEF_FATAL_FMT(res_perm.pvalue < res.pvalue,
 			"FAIL: shuffled rrho_permutation_generic(%d,%d) pvalue_perm = %.20Lf < %Lf = pvalue (pvalue_ks = %Lf)\n",
 			n, n, res_perm.pvalue, res.pvalue, res_perm.pvalue_ks);
+  /* TODO: Fix failure in 5% of the time */
   ERROR_UNDEF_FATAL_FMT(res_perm.pvalue <= 0.05,
 			"FAIL: shuffled rrho_permutation_generic(%d,%d) pval_perm = %.20Lf <= 0.05\n", n, n, res_perm.pvalue);
   

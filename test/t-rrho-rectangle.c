@@ -17,6 +17,7 @@ main(int argc, char *argv[argc])
   double *a = malloc(n * sizeof(double));
   double *b = malloc(n * sizeof(double));
   double exp;
+  struct rrho_rectangle_params params = { .m = mres, .n = nres };
 
   for (size_t i = 0 ; i < n ; i++)
     {
@@ -26,17 +27,17 @@ main(int argc, char *argv[argc])
   
   rrho_init(&rrho, n, a, b);
   
-  rrho_rectangle(&rrho, 0, 0, mres, nres,  mres, nres, RRHO_HYPER, 0, res);
+  rrho_rectangle(&rrho, 0, 0, mres, nres, &params, RRHO_HYPER, 0, res);
   exp = 1.0 / (double) n;
   ERROR_UNDEF_FATAL_FMT(0 != ale_cmp_double(res[0][0], exp, eps),
 			"FAIL: rrho_rectangle(0,0) pval = %.20e != %.20e\n", res[0][0], exp);
 
-  rrho_rectangle(&rrho, n-mres, n-nres, mres, nres, mres, nres, RRHO_HYPER, 0, res);
+  rrho_rectangle(&rrho, n-mres, n-nres, mres, nres, &params, RRHO_HYPER, 0, res);
   exp = 1.0;
   ERROR_UNDEF_FATAL_FMT(0 != ale_cmp_double(res[mres-1][nres-1], exp, eps),
 			"FAIL: rrho_rectangle(0,0) pval = %.20e != %.20e\n", res[mres-1][nres-1], exp);
 
-  rrho_rectangle(&rrho, n-mres, n-nres, mres, nres, mres, nres, RRHO_HYPER, 1, res);
+  rrho_rectangle(&rrho, n-mres, n-nres, mres, nres, &params, RRHO_HYPER, 1, res);
   exp = -log(1.0);
   ERROR_UNDEF_FATAL_FMT(0 != ale_cmp_double(res[mres-1][nres-1], exp, eps),
 			"FAIL: rrho_rectangle(0,0) -log pval = %.20e != %.20e\n", res[mres-1][nres-1], exp);

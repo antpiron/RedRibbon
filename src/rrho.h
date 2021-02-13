@@ -55,6 +55,25 @@ struct rrho_coord
   size_t i, j;
 };
 
+struct rrho_rectangle_params
+{
+  size_t m, n;
+};
+
+struct rrho_rectangle_params_ea
+{
+  double prob_mutation;
+  double sigma;
+  size_t niter;
+  size_t min_pop_size;
+  size_t max_pop_size;
+  /* Private */
+  int mode;
+  int direction;
+  size_t i, j, ilen, jlen;
+  struct rrho *rrho;
+};
+
 int rrho_init(struct rrho *rrho, size_t n, double a[n], double b[n]);
 int rrho_destroy(struct rrho *rrho);
 
@@ -67,17 +86,17 @@ static inline int rrho_generic(struct rrho *rrho, size_t i, size_t j, int mode, 
 void rrho_intersect(struct rrho *rrho, size_t i, size_t j, int directions, struct bitset *bs_res);
 
 int rrho_rectangle(struct rrho *rrho, size_t i, size_t j, size_t ilen, size_t jlen,
-		   size_t m, size_t n, int mode, int log_flag, double dst[m][n]);
+		   struct rrho_rectangle_params *params, int mode, int log_flag, double dst[params->m][params->n]);
 
 int rrho_rectangle_min(struct rrho *rrho, size_t i, size_t j, size_t ilen, size_t jlen,
-		        size_t m, size_t n, int mode, int direction, struct rrho_coord *coord);
+		        struct rrho_rectangle_params *params, int mode, int direction, struct rrho_coord *coord);
 int rrho_rectangle_min_ea(struct rrho *rrho, size_t i, size_t j, size_t ilen, size_t jlen,
-			  int mode, int direction, struct rrho_coord *coord);
+			  struct rrho_rectangle_params_ea *params, int mode, int direction, struct rrho_coord *coord);
 static inline int rrho_rectangle_min_generic(struct rrho *rrho, size_t i, size_t j, size_t ilen, size_t jlen,
-					     size_t m, size_t n, int mode, int direction, int algorithm, struct rrho_coord *coord);
+					     void *params, int mode, int direction, int algorithm, struct rrho_coord *coord);
 
 int rrho_permutation_generic(struct rrho *rrho, size_t i, size_t j, size_t ilen, size_t jlen,
-			     size_t m, size_t n, int mode, int direction, int algorithm,
+			     void *params, int mode, int direction, int algorithm,
 			     size_t niter, long double pvalue, struct rrho_permutation_result *res);
 // inline
 
@@ -95,12 +114,12 @@ rrho_generic(struct rrho *rrho, size_t i, size_t j, int mode, struct rrho_result
 
 static inline int
 rrho_rectangle_min_generic(struct rrho *rrho, size_t i, size_t j, size_t ilen, size_t jlen,
-			   size_t m, size_t n, int mode, int direction, int algorithm, struct rrho_coord *coord)
+			   void *params, int mode, int direction, int algorithm, struct rrho_coord *coord)
 {
   if (RRHO_CLASSIC == algorithm)
-    return rrho_rectangle_min(rrho, i, j, ilen, jlen, m, n, mode, direction, coord);
+    return rrho_rectangle_min(rrho, i, j, ilen, jlen, params, mode, direction, coord);
 
-  return rrho_rectangle_min_ea(rrho, i, j, ilen, jlen, mode, direction, coord);
+  return rrho_rectangle_min_ea(rrho, i, j, ilen, jlen, params, mode, direction, coord);
 }
 
 

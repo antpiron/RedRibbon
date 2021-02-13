@@ -248,16 +248,16 @@ mylogl(long double x)
 
 int
 rrho_rectangle(struct rrho *rrho, size_t i, size_t j, size_t ilen, size_t jlen,
-	       size_t m, size_t n, int mode, int log_flag, double dst[m][n])
+	       struct rrho_rectangle_params *params, int mode, int log_flag, double dst[params->m][params->n])
 {
   struct rrho_result res;
-  double istep = (double) ilen / (double) m;
-  double jstep = (double) jlen / (double) n;
+  double istep = (double) ilen / (double) params->m;
+  double jstep = (double) jlen / (double) params->n;
   long double pvalue;      
   
-  for (size_t y = 0 ; y < m ; y++)
+  for (size_t y = 0 ; y < params->m ; y++)
     {
-      for (size_t x = 0 ; x < n ; x++)
+      for (size_t x = 0 ; x < params->n ; x++)
 	{
 	  size_t ii = round(i + y * istep);
 	  size_t jj = round(j + x * jstep);
@@ -285,17 +285,17 @@ rrho_rectangle(struct rrho *rrho, size_t i, size_t j, size_t ilen, size_t jlen,
 
 int
 rrho_rectangle_min(struct rrho *rrho, size_t i, size_t j, size_t ilen, size_t jlen,
-		    size_t m, size_t n, int mode, int direction, struct rrho_coord *coord)
+		    struct rrho_rectangle_params *params, int mode, int direction, struct rrho_coord *coord)
 {
   struct rrho_result res;
-  double istep = (double) ilen / (double) m;
-  double jstep = (double) jlen / (double) n;
+  double istep = (double) ilen / (double) params->m;
+  double jstep = (double) jlen / (double) params->n;
   long double pvalue = 1.1;
   int ret = -1;
 
-  for (size_t y = 0 ; y < m ; y++)
+  for (size_t y = 0 ; y < params->m ; y++)
     {
-      for (size_t x = 0 ; x < n ; x++)
+      for (size_t x = 0 ; x < params->n ; x++)
 	{
 	  size_t ii = round(i + y * istep);
 	  size_t jj = round(j + x * jstep);
@@ -350,7 +350,7 @@ beta_cdfl(long double x, void *cls)
 
 int
 rrho_permutation_generic(struct rrho *rrho, size_t i, size_t j, size_t ilen, size_t jlen,
-			 size_t m, size_t n, int mode, int direction, int algorithm,
+			 void *params, int mode, int direction, int algorithm,
 			 size_t niter, long double pvalue, struct rrho_permutation_result *res_perm)
 {
   int ret;
@@ -376,7 +376,7 @@ rrho_permutation_generic(struct rrho *rrho, size_t i, size_t j, size_t ilen, siz
       
       rrho_init(&rrho_perm, rrho->n, rrho->a, b);
       
-      ret = rrho_rectangle_min_generic(&rrho_perm, i, j, ilen, jlen, m, n, mode, direction, algorithm, &coord);
+      ret = rrho_rectangle_min_generic(&rrho_perm, i, j, ilen, jlen, params, mode, direction, algorithm, &coord);
       if (ret < 0)
 	res.pvalue = 1;
       else
@@ -419,26 +419,14 @@ rrho_permutation_generic(struct rrho *rrho, size_t i, size_t j, size_t ilen, siz
   return 0;
 }
 
-
-struct params
-{
-  double prob_mutation;
-  double sigma;
-  int mode;
-  int direction;
-  size_t i, j, ilen, jlen;
-  struct rrho *rrho;
-};
-
-
 static double
-fitness(struct rrho_coord x,  struct params *param)
+fitness(struct rrho_coord x,  struct rrho_rectangle_params_ea *params)
 {
   struct rrho_result res;
   long double ret;
   
-  rrho_generic(param->rrho, x.i, x.j, param->mode, &res);
-  if ( copysign(1, res.direction) != copysign(1, param->direction) )
+  rrho_generic(params->rrho, x.i, x.j, params->mode, &res);
+  if ( copysign(1, res.direction) != copysign(1, params->direction) )
     return 0;
 
   ret = -logl(res.pvalue + LDBL_MIN);
@@ -458,61 +446,74 @@ in_range(size_t x, size_t i, size_t ilen)
 }
 
 static void
-mutate(struct rrho_coord *x, struct params *param)
+mutate(struct rrho_coord *x, struct rrho_rectangle_params_ea *params)
 {
-  if (stats_unif_std_rand() <= param->prob_mutation)
+  if (stats_unif_std_rand() <= params->prob_mutation)
     {
-      double sigma = (stats_unif_std_rand() <= 0.5)? param->sigma : param->ilen;
+      double sigma = (stats_unif_std_rand() <= 0.5)? params->sigma : params->ilen;
       double rand = stats_norm_rand(x->i, sigma);
       size_t i = round(rand);
-      x->i = in_range(i, param->i, param->ilen);
+      x->i = in_range(i, params->i, params->ilen);
     }
-  if (stats_unif_std_rand() <= param->prob_mutation)
+  if (stats_unif_std_rand() <= params->prob_mutation)
     {
-      double sigma = (stats_unif_std_rand() <= 0.5)? param->sigma : param->jlen;
+      double sigma = (stats_unif_std_rand() <= 0.5)? params->sigma : params->jlen;
       double rand = stats_norm_rand(x->j, sigma);
       size_t j = round(rand);
-      x->j = in_range(j, param->j, param->jlen);
+      x->j = in_range(j, params->j, params->jlen);
     }
 }
 
 
 static void
-mate(struct rrho_coord *x, struct rrho_coord m1, struct rrho_coord m2, struct params *param)
+mate(struct rrho_coord *x, struct rrho_coord m1, struct rrho_coord m2, struct rrho_rectangle_params_ea *params)
 {
-  (void)param;
   size_t i = round( m1.i + stats_unif_std_rand() * ( (double) m2.i - (double) m1.i) );
   size_t j = round( m1.j + stats_unif_std_rand() * ( (double) m2.j - (double) m1.j) );
-  x->i = in_range(i, param->i, param->ilen);
-  x->j = in_range(j, param->j, param->jlen);
+  x->i = in_range(i, params->i, params->ilen);
+  x->j = in_range(j, params->j, params->jlen);
 }
   
-EA_INIT(optim,struct rrho_coord,mate,mutate,fitness,struct params *);
+EA_INIT(optim,struct rrho_coord,mate,mutate,fitness,struct rrho_rectangle_params_ea *);
 
 int
 rrho_rectangle_min_ea(struct rrho *rrho, size_t i, size_t j, size_t ilen, size_t jlen,
-		      int mode, int direction, struct rrho_coord *coord)
+		      struct rrho_rectangle_params_ea *params, int mode, int direction, struct rrho_coord *coord)
 {
-#define ITER (200)
-  // const size_t max_pop = ilen * jlen;
-  const size_t min_pop_size = 100;
-  const size_t max_pop_size = 500 + sqrt(rrho->n);
-  struct params param = {.prob_mutation = 0.2, .sigma = 4.0, .mode = mode, .rrho = rrho,
-			 .i = i, .j = j, .ilen = ilen, .jlen = jlen, .direction = direction};
   struct ea_optim ea;
-  struct rrho_coord *population = malloc(max_pop_size * sizeof(struct rrho_coord));
+  struct rrho_coord *population;
+  struct rrho_rectangle_params_ea params_default;
 
-  for (size_t c = 0 ; c < max_pop_size ; c++)
+  if (NULL == params)
     {
-      population[c].i = in_range(floor(stats_unif_rand(i, i+ilen)), param.i, param.ilen);
-      population[c].j = in_range(floor(stats_unif_rand(j, j+jlen)), param.j, param.jlen);
+      params = &params_default;
+      params->min_pop_size = 100;
+      params->max_pop_size = 500 + sqrt(rrho->n);
+      params->prob_mutation = 0.2;
+      params->sigma = 4.0;
+      params->niter = 200;
+    }
+  params->mode = mode;
+  params->rrho = rrho;
+  params->i = i;
+  params->j = j;
+  params->ilen = ilen;
+  params->jlen = jlen;
+  params->direction = direction;
+
+  population = malloc(params->max_pop_size * sizeof(struct rrho_coord));
+
+  for (size_t c = 0 ; c < params->max_pop_size ; c++)
+    {
+      population[c].i = in_range(floor(stats_unif_rand(i, i+ilen)), params->i, params->ilen);
+      population[c].j = in_range(floor(stats_unif_rand(j, j+jlen)), params->j, params->jlen);
     }
   
-  ea_optim_init(&ea, min_pop_size, max_pop_size, population, &param);
+  ea_optim_init(&ea, params->min_pop_size, params->max_pop_size, population, params);
 
-  for (size_t iter = 0 ; iter < ITER ; iter++)
+  for (size_t iter = 0 ; iter < params->niter ; iter++)
     {
-      ea_optim_next_generation(&ea, &param);
+      ea_optim_next_generation(&ea, params);
       /* for (size_t c = 0 ; c < ( (max_pop_size > 5 )?5:max_pop_size ) ; c++) */
       /* 	{ */
       /* 	  size_t index = ea.fitness_index[c]; */
