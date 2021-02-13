@@ -5,7 +5,7 @@
 #include "ale.h"
 #include "rrho.h"
 
-#define SIZE (1024)
+#define SIZE (256)
 #define NITER (96)
 
 int
