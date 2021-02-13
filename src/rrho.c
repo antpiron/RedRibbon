@@ -358,6 +358,8 @@ rrho_permutation_generic(struct rrho *rrho, size_t i, size_t j, size_t ilen, siz
   double *b = malloc(sizeb);
   long double *pvalues = malloc(sizeof(long double) * niter);
   long double threshold;
+  const long double alpha = 0.05;
+  const long double alpha_ks = 0.05;
   size_t iter;
   struct rrho_coord coord;
   struct rrho_result res;
@@ -387,10 +389,27 @@ rrho_permutation_generic(struct rrho *rrho, size_t i, size_t j, size_t ilen, siz
 
   stats_beta_fitl(iter, pvalues, &bparams.alpha, &bparams.beta);
   stats_ks_testl(iter, pvalues, beta_cdfl, &bparams, &res_perm->pvalue_ks, &res_perm->stat_ks);
- 
-  threshold = stats_beta_F_inv(0.05, bparams.alpha, bparams.beta);
+
+  if (res_perm->stat_ks > alpha_ks)
+    {
+      threshold = stats_beta_F_inv(alpha, bparams.alpha, bparams.beta);
+    }
+  else
+    {
+      size_t *index = malloc(sizeof(size_t) * iter);
+      size_t quantile = floorl(alpha * niter);
+
+      if (quantile >= niter)
+	quantile = niter - 1;
+      
+      sort_q_indirect(index,  pvalues, niter, sizeof(long double), sort_compar_doublel, NULL);
+      
+      threshold = pvalues[index[quantile]];
   
-  res_perm->pvalue = pvalue * 0.05 / threshold;
+      free(index);
+    }
+  
+  res_perm->pvalue = pvalue * alpha / threshold;
   if (res_perm->pvalue > 1)
     res_perm->pvalue = 1;
   
