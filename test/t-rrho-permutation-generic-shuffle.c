@@ -40,7 +40,7 @@ main(int argc, char *argv[argc])
 			"FAIL: shuffled rrho_permutation_generic(%d,%d) pvalue_perm = %.20Lf < %Lf = pvalue (pvalue_ks = %Lf)\n",
 			n, n, res_perm.pvalue, res.pvalue, res_perm.pvalue_ks);
   ERROR_UNDEF_FATAL_FMT(res_perm.pvalue <= 0.05,
-			"FAIL: shuffled rrho_permutation_generic(%d,%d) pval = %.20Le <= 0.05\n", n, n, res_perm.pvalue);
+			"FAIL: shuffled rrho_permutation_generic(%d,%d) pval_perm = %.20Lf <= 0.05\n", n, n, res_perm.pvalue);
   
   rrho_destroy(&rrho);
   free(a);
