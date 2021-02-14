@@ -67,6 +67,8 @@ struct rrho_rectangle_params_ea
   size_t niter;
   size_t min_pop_size;
   size_t max_pop_size;
+  size_t initial_population_size;
+  struct rrho_coord *initial_population;
   /* Private */
   int mode;
   int direction;
@@ -123,6 +125,8 @@ rrho_init_params_ea(struct rrho *rrho, struct rrho_rectangle_params_ea *params)
   params->prob_mutation = 0.2;
   params->sigma = 4.0;
   params->niter = 200;
+  params->initial_population_size = 0;
+  params->initial_population = NULL;
 }
 
 static inline int

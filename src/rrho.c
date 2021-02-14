@@ -500,8 +500,15 @@ rrho_rectangle_min_ea(struct rrho *rrho, size_t i, size_t j, size_t ilen, size_t
   params->direction = direction;
 
   population = malloc(params->max_pop_size * sizeof(struct rrho_coord));
+  if ( params->initial_population_size > 0)
+    {
+      size_t memcpy_size = (params->initial_population_size <= params->max_pop_size) ?
+	params->initial_population_size : params->max_pop_size;
 
-  for (size_t c = 0 ; c < params->max_pop_size ; c++)
+      memcpy(population, params->initial_population, memcpy_size * sizeof(struct rrho_coord));
+    }
+
+  for (size_t c = params->initial_population_size ; c < params->max_pop_size ; c++)
     {
       population[c].i = in_range(floor(stats_unif_rand(i, i+ilen)), params->i, params->ilen);
       population[c].j = in_range(floor(stats_unif_rand(j, j+jlen)), params->j, params->jlen);
