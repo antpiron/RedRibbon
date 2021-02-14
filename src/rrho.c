@@ -436,7 +436,7 @@ fitness(struct rrho_coord x,  struct rrho_rectangle_params_ea *params)
   return (ret < 0)?0:ret;
 }
 
-static size_t
+static inline size_t
 in_range(size_t x, size_t i, size_t ilen)
 {
   if ( x < i )
