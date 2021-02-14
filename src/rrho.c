@@ -488,12 +488,8 @@ rrho_rectangle_min_ea(struct rrho *rrho, size_t i, size_t j, size_t ilen, size_t
 
   if (NULL == params)
     {
+      rrho_init_params_ea(rrho, &params_default);
       params = &params_default;
-      params->min_pop_size = 100;
-      params->max_pop_size = 500 + sqrt(rrho->n);
-      params->prob_mutation = 0.2;
-      params->sigma = 4.0;
-      params->niter = 200;
     }
   params->mode = mode;
   params->rrho = rrho;

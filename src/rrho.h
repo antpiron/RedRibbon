@@ -90,8 +90,11 @@ int rrho_rectangle(struct rrho *rrho, size_t i, size_t j, size_t ilen, size_t jl
 
 int rrho_rectangle_min(struct rrho *rrho, size_t i, size_t j, size_t ilen, size_t jlen,
 		        struct rrho_rectangle_params *params, int mode, int direction, struct rrho_coord *coord);
+
+static inline void rrho_init_params_ea(struct rrho *rrho, struct rrho_rectangle_params_ea *params);
 int rrho_rectangle_min_ea(struct rrho *rrho, size_t i, size_t j, size_t ilen, size_t jlen,
 			  struct rrho_rectangle_params_ea *params, int mode, int direction, struct rrho_coord *coord);
+
 static inline int rrho_rectangle_min_generic(struct rrho *rrho, size_t i, size_t j, size_t ilen, size_t jlen,
 					     void *params, int mode, int direction, int algorithm, struct rrho_coord *coord);
 
@@ -110,6 +113,16 @@ rrho_generic(struct rrho *rrho, size_t i, size_t j, int mode, struct rrho_result
     return rrho_hyper_two_tailed_as_r_module(rrho, i, j, res);
 
   return rrho_hyper(rrho, i, j, res);
+}
+
+static inline void
+rrho_init_params_ea(struct rrho *rrho, struct rrho_rectangle_params_ea *params)
+{
+  params->min_pop_size = 100;
+  params->max_pop_size = 500 + sqrt(rrho->n);
+  params->prob_mutation = 0.2;
+  params->sigma = 4.0;
+  params->niter = 200;
 }
 
 static inline int
