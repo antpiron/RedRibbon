@@ -341,8 +341,8 @@ rrho_r_permutation(SEXP i, SEXP j, SEXP ilen, SEXP jlen, SEXP a, SEXP b, SEXP al
   if ( ! isInteger(jlen) )
      error("jlen is not an integer.");
 
-  if ( ! isList(algo_params) )
-     error("algo_params is not an integer.");
+  if ( ! isNewList(algo_params) )
+     error("algo_params is not a (new)List.");
 
   if ( ! isInteger(niter) )
      error("niter is not an integer.");
