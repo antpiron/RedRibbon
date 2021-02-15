@@ -17,9 +17,13 @@ struct rrho_c
   double *a, *b;
   const char *strmode;
   const char *strdirection;
+  const char *stralgorithm;
   int mode;
   int direction;
+  int algorithm;
   int log;
+  int niter;
+  double pvalue;
 };
 
 SEXP
@@ -146,8 +150,9 @@ rrho_r_rectangle_min(SEXP i, SEXP j, SEXP ilen, SEXP jlen, SEXP m, SEXP n, SEXP 
      .a = REAL(a), .b = REAL(b),
      .strmode = CHAR(STRING_PTR(mode)[0]),
      .mode = RRHO_HYPER,
-      .strdirection = CHAR(STRING_PTR(direction)[0]),
-    };
+     .strdirection = CHAR(STRING_PTR(direction)[0]),
+     .direction = 1
+   };
 
   if ( c.i < 0 )
     error("i should be  greater or equal of 1.");
@@ -278,6 +283,155 @@ rrho_r_rectangle_min_ea(SEXP i, SEXP j, SEXP ilen, SEXP jlen, SEXP a, SEXP b, SE
   return ret;
 }
 
+/* from https://cran.r-project.org/doc/manuals/r-release/R-exts.html#Handling-lists */
+/* get the list element named str, or return NULL */
+SEXP getListElement(SEXP list, const char *str)
+{
+    SEXP elmt = R_NilValue, names = getAttrib(list, R_NamesSymbol);
+
+
+    for (int i = 0; i < length(list); i++)
+        if(strcmp(CHAR(STRING_ELT(names, i)), str) == 0) {
+           elmt = VECTOR_ELT(list, i);
+           break;
+        }
+    return elmt;
+}
+
+// int rrho_permutation_generic(struct rrho *rrho, size_t i, size_t j, size_t ilen, size_t jlen,
+//			     void *params, int mode, int direction, int algorithm,
+//			     size_t niter, long double pvalue, struct rrho_permutation_result *res);
+SEXP
+rrho_r_permutation(SEXP i, SEXP j, SEXP ilen, SEXP jlen, SEXP a, SEXP b, SEXP algo_params,
+		   SEXP mode, SEXP direction, SEXP algorithm, SEXP niter, SEXP pvalue)
+{
+  struct rrho rrho;
+  struct rrho_permutation_result res;
+  int length_a = length(a);
+  int length_b = length(b);
+  struct rrho_rectangle_params_ea params_ea;
+  struct rrho_rectangle_params params_classic;
+  struct rrho_permutation_result perm_res;
+  SEXP ret;
+
+  if ( length_a != length_b )
+    error("The vectors a and b should be of equal size.");
+  if ( ! isReal(a) )
+     error("a is not a real.");
+  if ( ! isReal(b) )
+     error("b is not a real.");
+
+  if ( ! isReal(pvalue) )
+     error("pvalue is not a real.");
+
+  if ( ! isString(mode) )
+    error("Mode is not a string.");
+  if ( ! isString(direction) )
+    error("Direction is not a string.");
+  if ( ! isString(algorithm) )
+    error("algorithm is not a string.");
+  
+  if ( ! isInteger(i) )
+     error("i is not an integer.");
+  if ( ! isInteger(j) )
+     error("j is not an integer.");
+
+  if ( ! isInteger(ilen) )
+     error("ilen is not an integer.");
+  if ( ! isInteger(jlen) )
+     error("jlen is not an integer.");
+
+  if ( ! isList(algo_params) )
+     error("algo_params is not an integer.");
+
+  if ( ! isInteger(niter) )
+     error("niter is not an integer.");
+
+  
+  struct rrho_c c =
+    {
+     .i = INTEGER(i)[0] - 1, .j = INTEGER(j)[0] - 1,
+     .ilen = INTEGER(ilen)[0], .jlen = INTEGER(jlen)[0],
+     .a = REAL(a), .b = REAL(b), .pvalue = REAL(pvalue)[0],
+     .niter = INTEGER(niter)[0],
+     .strmode = CHAR(STRING_PTR(mode)[0]),
+     .mode = RRHO_HYPER,
+     .strdirection = CHAR(STRING_PTR(direction)[0]),
+     .direction = 1,
+     .stralgorithm = CHAR(STRING_PTR(algorithm)[0]),
+     .algorithm = RRHO_CLASSIC
+    };
+
+  if ( c.i < 0 )
+    error("i should be  greater or equal of 1.");
+  if ( c.j < 0 )
+    error("j should be  greater or equal of 1.");
+  if ( c.m > c.ilen )
+    error("m should be less than ilen.");
+  if ( c.n > c.jlen )
+    error("n should be less than jlen.");
+  /* enum {
+      RRHO_HYPER = 0,
+      RRHO_HYPER_TWO_TAILED,
+      RRHO_HYPER_TWO_TAILED_R_MODULE
+      }; */
+  if ( 0 == strcmp(c.strmode, "hyper-two-tailed") )
+    c.mode = RRHO_HYPER_TWO_TAILED;
+  else if ( 0 == strcmp(c.strmode, "hyper-two-tailed-old") )
+    c.mode = RRHO_HYPER_TWO_TAILED_R_MODULE;
+
+  if ( 0 !=  strcmp(c.strdirection, "enrichment") )
+    c.direction = -1;
+
+  /* enum {
+      RRHO_CLASSIC = 0,
+      RRHO_EA,
+      }; */
+  if ( 0 !=  strcmp(c.stralgorithm, "classic") )
+    c.algorithm = RRHO_EA;
+
+  
+  rrho_init(&rrho, length_a, c.a, c.b);
+  
+
+  void *ptr_params;
+  if (RRHO_CLASSIC == c.algorithm)
+    {
+      SEXP val;
+
+      val = getListElement(a, "m");
+      params_classic.m = (R_NilValue == val) ? c.ilen : INTEGER(val)[0];
+      val = getListElement(a, "n");
+      params_classic.n = (R_NilValue == val) ? c.jlen : INTEGER(val)[0];
+
+      ptr_params = &params_classic;
+    }
+  else
+    {
+      rrho_init_params_ea(&rrho, &params_ea);
+      ptr_params = &params_ea;
+    }
+
+  rrho_permutation_generic(&rrho, c.i, c.j, c.ilen, c.jlen, ptr_params, c.mode, c.direction, c.algorithm,
+			   c.niter, c.pvalue, &perm_res);
+  rrho_destroy(&rrho);
+  
+
+  const char *names[] = {"pvalue", "pvalue_ks", "stat_ks", ""};
+  ret = PROTECT(Rf_mkNamed(VECSXP, names));
+
+  SEXP Spvalue = PROTECT(Rf_ScalarReal(perm_res.pvalue));
+  SET_VECTOR_ELT(ret, 0, Spvalue);
+  SEXP Spvalue_ks = PROTECT(Rf_ScalarReal(perm_res.pvalue_ks));
+  SET_VECTOR_ELT(ret, 1, Spvalue_ks);
+  SEXP Sstat_ks = PROTECT(Rf_ScalarReal(perm_res.stat_ks));
+  SET_VECTOR_ELT(ret, 2, Sstat_ks);
+  
+  UNPROTECT(4);
+
+  return ret;
+}
+
 // static inline int
 // rrho_generic(struct rrho *rrho, size_t i, size_t j, struct rrho_result *res, int mode)
 SEXP
@@ -380,7 +534,7 @@ rrho_r_intersect(SEXP i, SEXP j, SEXP a, SEXP b, SEXP directions)
      .i = INTEGER(i)[0] - 1, .j = INTEGER(j)[0] - 1,
      .a = REAL(a), .b = REAL(b),
      .strdirection = CHAR(STRING_PTR(directions)[0]),
-      c.direction = RRHO_DOWN_DOWN
+     .direction = RRHO_DOWN_DOWN
     };
 
   if ( c.i < 0 )
@@ -438,6 +592,7 @@ static const R_CallMethodDef callMethods[]  = {
   {"rrho_r_rectangle", (DL_FUNC) &rrho_r_rectangle, 10},
   {"rrho_r_rectangle_min", (DL_FUNC) &rrho_r_rectangle_min, 10},
   {"rrho_r_rectangle_min_ea", (DL_FUNC) &rrho_r_rectangle_min_ea, 8},
+  {"rrho_r_permutation", (DL_FUNC) &rrho_r_permutation, 12},
   {"rrho_r_rrho", (DL_FUNC) &rrho_r_rrho, 5},
   {"rrho_r_intersect", (DL_FUNC) &rrho_r_intersect, 5},
   {NULL, NULL, 0}
