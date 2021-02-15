@@ -506,7 +506,7 @@ rrho_rectangle_min_ea(struct rrho *rrho, size_t i, size_t j, size_t ilen, size_t
     {
       for ( ; c < params->max_pop_size ; c++)
 	{
-	  if ( ! params->initial_population_func(population + c, c, params) )
+	  if ( ! params->initial_population_func(population + c, c, params, params->initial_population_cls) )
 	    break;
 	}
     }
