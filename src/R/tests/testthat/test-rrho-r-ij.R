@@ -15,8 +15,8 @@ test_that(paste("is.list(result)?"), {
   expect(is.list(result), paste("type(result) = ", result))
 })
 
-test_that(paste("length(result) == 4"), {
-  expect(length(result) == 4, paste("length(result) = ", length(result)))
+test_that(paste("length(result) == 3"), {
+  expect(length(result) == 3, paste("length(result) = ", length(result)))
 })
 
 test_that(paste("result$pvalue == 1/1000"), {
@@ -26,6 +26,7 @@ test_that(paste("result$pvalue == 1/1000"), {
 test_that(paste("result$direction > 0"), {
   expect(result$direction > 0, paste("result$direction = ", result$direction))
 })
+
 
 test_that(paste("result$count == 1"), {
   expect(result$count == 1, paste("result$count = ", result$count))

@@ -84,8 +84,9 @@ rrho_r_rectangle(SEXP i, SEXP j, SEXP ilen, SEXP jlen, SEXP m, SEXP n, SEXP a, S
     c.mode = RRHO_HYPER_TWO_TAILED_R_MODULE;
 
   double (*c_array)[c.n] = malloc(sizeof(double) * c.m * c.n);
+  struct rrho_rectangle_params params = { .m = c.m, .n = c.n };
   rrho_init(&rrho, length_a, c.a, c.b);
-  rrho_rectangle(&rrho, c.i, c.j, c.ilen, c.jlen, c.m, c.n, c_array, c.mode, c.log);
+  rrho_rectangle(&rrho, c.i, c.j, c.ilen, c.jlen, &params, c.mode, c.log, c_array);
   rrho_destroy(&rrho);
 
   
@@ -172,7 +173,8 @@ rrho_r_rectangle_min(SEXP i, SEXP j, SEXP ilen, SEXP jlen, SEXP m, SEXP n, SEXP 
  
 
   rrho_init(&rrho, length_a, c.a, c.b);
-  err = rrho_rectangle_min(&rrho, c.i, c.j, c.ilen, c.jlen, c.m, c.n, &coord, c.mode, c.direction);
+  struct rrho_rectangle_params params = { .m = c.m, .n = c.n };
+  err = rrho_rectangle_min(&rrho, c.i, c.j, c.ilen, c.jlen, &params, c.mode, c.direction, &coord);
   rrho_destroy(&rrho);
 
   if ( 0 == err)
@@ -260,10 +262,11 @@ rrho_r_rectangle_min_ea(SEXP i, SEXP j, SEXP ilen, SEXP jlen, SEXP a, SEXP b, SE
     c.direction = -1;
   
   ret = PROTECT(allocVector(INTSXP, 2));
-
+  struct rrho_rectangle_params_ea params;
+  
   rrho_init(&rrho, length_a, c.a, c.b);
-
-  rrho_rectangle_min_ea(&rrho, c.i, c.j, c.ilen, c.jlen, &coord, c.mode, c.direction);
+  rrho_init_params_ea(&rrho, &params);
+  rrho_rectangle_min_ea(&rrho, c.i, c.j, c.ilen, c.jlen, &params, c.mode, c.direction, &coord);
   // rrho_rectangle(&rrho, c.i, c.j, c.ilen, c.jlen, c.m, c.n, array, RRHO_HYPER);
   INTEGER(ret)[0] = coord.i + 1;
   INTEGER(ret)[1] = coord.j + 1;
@@ -325,26 +328,24 @@ rrho_r_rrho(SEXP i, SEXP j, SEXP a, SEXP b, SEXP mode)
 
 
 
-  const char *names[] = {"pvalue", "direction", "fdr", "count", ""};
+  const char *names[] = {"pvalue", "direction", "count", ""};
   ret = PROTECT(Rf_mkNamed(VECSXP, names));
 
   rrho_init(&rrho, length_a, c.a, c.b);
 
-  rrho_generic(&rrho, c.i, c.j, &res, c.mode);
+  rrho_generic(&rrho, c.i, c.j, c.mode, &res);
   // rrho_rectangle(&rrho, c.i, c.j, c.ilen, c.jlen, c.m, c.n, array, RRHO_HYPER);
 
   SEXP pvalue = PROTECT(Rf_ScalarReal(res.pvalue));
   SET_VECTOR_ELT(ret, 0, pvalue);
   SEXP direction = PROTECT(Rf_ScalarInteger(res.direction));
   SET_VECTOR_ELT(ret, 1, direction);
-  SEXP fdr = PROTECT(Rf_ScalarReal(res.fdr));
-  SET_VECTOR_ELT(ret, 2, fdr);
   SEXP count = PROTECT(Rf_ScalarInteger(res.count));
-  SET_VECTOR_ELT(ret, 3, count);
+  SET_VECTOR_ELT(ret, 2, count);
 
   rrho_destroy(&rrho);
   
-  UNPROTECT(5);
+  UNPROTECT(4);
 
   return ret;
 }
