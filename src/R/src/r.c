@@ -399,9 +399,9 @@ rrho_r_permutation(SEXP i, SEXP j, SEXP ilen, SEXP jlen, SEXP a, SEXP b, SEXP al
     {
       SEXP val;
 
-      val = getListElement(a, "m");
+      val = getListElement(algo_params, "m");
       params_classic.m = (R_NilValue == val) ? c.ilen : INTEGER(val)[0];
-      val = getListElement(a, "n");
+      val = getListElement(algo_params, "n");
       params_classic.n = (R_NilValue == val) ? c.jlen : INTEGER(val)[0];
 
       ptr_params = &params_classic;

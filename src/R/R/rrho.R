@@ -21,6 +21,25 @@ rrho_rectangle_min_ea  <- function (i, j, i.len, j.len, a, b, mode=c("hyper"), d
              as.double(a), as.double(b), as.character(mode), as.character(direction))
 }
 
+## SEXP
+## rrho_r_permutation(SEXP i, SEXP j, SEXP ilen, SEXP jlen, SEXP a, SEXP b, SEXP algo_params,
+## 		   SEXP mode, SEXP direction, SEXP algorithm, SEXP niter, SEXP pvalue)
+rrho_permutation <- function (i, j, i.len, j.len, a, b, algo_params=NULL, mode=c("hyper"), direction="enrichment", algorithm="classic", niter=96, pvalue)
+{
+    if ( is.null( algo_params ) )
+        algo_params <- list()
+
+    if ( ! is.null(algo_params[["m"]]) )
+        algo_params[["m"]] <- as.integer(algo_params[["m"]])
+    if ( ! is.null(algo_params[["n"]]) )
+        algo_params[["n"]] <- as.integer(algo_params[["n"]])
+        
+    
+    .Call("rrho_r_permutation", as.integer(i), as.integer(j), as.integer(i.len), as.integer(j.len),
+          as.double(a), as.double(b), algo_params, as.character(mode), as.character(direction),
+          as.character(algorithm),as.integer(niter),as.double(pvalue))
+}
+
 ## SEXP rrho_r_rrho(SEXP i, SEXP j, SEXP a, SEXP b, SEXP mode)
 rrho_ij  <- function (i, j, a, b, mode=c("hyper"))
 {

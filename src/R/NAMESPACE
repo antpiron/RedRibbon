@@ -10,7 +10,7 @@ S3method(setoptions, rrho)
 S3method(rectangle_min, rrho)
 S3method(quadrants, rrho)
 
-export("rrho_rectangle", "rrho_rectangle_min", "rrho_rectangle_min_ea", "rrho_ij", "rrho_intersect",
+export("rrho_rectangle", "rrho_rectangle_min", "rrho_rectangle_min_ea", "rrho_permutation", "rrho_ij", "rrho_intersect",
        "newRRHO", "setoptions", "rectangle_min", "enrichment", "quadrants",
        "newRRHO.data.frame", "newRRHO.numeric",
        "ggplot.rrho", "setoptions.rrho", "rectangle_min.rrho", "enrichment.rrho", "quadrants.rrho")
