@@ -50,8 +50,7 @@ rr <- newRRHO(a, b)
 rr <- setoptions(rr, enrichment_mode="hyper-two-tailed")
 
 quad <- quadrants(rr, whole=FALSE, m=1000, n=1000)
-
-test_that(paste("Testing quadrants"), {
+test_that(paste("Testing quadrants (two-tailed)"), {
     expect(is.list(quad), paste("type(quad) = ", typeof(quad)))
     expect(is.list(quad$updown),  paste("type(quad$updown) = ", typeof(quad$updown)))
     expect(is.list(quad$downup),  paste("type(quad$downup) = ", typeof(quad$downup)))

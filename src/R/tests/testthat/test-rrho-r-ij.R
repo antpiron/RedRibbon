@@ -16,7 +16,7 @@ test_that(paste("is.list(result)?"), {
 })
 
 test_that(paste("length(result) == 3"), {
-  expect(length(result) == 3, paste("length(result) = ", length(result)))
+  expect(length(result) == 4, paste("length(result) = ", length(result)))
 })
 
 test_that(paste("result$pvalue == 1/1000"), {

@@ -5,7 +5,7 @@
 #include "ale.h"
 #include "rrho.h"
 
-#define SIZE (256)
+#define SIZE (2000)
 #define POINTS (256)
 #define NITER (96)
 

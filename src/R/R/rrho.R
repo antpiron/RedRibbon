@@ -24,20 +24,24 @@ rrho_rectangle_min_ea  <- function (i, j, i.len, j.len, a, b, mode=c("hyper"), d
 ## SEXP
 ## rrho_r_permutation(SEXP i, SEXP j, SEXP ilen, SEXP jlen, SEXP a, SEXP b, SEXP algo_params,
 ## 		   SEXP mode, SEXP direction, SEXP algorithm, SEXP niter, SEXP pvalue)
-rrho_permutation <- function (i, j, i.len, j.len, a, b, algo_params=NULL, mode=c("hyper"), direction="enrichment", algorithm="classic", niter=96, pvalue)
+rrho_permutation <- function (i, j, i.len, j.len, a, b, algo_params=NULL, mode=c("hyper"), direction="enrichment", algorithm="classic", niter=96, pvalue_i, pvalue_j)
 {
     if ( is.null( algo_params ) )
         algo_params <- list()
 
-    if ( ! is.null(algo_params[["m"]]) )
+    if ( is.null(algo_params[["m"]]) )
+        algo_params[["m"]] <- as.integer(i.len)
+    else
         algo_params[["m"]] <- as.integer(algo_params[["m"]])
-    if ( ! is.null(algo_params[["n"]]) )
+    if ( is.null(algo_params[["n"]]) )
+        algo_params[["n"]] <- as.integer(j.len)
+    else
         algo_params[["n"]] <- as.integer(algo_params[["n"]])
         
     
     .Call("rrho_r_permutation", as.integer(i), as.integer(j), as.integer(i.len), as.integer(j.len),
           as.double(a), as.double(b), algo_params, as.character(mode), as.character(direction),
-          as.character(algorithm),as.integer(niter),as.double(pvalue))
+          as.character(algorithm),as.integer(niter), as.integer(pvalue_i), as.integer(pvalue_j))
 }
 
 ## SEXP rrho_r_rrho(SEXP i, SEXP j, SEXP a, SEXP b, SEXP mode)
@@ -77,6 +81,11 @@ quadrants <- function (self, ...)
 rectangle_min <- function (self, ...)
 {
     UseMethod("rectangle_min")
+}
+
+permutation <- function (self, ...)
+{
+    UseMethod("permutation")
 }
 
 enrichment <- function (self, ...)
@@ -142,78 +151,65 @@ setoptions.rrho <- function(self, enrichment_mode=NULL, ggplot_colours = NULL, d
 }
 
 quadrants.rrho <- function(self, m=NULL, n=NULL,
-                           whole=TRUE, ea=FALSE, threshold=0.05)
+                           whole=TRUE, threshold=0.05, algorithm="classic", permutation=FALSE, niter=96)
 {
     len <- length(self$data$a)
+
+    do.quadrant <- function (i, j, i.len, j.len, direction="enrichment", directions="downdown")
+    {
+        ret  <- NA
+        coord <- rectangle_min(self, i, j, i.len, j.len, m=m, n=n, direction=direction, algorithm=algorithm)
+        if (! all(is.na(coord)) )
+        {
+            enrich.ret  <-  enrichment(self, coord[1], coord[2], directions=directions)
+            direction.integer <- if (direction == "enrichment") 1 else -1
+            if (enrich.ret$direction == direction.integer)
+            {
+                ret <- enrich.ret
+                ret$i  <- coord[1]
+                ret$j  <- coord[2]
+                if (permutation)
+                {
+                    perm <- permutation(self, i, j, i.len, j.len, self$data$a, self$data$b, algo_params=list(m=m, n=n),
+                                        direction="enrichment", algorithm=algorithm, niter=niter, pvalue_i=ret$i, pvalue_j=ret$j)
+                    ret$padj <- perm$pvalue
+                    ret$log_padj <- perm$log_pvalue
+                }
+            }
+        }
+
+        return(ret);
+    }
 
     quadrants = list()
     
     if (whole)
     {
-        coord <- rectangle_min(self, 1, 1, len, len, m=m, n=n, direction="enrichment", ea=ea)
-        if (! all(is.na(coord)) )
-        {
-            
-            quadrants$whole <- enrichment(self, coord[1], coord[2])
-            quadrants$whole$i  <- coord[1]
-            quadrants$whole$j  <- coord[2]
-        }
+        quadrant <- do.quadrant(1, 1, len, len, direction="enrichment", directions="downdown")
+        if (! all(is.na(quadrant)) )
+            quadrants$whole <- quadrant
     } else
     {
         a_ltzero <- sum(self$data$a < 0)
         b_ltzero <- sum(self$data$b < 0)
 
-        coord_downdown <- rectangle_min(self, 1, 1, a_ltzero, b_ltzero, m=m, n=n, direction="enrichment", ea=ea)
-        if (! all(is.na(coord_downdown)) )
-        {
-            downdown <- enrichment(self, coord_downdown[1], coord_downdown[2])
-            if (downdown$direction > 0 && downdown$pvalue <= threshold)
-            {
-                quadrants$downdown <- enrichment(self, coord_downdown[1], coord_downdown[2])
-                quadrants$downdown$i  <- coord_downdown[1]
-                quadrants$downdown$j  <- coord_downdown[2]
-            }
-        }
+        quadrant <- do.quadrant(1, 1, a_ltzero, b_ltzero, direction="enrichment", directions="downdown")
+        if (! all(is.na(quadrant)) )
+            quadrants$downdown <- quadrant
+        
+        quadrant <- do.quadrant( a_ltzero + 1, b_ltzero + 1, len - a_ltzero, len - b_ltzero, direction="enrichment", directions="upup")
+        if (! all(is.na(quadrant)) )
+            quadrants$upup <- quadrant
+        
 
-        coord_upup <- rectangle_min(self, a_ltzero + 1, b_ltzero + 1, len - a_ltzero, len - b_ltzero,
-                                    m=m, n=n, direction="enrichment", ea=ea)
-        if (! all(is.na(coord_upup)) )
-        {
-            upup <- enrichment(self, coord_upup[1], coord_upup[2], directions="upup")
-            if (upup$direction > 0 && upup$pvalue <= threshold)
-            {
-                quadrants$upup <- upup
-                quadrants$upup$i  <- coord_upup[1]
-                quadrants$upup$j  <- coord_upup[2]
-            }
-        }
+        quadrant <- do.quadrant(a_ltzero + 1, 1, len - a_ltzero, b_ltzero, direction="notenrichment", directions="updown")
+        if (! all(is.na(quadrant)) )
+            quadrants$updown <- quadrant
+        
 
-        coord_updown <- rectangle_min(self, a_ltzero + 1, 1, len - a_ltzero, b_ltzero,
-                                    m=m, n=n, direction="notenrichment", ea=ea)
-        if (! all(is.na(coord_updown)) )
-        {
-            updown <- enrichment(self, coord_updown[1], coord_updown[2], directions="updown")
-            if (updown$direction < 0 && updown$pvalue <= threshold)
-            {
-                quadrants$updown <- updown
-                quadrants$updown$i  <- coord_updown[1]
-                quadrants$updown$j  <- coord_updown[2]
-            }
-        }
-
-        coord_downup <- rectangle_min(self, 1, b_ltzero + 1, a_ltzero, len - b_ltzero,
-                                    m=m, n=n, direction="notenrichment", ea=ea)
-        if (! all(is.na(coord_downup)) )
-        {
-            downup <- enrichment(self, coord_downup[1], coord_downup[2], directions="downup")
-            if (downup$direction < 0 && downup$pvalue <= threshold)
-            {
-                quadrants$downup <-downup
-                quadrants$downup$i  <- coord_downup[1]
-                quadrants$downup$j  <- coord_downup[2]
-            }
-        }
-
+        quadrant <- do.quadrant(1, b_ltzero + 1, a_ltzero, len - b_ltzero, direction="notenrichment", directions="downup")
+        if (! all(is.na(quadrant)) )
+            quadrants$downup <- quadrant
     }
 
     return(quadrants)
@@ -300,8 +296,20 @@ ggplot.rrho <- function (self, n = NULL, labels = c("a", "b"), show.quadrants=TR
             pval_size  <- as.integer(base_size * 1/5)
             quadrants_df <- as.data.frame(
                 do.call(rbind, lapply(quadrants,
-                                      function (quadrant) data.frame(i=quadrant$i, j=quadrant$j,
-                                                                     pvalue=quadrant$pvalue, value=quadrant$pvalue))))
+                                      function (quadrant)
+                                      {
+                                          pvalue <- quadrant$log_pvalue
+                                          pvalue.formatted <-  formatC(pvalue, format = "f", digits = 1)
+
+                                          if (! is.null(quadrant$padj) )
+                                          {
+                                              padj <- quadrant$log_padj
+                                              pvalue.formatted <-  paste(pvalue.formatted,
+                                                                         "(padj =", formatC(padj, format = "f", digits = 1), ")")
+                                          }
+                                          data.frame(i=quadrant$i, j=quadrant$j,
+                                                     pvalue=pvalue.formatted, value=pvalue)
+                                      })))
             gg <- gg +
                 ggrepel::geom_text_repel(data=quadrants_df,
                                          aes(x=i * n.i / len, y=j * n.j / len,
@@ -317,7 +325,7 @@ ggplot.rrho <- function (self, n = NULL, labels = c("a", "b"), show.quadrants=TR
     return(gg)
 }
 
-rectangle_min.rrho <- function(self, i, j, i.len, j.len, m=NULL, n=NULL, direction="enrichment", ea=FALSE)
+rectangle_min.rrho <- function(self, i, j, i.len, j.len, m=NULL, n=NULL, direction="enrichment", algorithm="classic")
 {
     len <- length(self$data$a)
    
@@ -335,7 +343,7 @@ rectangle_min.rrho <- function(self, i, j, i.len, j.len, m=NULL, n=NULL, directi
 
         
 
-    if (ea)
+    if ("classic" != algorithm)
     {
         result <- rrho_rectangle_min_ea(i, j, i.len, j.len,
                                         self$data$a, self$data$b,
@@ -358,6 +366,19 @@ rectangle_min.rrho <- function(self, i, j, i.len, j.len, m=NULL, n=NULL, directi
     return(result)
 }
 
+permutation.rrho <- function (self, i, j, i.len, j.len, a, b, algo_params=NULL, direction="enrichment", algorithm="classic", niter=96, pvalue_i, pvalue_j)
+{
+    if ( is.null( algo_params ) )
+        algo_params <- list()
+    
+    if ( is.null(algo_params[["m"]]) )
+        algo_params[["m"]] <- as.integer(sqrt(i.len))
+    if ( is.null(algo_params[["n"]]) )
+        algo_params[["n"]] <- as.integer(sqrt(j.len))
+
+    rrho_permutation(i, j, i.len, j.len, a, b, algo_params=algo_params, mode=self$enrichment_mode, direction=direction, algorithm=algorithm,
+                     niter=niter, pvalue_i=pvalue_i, pvalue_j=pvalue_j)
+}
 
 enrichment.rrho <- function(self, i, j, directions="downdown")
 {

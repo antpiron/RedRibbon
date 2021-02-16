@@ -23,7 +23,8 @@ struct rrho_c
   int algorithm;
   int log;
   int niter;
-  double pvalue;
+  long double pvalue;
+  int pvalue_i, pvalue_j;
 };
 
 SEXP
@@ -303,10 +304,10 @@ SEXP getListElement(SEXP list, const char *str)
 //			     size_t niter, long double pvalue, struct rrho_permutation_result *res);
 SEXP
 rrho_r_permutation(SEXP i, SEXP j, SEXP ilen, SEXP jlen, SEXP a, SEXP b, SEXP algo_params,
-		   SEXP mode, SEXP direction, SEXP algorithm, SEXP niter, SEXP pvalue)
+		   SEXP mode, SEXP direction, SEXP algorithm, SEXP niter, SEXP pvalue_i, SEXP pvalue_j)
 {
   struct rrho rrho;
-  struct rrho_permutation_result res;
+  struct rrho_result res;
   int length_a = length(a);
   int length_b = length(b);
   struct rrho_rectangle_params_ea params_ea;
@@ -321,8 +322,10 @@ rrho_r_permutation(SEXP i, SEXP j, SEXP ilen, SEXP jlen, SEXP a, SEXP b, SEXP al
   if ( ! isReal(b) )
      error("b is not a real.");
 
-  if ( ! isReal(pvalue) )
-     error("pvalue is not a real.");
+  if ( ! isInteger(pvalue_i) )
+     error("pvalue_i is not an integer.");
+  if ( ! isInteger(pvalue_j) )
+     error("pvalue_j is not an integer.");
 
   if ( ! isString(mode) )
     error("Mode is not a string.");
@@ -352,7 +355,8 @@ rrho_r_permutation(SEXP i, SEXP j, SEXP ilen, SEXP jlen, SEXP a, SEXP b, SEXP al
     {
      .i = INTEGER(i)[0] - 1, .j = INTEGER(j)[0] - 1,
      .ilen = INTEGER(ilen)[0], .jlen = INTEGER(jlen)[0],
-     .a = REAL(a), .b = REAL(b), .pvalue = REAL(pvalue)[0],
+     .a = REAL(a), .b = REAL(b),
+     .pvalue_i = INTEGER(pvalue_i)[0], .pvalue_j = INTEGER(pvalue_j)[0],
      .niter = INTEGER(niter)[0],
      .strmode = CHAR(STRING_PTR(mode)[0]),
      .mode = RRHO_HYPER,
@@ -392,8 +396,11 @@ rrho_r_permutation(SEXP i, SEXP j, SEXP ilen, SEXP jlen, SEXP a, SEXP b, SEXP al
 
   
   rrho_init(&rrho, length_a, c.a, c.b);
-  
 
+  
+  rrho_generic(&rrho, c.pvalue_i, c.pvalue_j, c.mode, &res);
+  c.pvalue = res.pvalue;
+  
   void *ptr_params;
   if (RRHO_CLASSIC == c.algorithm)
     {
@@ -417,17 +424,24 @@ rrho_r_permutation(SEXP i, SEXP j, SEXP ilen, SEXP jlen, SEXP a, SEXP b, SEXP al
   rrho_destroy(&rrho);
   
 
-  const char *names[] = {"pvalue", "pvalue_ks", "stat_ks", ""};
+  const char *names[] = {"pvalue", "log_pvalue", "pvalue_ks", "stat_ks", ""};
   ret = PROTECT(Rf_mkNamed(VECSXP, names));
 
   SEXP Spvalue = PROTECT(Rf_ScalarReal(perm_res.pvalue));
   SET_VECTOR_ELT(ret, 0, Spvalue);
-  SEXP Spvalue_ks = PROTECT(Rf_ScalarReal(perm_res.pvalue_ks));
-  SET_VECTOR_ELT(ret, 1, Spvalue_ks);
-  SEXP Sstat_ks = PROTECT(Rf_ScalarReal(perm_res.stat_ks));
-  SET_VECTOR_ELT(ret, 2, Sstat_ks);
   
-  UNPROTECT(4);
+  long double log_pvalue = fabsl(-logl(perm_res.pvalue));
+  /* Rprintf("pval = %Le, perm pval = %Le, log_pval = %Lf\n", c.pvalue,  perm_res.pvalue, log_pvalue); */
+  SEXP Slog_pvalue = PROTECT(Rf_ScalarReal(log_pvalue));
+  SET_VECTOR_ELT(ret, 1, Slog_pvalue);
+  
+  SEXP Spvalue_ks = PROTECT(Rf_ScalarReal(perm_res.pvalue_ks));
+  SET_VECTOR_ELT(ret, 2, Spvalue_ks);
+  
+  SEXP Sstat_ks = PROTECT(Rf_ScalarReal(perm_res.stat_ks));
+  SET_VECTOR_ELT(ret, 3, Sstat_ks);
+  
+  UNPROTECT(5);
 
   return ret;
 }
@@ -482,7 +496,7 @@ rrho_r_rrho(SEXP i, SEXP j, SEXP a, SEXP b, SEXP mode)
 
 
 
-  const char *names[] = {"pvalue", "direction", "count", ""};
+  const char *names[] = {"pvalue", "log_pvalue", "direction", "count", ""};
   ret = PROTECT(Rf_mkNamed(VECSXP, names));
 
   rrho_init(&rrho, length_a, c.a, c.b);
@@ -492,14 +506,20 @@ rrho_r_rrho(SEXP i, SEXP j, SEXP a, SEXP b, SEXP mode)
 
   SEXP pvalue = PROTECT(Rf_ScalarReal(res.pvalue));
   SET_VECTOR_ELT(ret, 0, pvalue);
+  
+  long double log_pvalue = fabsl(-logl(res.pvalue));
+  SEXP Slog_pvalue = PROTECT(Rf_ScalarReal(log_pvalue));
+  SET_VECTOR_ELT(ret, 1, Slog_pvalue);
+  
   SEXP direction = PROTECT(Rf_ScalarInteger(res.direction));
-  SET_VECTOR_ELT(ret, 1, direction);
+  SET_VECTOR_ELT(ret, 2, direction);
+  
   SEXP count = PROTECT(Rf_ScalarInteger(res.count));
-  SET_VECTOR_ELT(ret, 2, count);
+  SET_VECTOR_ELT(ret, 3, count);
 
   rrho_destroy(&rrho);
   
-  UNPROTECT(4);
+  UNPROTECT(5);
 
   return ret;
 }
@@ -592,7 +612,7 @@ static const R_CallMethodDef callMethods[]  = {
   {"rrho_r_rectangle", (DL_FUNC) &rrho_r_rectangle, 10},
   {"rrho_r_rectangle_min", (DL_FUNC) &rrho_r_rectangle_min, 10},
   {"rrho_r_rectangle_min_ea", (DL_FUNC) &rrho_r_rectangle_min_ea, 8},
-  {"rrho_r_permutation", (DL_FUNC) &rrho_r_permutation, 12},
+  {"rrho_r_permutation", (DL_FUNC) &rrho_r_permutation, 13},
   {"rrho_r_rrho", (DL_FUNC) &rrho_r_rrho, 5},
   {"rrho_r_intersect", (DL_FUNC) &rrho_r_intersect, 5},
   {NULL, NULL, 0}
