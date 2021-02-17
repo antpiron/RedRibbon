@@ -2,7 +2,7 @@ LDADD = ../src/librrho.la
 AM_LDFLAGS = -static
 AM_CFLAGS = -I$(top_srcdir)/src
 
-check_PROGRAMS = p-rrho p-longdouble
+check_PROGRAMS = p-rrho p-longdouble p-rrho-permutation
 
 
 check-perf:	$(check_PROGRAMS)

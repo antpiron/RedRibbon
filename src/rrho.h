@@ -11,7 +11,7 @@ enum {
       RRHO_HYPER_TWO_TAILED_R_MODULE
 };
 
-/* direction */
+/* directions */
 enum {
       RRHO_DOWN_DOWN = 0,
       RRHO_UP_UP,
