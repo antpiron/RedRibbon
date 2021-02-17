@@ -70,10 +70,13 @@ main(int argc, char *argv[argc])
       free(b);
     }
 
-  size_t vec_n =  10000;
+  /* from RRHO paper
+     For a comparison of gene lists of length 5000 and a rank threshold step size of 50, it takes ∼15 s to calculate the 10 000 [(5000/50)2] hypergeometric CDF results required to create one RRHO map using an Intel Xeon 3.2 GHz processor, thus requiring ∼4 h to create and analyze 1000 permutation maps on a single computational node.
+  */
+  size_t vec_n =  5000;
   double *a = malloc(vec_n * sizeof(double));
   double *b = malloc(vec_n * sizeof(double));
-  size_t m = ceil(sqrt(vec_n)), n = ceil(sqrt(vec_n));
+  size_t m = 100, n = 100;
   
   for (size_t i = 0 ; i < vec_n ; i++)
     {
@@ -81,8 +84,24 @@ main(int argc, char *argv[argc])
       b[i] = stats_unif_std_rand();
     }
 
+  rrho_init(&rrho, vec_n, a, b);    
+      
+  clock_gettime(CLOCK_REALTIME, &st);
+  
+  rrho_rectangle_min(&rrho, 0, 0, vec_n, vec_n, &(struct rrho_rectangle_params){.m = m, .n = n}, RRHO_HYPER, 1, &rrho_coord);
+  rrho_hyper(&rrho, rrho_coord.i, rrho_coord.j, &rrho_res);
+  rrho_permutation_generic(&rrho, 0, 0, vec_n, vec_n, &(struct rrho_rectangle_params){.m = m, .n = n}, RRHO_HYPER, 1, RRHO_CLASSIC, 96, rrho_res.pvalue, &perm_res);
+  
+  clock_gettime(CLOCK_REALTIME, &et);
+  diff = (et.tv_sec - st.tv_sec) + (et.tv_nsec - st.tv_nsec) / 1e9d;
+  
+  rrho_destroy(&rrho);
+
+  printf("RRHO for vectors of n = %6zu elements, step = %4ld, n.threads = %3d: ", vec_n, vec_n / n, omp_get_max_threads());
+  printf("%12.2F sec (pvalue = %Le, padj = %Le)\n", diff, rrho_res.pvalue, perm_res.pvalue);
+  fprintf(file, "%d\t%zu\t%zu\t%e\n", omp_get_max_threads(), vec_n, vec_n / n, diff); 
+
   /* Mono-thread 10k */
-  ERROR_ERRNO_FATAL(setenv("OMP_NUM_THREADS", "1", 1) < 0, "setenv() failed.\n");
   omp_set_num_threads(1);
   rrho_init(&rrho, vec_n, a, b);    
       
@@ -99,7 +118,7 @@ main(int argc, char *argv[argc])
 
   printf("RRHO for vectors of n = %6zu elements, step = %4ld, n.threads = %3d: ", vec_n, vec_n / n, omp_get_max_threads());
   printf("%12.2F sec (pvalue = %Le, padj = %Le)\n", diff, rrho_res.pvalue, perm_res.pvalue);
-  fprintf(file, "%d\t%zu\t%zu\t%e\n", omp_get_max_threads(), vec_n, n, diff); 
+  fprintf(file, "%d\t%zu\t%zu\t%e\n", omp_get_max_threads(), vec_n, vec_n / n, diff); 
 
   fclose(file);
   free(a);
