@@ -371,13 +371,21 @@ rrho_permutation_generic(struct rrho *rrho, size_t i, size_t j, size_t ilen, siz
 	struct rrho rrho_perm;
 	struct rrho_coord coord;
 	struct rrho_result res;
+	struct rrho_rectangle_params_ea params_ea;
+	void *params_ptr = params;
 	int ret;
 	
 	stats_shuffle(b, rrho->n, sizeof(double));
 	
 	rrho_init(&rrho_perm, rrho->n, rrho->a, b);
-	
-	ret = rrho_rectangle_min_generic(&rrho_perm, i, j, ilen, jlen, params, mode, direction, algorithm, &coord);
+
+	if (RRHO_EA == algorithm)
+	  {
+	    /* field params.rrho is shared!!! */
+	    params_ea = *((struct rrho_rectangle_params_ea*) params);
+	    params_ptr = &params_ea;
+	  }
+	ret = rrho_rectangle_min_generic(&rrho_perm, i, j, ilen, jlen, params_ptr, mode, direction, algorithm, &coord);
 	if (ret < 0)
 	  res.pvalue = 1;
 	else
@@ -431,8 +439,10 @@ fitness(struct rrho_coord x,  struct rrho_rectangle_params_ea *params)
   if ( copysign(1, res.direction) != copysign(1, params->direction) )
     return 0;
 
-  ret = -logl(res.pvalue + LDBL_MIN);
-  
+  ret = -logl(res.pvalue);
+  // if ( isinf(ret) )
+  //  ret = -log(LDBL_EPSILON);
+  // printf("(%zu,%zu) = %Le, log = %Le, count = %zu, direction = %d\n", x.i, x.j, res.pvalue, ret, res.count, res.direction);
   return (ret < 0)?0:ret;
 }
 
@@ -522,11 +532,19 @@ rrho_rectangle_min_ea(struct rrho *rrho, size_t i, size_t j, size_t ilen, size_t
   for (size_t iter = 0 ; iter < params->niter ; iter++)
     {
       ea_optim_next_generation(&ea, params);
-      /* for (size_t c = 0 ; c < ( (max_pop_size > 5 )?5:max_pop_size ) ; c++) */
+
+      size_t index_first = ea.fitness_index[0];
+      size_t index_last = ea.fitness_index[params->min_pop_size - 1];
+
+      if (population[index_first].i == population[index_last].i &&
+	  population[index_first].j == population[index_last].j)
+	break;
+      /* printf("%3zu: ", iter); */
+      /* for (size_t c = 0 ; c < ( (params->max_pop_size > 5 )?5:params->max_pop_size ) ; c++) */
       /* 	{ */
       /* 	  size_t index = ea.fitness_index[c]; */
       /* 	  printf("(%zu, %zu, %e)", population[index].i, population[index].j, ea.fitness[index]); */
-      /* 	  if (c+1 < max_pop_size) */
+      /* 	  if (c+1 < params->max_pop_size) */
       /* 	    { */
       /* 	      size_t index1 = ea.fitness_index[c+1]; */
       /* 	      if ( ea.fitness[index] > ea.fitness[index1] ) */
@@ -543,7 +561,8 @@ rrho_rectangle_min_ea(struct rrho *rrho, size_t i, size_t j, size_t ilen, size_t
 
   size_t index0 = ea.fitness_index[0];
   *coord = ea.population[index0];
-  
+
+  ea_optim_destroy(&ea);
   free(population);
 
   return 0;
