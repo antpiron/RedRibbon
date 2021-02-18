@@ -64,7 +64,7 @@ main(int argc, char *argv[argc])
       rrho_destroy(&rrho);
       
       printf("%12.2F sec (pvalue = %Le, padj = %Le)\n", diff, rrho_res.pvalue, perm_res.pvalue);      
-      fprintf(file, "%d\t%zu\t%zu\t%e\n", num_threads, vec_n, n, diff); 
+      fprintf(file, "%d\t%zu\t%zu\t%e\n", num_threads, vec_n, vec_n / n, diff); 
        
       free(a);
       free(b);

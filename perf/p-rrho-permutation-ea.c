@@ -32,18 +32,18 @@ main(int argc, char *argv[argc])
 
   file = fopen(".perf/p-rrho-permutation-ea.tsv", "w");
   ERROR_ERRNO_FATAL(NULL == file, "fopen() failed.\n");
-  fprintf(file, "n.threads\tn\tstep\ttime\n");
+  fprintf(file, "n.threads\tn\ttime\n");
   
   for (size_t iter = 1 ; iter <= 32 ; iter *= 2)
     {
       size_t vec_n = iter * 5000;
-      size_t vec_perc = 0.1 * vec_n;
+      size_t vec_perc = 0.01 * vec_n;
       double *a = malloc(vec_n * sizeof(double));
       double *b = malloc(vec_n * sizeof(double));
       size_t m = ceil(sqrt(vec_n)), n = ceil(sqrt(vec_n));
       struct rrho_rectangle_params_ea params_ea;
       
-      printf("RRHO for vectors of n = %6zu elements, step = %4ld, n.threads = %3d: ", vec_n, vec_n / n, num_threads);
+      printf("RRHO for vectors of n = %6zu elements, n.threads = %3d: ", vec_n, num_threads);
 	
       for (ssize_t i = 0 ; i < vec_n ; i++)
 	{
@@ -76,9 +76,9 @@ main(int argc, char *argv[argc])
       
       rrho_destroy(&rrho);
       
-      printf("%12.2F sec ((%zu, %zu), vec_perc= %zu, pvalue = %Le, padj = %Le)\n",
-	     diff, rrho_coord.i, rrho_coord.j, vec_perc, rrho_res.pvalue, perm_res.pvalue);      
-      fprintf(file, "%d\t%zu\t%zu\t%e\n", num_threads, vec_n, n, diff); 
+      printf("%12.2F sec ((%zu, %zu), vec_perc= %zu, pvalue = %Le, count = %zu, padj = %Le)\n",
+	     diff, rrho_coord.i, rrho_coord.j, vec_perc, rrho_res.pvalue, rrho_res.count, perm_res.pvalue);      
+      fprintf(file, "%d\t%zu\t%e\n", num_threads, vec_n, diff); 
        
       free(a);
       free(b);
