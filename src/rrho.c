@@ -371,7 +371,6 @@ rrho_permutation_generic(struct rrho *rrho, size_t i, size_t j, size_t ilen, siz
 	struct rrho rrho_perm;
 	struct rrho_coord coord;
 	struct rrho_result res;
-	struct rrho_rectangle_params_ea params_ea;
 	void *params_ptr = params;
 	int ret;
 	
@@ -379,17 +378,11 @@ rrho_permutation_generic(struct rrho *rrho, size_t i, size_t j, size_t ilen, siz
 	
 	rrho_init(&rrho_perm, rrho->n, rrho->a, b);
 
-	if (RRHO_EA == algorithm)
-	  {
-	    /* field params.rrho is shared!!! */
-	    params_ea = *((struct rrho_rectangle_params_ea*) params);
-	    params_ptr = &params_ea;
-	  }
 	ret = rrho_rectangle_min_generic(&rrho_perm, i, j, ilen, jlen, params_ptr, mode, direction, algorithm, &coord);
 	if (ret < 0)
 	  res.pvalue = 1;
 	else
-	rrho_generic(&rrho_perm, coord.i, coord.j, mode, &res);
+	  rrho_generic(&rrho_perm, coord.i, coord.j, mode, &res);
 	
 	pvalues[iter] = res.pvalue;
 	
@@ -490,61 +483,61 @@ EA_INIT(optim,struct rrho_coord,mate,mutate,fitness,struct rrho_rectangle_params
 
 int
 rrho_rectangle_min_ea(struct rrho *rrho, size_t i, size_t j, size_t ilen, size_t jlen,
-		      struct rrho_rectangle_params_ea *params, int mode, int direction, struct rrho_coord *coord)
+		      struct rrho_rectangle_params_ea *params_init, int mode, int direction, struct rrho_coord *coord)
 {
   struct ea_optim ea;
   struct rrho_coord *population;
-  struct rrho_rectangle_params_ea params_default;
+  struct rrho_rectangle_params_ea params;
 
-  if (NULL == params)
-    {
-      rrho_init_params_ea(rrho, &params_default);
-      params = &params_default;
-    }
-  params->mode = mode;
-  params->rrho = rrho;
-  params->i = i;
-  params->j = j;
-  params->ilen = ilen;
-  params->jlen = jlen;
-  params->direction = direction;
+  if (NULL == params_init)
+    rrho_init_params_ea(rrho, &params);
+  else
+    params = *params_init;
 
-  population = malloc(params->max_pop_size * sizeof(struct rrho_coord));
+  params.mode = mode;
+  params.rrho = rrho;
+  params.i = i;
+  params.j = j;
+  params.ilen = ilen;
+  params.jlen = jlen;
+  params.direction = direction;
+
+  population = malloc(params.max_pop_size * sizeof(struct rrho_coord));
   
   size_t c = 0;
-  if ( NULL != params->initial_population_func )
+  if ( NULL != params.initial_population_func )
     {
-      for ( ; c < params->max_pop_size ; c++)
+      for ( ; c < params.max_pop_size ; c++)
 	{
-	  if ( ! params->initial_population_func(population + c, c, params, params->initial_population_cls) )
+	  if ( ! params.initial_population_func(population + c, c, &params, params.initial_population_cls) )
 	    break;
 	}
     }
   
-  for ( ; c < params->max_pop_size ; c++)
+  for ( ; c < params.max_pop_size ; c++)
     {
-      population[c].i = in_range(floor(stats_unif_rand(i, i+ilen)), params->i, params->ilen);
-      population[c].j = in_range(floor(stats_unif_rand(j, j+jlen)), params->j, params->jlen);
+      population[c].i = in_range(floor(stats_unif_rand(i, i+ilen)), params.i, params.ilen);
+      population[c].j = in_range(floor(stats_unif_rand(j, j+jlen)), params.j, params.jlen);
     }
   
-  ea_optim_init(&ea, params->min_pop_size, params->max_pop_size, population, params);
+  ea_optim_init(&ea, params.min_pop_size, params.max_pop_size, population, &params);
 
-  for (size_t iter = 0 ; iter < params->niter ; iter++)
+  for (size_t iter = 0 ; iter < params.niter ; iter++)
     {
-      ea_optim_next_generation(&ea, params);
+      ea_optim_next_generation(&ea, &params);
 
       size_t index_first = ea.fitness_index[0];
-      size_t index_last = ea.fitness_index[params->min_pop_size - 1];
+      size_t index_last = ea.fitness_index[params.min_pop_size - 1];
 
       if (population[index_first].i == population[index_last].i &&
 	  population[index_first].j == population[index_last].j)
 	break;
       /* printf("%3zu: ", iter); */
-      /* for (size_t c = 0 ; c < ( (params->max_pop_size > 5 )?5:params->max_pop_size ) ; c++) */
+      /* for (size_t c = 0 ; c < ( (params.max_pop_size > 5 )?5:params.max_pop_size ) ; c++) */
       /* 	{ */
       /* 	  size_t index = ea.fitness_index[c]; */
       /* 	  printf("(%zu, %zu, %e)", population[index].i, population[index].j, ea.fitness[index]); */
-      /* 	  if (c+1 < params->max_pop_size) */
+      /* 	  if (c+1 < params.max_pop_size) */
       /* 	    { */
       /* 	      size_t index1 = ea.fitness_index[c+1]; */
       /* 	      if ( ea.fitness[index] > ea.fitness[index1] ) */
