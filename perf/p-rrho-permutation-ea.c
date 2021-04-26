@@ -24,7 +24,8 @@ main(int argc, char *argv[argc])
   int num_threads = omp_get_max_threads();
   int ret;
   FILE *file;
-    
+  struct stats_permutation permutation;
+ 
   printf("%s: \n", argv[0]);
 
   ret = mkdir(".perf", S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
@@ -60,7 +61,7 @@ main(int argc, char *argv[argc])
 	}
       
       rrho_init(&rrho, vec_n, a, b);
-	
+      stats_permutation_init(&permutation, vec_n, b);
       
       clock_gettime(CLOCK_REALTIME, &st);
 
@@ -69,11 +70,13 @@ main(int argc, char *argv[argc])
       rrho_hyper(&rrho, rrho_coord.i, rrho_coord.j, &rrho_res);
       // printf("after rrho_rectangle_min_ea()");
       
-      rrho_permutation_generic(&rrho, 0, 0, vec_n, vec_n, &params_ea, RRHO_HYPER, 1, RRHO_EA, 96, rrho_res.pvalue, &perm_res);
+      rrho_permutation_generic(&rrho, 0, 0, vec_n, vec_n,
+			       &params_ea, &permutation, RRHO_HYPER, 1, RRHO_EA, 96, rrho_res.pvalue, &perm_res);
       
       clock_gettime(CLOCK_REALTIME, &et);
       diff = (et.tv_sec - st.tv_sec) + (et.tv_nsec - st.tv_nsec) / 1e9d;
       
+      stats_permutation_destroy(&permutation);
       rrho_destroy(&rrho);
       
       printf("%12.2F sec ((%zu, %zu), vec_perc= %zu, pvalue = %Le, count = %zu, padj = %Le)\n",

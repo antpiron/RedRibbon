@@ -350,7 +350,7 @@ beta_cdfl(long double x, void *cls)
 
 int
 rrho_permutation_generic(struct rrho *rrho, size_t i, size_t j, size_t ilen, size_t jlen,
-			 void *params, int mode, int direction, int algorithm,
+			 void *params, struct stats_permutation *permutation, int mode, int direction, int algorithm,
 			 size_t niter, long double pvalue, struct rrho_permutation_result *res_perm)
 {
   long double *pvalues = malloc(sizeof(long double) * niter);
@@ -374,7 +374,8 @@ rrho_permutation_generic(struct rrho *rrho, size_t i, size_t j, size_t ilen, siz
 	void *params_ptr = params;
 	int ret;
 	
-	stats_shuffle(b, rrho->n, sizeof(double));
+	// stats_shuffle(b, rrho->n, sizeof(double));
+	stats_permutation(permutation, b);
 	
 	rrho_init(&rrho_perm, rrho->n, rrho->a, b);
 

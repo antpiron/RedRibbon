@@ -24,7 +24,8 @@ main(int argc, char *argv[argc])
   int num_threads = omp_get_max_threads();
   int ret;
   FILE *file;
-    
+  struct stats_permutation permutation;
+ 
   printf("%s: \n", argv[0]);
 
   ret = mkdir(".perf", S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
@@ -50,17 +51,20 @@ main(int argc, char *argv[argc])
 	}
       
       rrho_init(&rrho, vec_n, a, b);
-	
+      stats_permutation_init(&permutation, n, b);
       
       clock_gettime(CLOCK_REALTIME, &st);
       
       rrho_rectangle_min(&rrho, 0, 0, vec_n, vec_n, &(struct rrho_rectangle_params){.m = m, .n = n}, RRHO_HYPER, 1, &rrho_coord);
       rrho_hyper(&rrho, rrho_coord.i, rrho_coord.j, &rrho_res);
-      rrho_permutation_generic(&rrho, 0, 0, vec_n, vec_n, &(struct rrho_rectangle_params){.m = m, .n = n}, RRHO_HYPER, 1, RRHO_CLASSIC, 96, rrho_res.pvalue, &perm_res);
+      rrho_permutation_generic(&rrho, 0, 0, vec_n, vec_n,
+			       &(struct rrho_rectangle_params){.m = m, .n = n}, &permutation, 
+			       RRHO_HYPER, 1, RRHO_CLASSIC, 96, rrho_res.pvalue, &perm_res);
       
       clock_gettime(CLOCK_REALTIME, &et);
       diff = (et.tv_sec - st.tv_sec) + (et.tv_nsec - st.tv_nsec) / 1e9d;
       
+      stats_permutation_destroy(&permutation);
       rrho_destroy(&rrho);
       
       printf("%12.2F sec (pvalue = %Le, padj = %Le)\n", diff, rrho_res.pvalue, perm_res.pvalue);      
@@ -85,16 +89,19 @@ main(int argc, char *argv[argc])
     }
 
   rrho_init(&rrho, vec_n, a, b);    
-      
+  stats_permutation_init(&permutation, n, b);
+   
   clock_gettime(CLOCK_REALTIME, &st);
   
   rrho_rectangle_min(&rrho, 0, 0, vec_n, vec_n, &(struct rrho_rectangle_params){.m = m, .n = n}, RRHO_HYPER, 1, &rrho_coord);
   rrho_hyper(&rrho, rrho_coord.i, rrho_coord.j, &rrho_res);
-  rrho_permutation_generic(&rrho, 0, 0, vec_n, vec_n, &(struct rrho_rectangle_params){.m = m, .n = n}, RRHO_HYPER, 1, RRHO_CLASSIC, 96, rrho_res.pvalue, &perm_res);
+  rrho_permutation_generic(&rrho, 0, 0, vec_n, vec_n, &(struct rrho_rectangle_params){.m = m, .n = n},
+			   &permutation, RRHO_HYPER, 1, RRHO_CLASSIC, 96, rrho_res.pvalue, &perm_res);
   
   clock_gettime(CLOCK_REALTIME, &et);
   diff = (et.tv_sec - st.tv_sec) + (et.tv_nsec - st.tv_nsec) / 1e9d;
   
+  stats_permutation_destroy(&permutation);
   rrho_destroy(&rrho);
 
   printf("RRHO for vectors of n = %6zu elements, step = %4ld, n.threads = %3d: ", vec_n, vec_n / n, omp_get_max_threads());
@@ -104,16 +111,20 @@ main(int argc, char *argv[argc])
   /* Mono-thread 10k */
   omp_set_num_threads(1);
   rrho_init(&rrho, vec_n, a, b);    
-      
+  stats_permutation_init(&permutation, n, b);
+   
   clock_gettime(CLOCK_REALTIME, &st);
   
   rrho_rectangle_min(&rrho, 0, 0, vec_n, vec_n, &(struct rrho_rectangle_params){.m = m, .n = n}, RRHO_HYPER, 1, &rrho_coord);
   rrho_hyper(&rrho, rrho_coord.i, rrho_coord.j, &rrho_res);
-  rrho_permutation_generic(&rrho, 0, 0, vec_n, vec_n, &(struct rrho_rectangle_params){.m = m, .n = n}, RRHO_HYPER, 1, RRHO_CLASSIC, 96, rrho_res.pvalue, &perm_res);
+  rrho_permutation_generic(&rrho, 0, 0, vec_n, vec_n,
+			   &(struct rrho_rectangle_params){.m = m, .n = n},
+			   &permutation, RRHO_HYPER, 1, RRHO_CLASSIC, 96, rrho_res.pvalue, &perm_res);
   
   clock_gettime(CLOCK_REALTIME, &et);
   diff = (et.tv_sec - st.tv_sec) + (et.tv_nsec - st.tv_nsec) / 1e9d;
   
+  stats_permutation_destroy(&permutation);
   rrho_destroy(&rrho);
 
   printf("RRHO for vectors of n = %6zu elements, step = %4ld, n.threads = %3d: ", vec_n, vec_n / n, omp_get_max_threads());

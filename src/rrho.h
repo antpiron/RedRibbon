@@ -2,7 +2,8 @@
 #define __RRHO_H
 
 #include <stddef.h>
-#include "ale.h"
+#include <ale.h>
+#include <ale/stats.h>
 
 /* mode */
 enum {
@@ -101,7 +102,7 @@ static inline int rrho_rectangle_min_generic(struct rrho *rrho, size_t i, size_t
 					     void *params, int mode, int direction, int algorithm, struct rrho_coord *coord);
 
 int rrho_permutation_generic(struct rrho *rrho, size_t i, size_t j, size_t ilen, size_t jlen,
-			     void *params, int mode, int direction, int algorithm,
+			     void *params, struct stats_permutation *permutation, int mode, int direction, int algorithm,
 			     size_t niter, long double pvalue, struct rrho_permutation_result *res);
 // inline
 
