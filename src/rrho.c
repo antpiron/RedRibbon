@@ -402,8 +402,6 @@ rrho_permutation_generic(struct rrho *rrho, size_t i, size_t j, size_t ilen, siz
   else
     {
       struct stats_ecdfl ecdf;
-      // size_t *index = malloc(sizeof(size_t) * niter);
-      // size_t quantile = floorl(alpha * niter);
 
       stats_ecdf_initl(&ecdf, niter, pvalues);
 
@@ -411,16 +409,7 @@ rrho_permutation_generic(struct rrho *rrho, size_t i, size_t j, size_t ilen, siz
       if (threshold < 0)
 	threshold = 0;
 
-      printf("threshold = %Le\n", threshold);
-
       stats_ecdf_destroyl(&ecdf);
-      
-      // if (quantile >= niter)
-      // quantile = niter - 1;
-      //
-      // sort_q_indirect(index,  pvalues, niter, sizeof(long double), sort_compar_doublel, NULL);
-      // threshold = pvalues[index[quantile]];
-      // free(index);
     }
   
   res_perm->pvalue = pvalue * alpha / threshold;
