@@ -7,7 +7,7 @@
 
 #define SIZE (2000)
 #define POINTS (256)
-#define NITER (96)
+#define NITER (1 << 7)
 
 int
 main(int argc, char *argv[argc])

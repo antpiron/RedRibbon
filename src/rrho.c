@@ -395,23 +395,32 @@ rrho_permutation_generic(struct rrho *rrho, size_t i, size_t j, size_t ilen, siz
   stats_beta_fitl(niter, pvalues, &bparams.alpha, &bparams.beta);
   stats_ks_testl(niter, pvalues, beta_cdfl, &bparams, &res_perm->pvalue_ks, &res_perm->stat_ks);
 
-  if (res_perm->stat_ks > alpha_ks)
+  if (res_perm->pvalue_ks > alpha_ks)
     {
       threshold = stats_beta_F_inv(alpha, bparams.alpha, bparams.beta);
     }
   else
     {
-      size_t *index = malloc(sizeof(size_t) * niter);
-      size_t quantile = floorl(alpha * niter);
+      struct stats_ecdfl ecdf;
+      // size_t *index = malloc(sizeof(size_t) * niter);
+      // size_t quantile = floorl(alpha * niter);
 
-      if (quantile >= niter)
-	quantile = niter - 1;
+      stats_ecdf_initl(&ecdf, niter, pvalues);
+
+      threshold = stats_ecdf_F_invl(&ecdf, alpha);
+      if (threshold < 0)
+	threshold = 0;
+
+      printf("threshold = %Le\n", threshold);
+
+      stats_ecdf_destroyl(&ecdf);
       
-      sort_q_indirect(index,  pvalues, niter, sizeof(long double), sort_compar_doublel, NULL);
-      
-      threshold = pvalues[index[quantile]];
-  
-      free(index);
+      // if (quantile >= niter)
+      // quantile = niter - 1;
+      //
+      // sort_q_indirect(index,  pvalues, niter, sizeof(long double), sort_compar_doublel, NULL);
+      // threshold = pvalues[index[quantile]];
+      // free(index);
     }
   
   res_perm->pvalue = pvalue * alpha / threshold;
