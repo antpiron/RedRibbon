@@ -25,8 +25,8 @@ main(int argc, char *argv[argc])
   
   for (size_t i = 0 ; i < n ; i++)
     {
-      a[i] = i ; // stats_unif_std_rand();
-      b[i] = i; //stats_unif_std_rand();
+      a[i] = stats_unif_std_rand();
+      b[i] = stats_unif_std_rand();
     }
   
   stats_shuffle(b, SIZE, sizeof(double));
