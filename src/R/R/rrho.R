@@ -23,8 +23,9 @@ rrho_rectangle_min_ea  <- function (i, j, i.len, j.len, a, b, mode=c("hyper"), d
 
 ## SEXP
 ## rrho_r_permutation(SEXP i, SEXP j, SEXP ilen, SEXP jlen, SEXP a, SEXP b, SEXP algo_params,
-## 		   SEXP mode, SEXP direction, SEXP algorithm, SEXP niter, SEXP pvalue)
-rrho_permutation <- function (i, j, i.len, j.len, a, b, algo_params=NULL, mode=c("hyper"), direction="enrichment", algorithm="classic", niter=96, pvalue_i, pvalue_j)
+## 		   SEXP mode, SEXP direction, SEXP algorithm,  SEXP correlation, SEXP niter, SEXP pvalue)
+rrho_permutation <- function (i, j, i.len, j.len, a, b, algo_params=NULL, mode=c("hyper"), direction="enrichment", algorithm="classic", correlation=NULL,
+                              niter=96, pvalue_i, pvalue_j)
 {
     if ( is.null( algo_params ) )
         algo_params <- list()
@@ -37,11 +38,13 @@ rrho_permutation <- function (i, j, i.len, j.len, a, b, algo_params=NULL, mode=c
         algo_params[["n"]] <- as.integer(j.len)
     else
         algo_params[["n"]] <- as.integer(algo_params[["n"]])
-        
+
+    if (! is.null(correlation) )
+        correlation  <- as.integer(correlation)
     
     .Call("rrho_r_permutation", as.integer(i), as.integer(j), as.integer(i.len), as.integer(j.len),
           as.double(a), as.double(b), algo_params, as.character(mode), as.character(direction),
-          as.character(algorithm),as.integer(niter), as.integer(pvalue_i), as.integer(pvalue_j))
+          as.character(algorithm), correlation, as.integer(niter), as.integer(pvalue_i), as.integer(pvalue_j))
 }
 
 ## SEXP rrho_r_rrho(SEXP i, SEXP j, SEXP a, SEXP b, SEXP mode)

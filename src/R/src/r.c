@@ -286,7 +286,8 @@ rrho_r_rectangle_min_ea(SEXP i, SEXP j, SEXP ilen, SEXP jlen, SEXP a, SEXP b, SE
 
 /* from https://cran.r-project.org/doc/manuals/r-release/R-exts.html#Handling-lists */
 /* get the list element named str, or return NULL */
-SEXP getListElement(SEXP list, const char *str)
+SEXP
+getListElement(SEXP list, const char *str)
 {
     SEXP elmt = R_NilValue, names = getAttrib(list, R_NamesSymbol);
 
@@ -299,12 +300,38 @@ SEXP getListElement(SEXP list, const char *str)
     return elmt;
 }
 
+struct prediction
+{
+  size_t n;
+  double *r;
+  double *beta0;
+  double *beta1;
+  struct stats_ecdf ecdf;
+};
+
+static
+int
+predict_ld(size_t i, size_t j, int flags, double x,
+		  struct stats_predict_results *res, void *cls)
+{
+  struct prediction *p = cls;
+  
+  res->pvalue = 0;
+  res->mse = 0;
+  res->r = p->r[i];
+  res->y = fabs(p->r[i]) * (p->beta0[i] + p->beta1[i] * x) + (1 - fabs(p->r[i]) ) * stats_ecdf_rand(& p->ecdf);
+  
+  return 0;
+}
+
 // int rrho_permutation_generic(struct rrho *rrho, size_t i, size_t j, size_t ilen, size_t jlen,
 //			     void *params, int mode, int direction, int algorithm,
 //			     size_t niter, long double pvalue, struct rrho_permutation_result *res);
 SEXP
 rrho_r_permutation(SEXP i, SEXP j, SEXP ilen, SEXP jlen, SEXP a, SEXP b, SEXP algo_params,
-		   SEXP mode, SEXP direction, SEXP algorithm, SEXP niter, SEXP pvalue_i, SEXP pvalue_j)
+		   SEXP mode, SEXP direction, SEXP algorithm,
+		   SEXP correlation,
+		   SEXP niter, SEXP pvalue_i, SEXP pvalue_j)
 {
   struct rrho rrho;
   struct rrho_result res;
@@ -313,6 +340,7 @@ rrho_r_permutation(SEXP i, SEXP j, SEXP ilen, SEXP jlen, SEXP a, SEXP b, SEXP al
   struct rrho_rectangle_params_ea params_ea;
   struct rrho_rectangle_params params_classic;
   struct rrho_permutation_result perm_res;
+  struct stats_permutation permutation;
   SEXP ret;
 
   if ( length_a != length_b )
@@ -321,6 +349,16 @@ rrho_r_permutation(SEXP i, SEXP j, SEXP ilen, SEXP jlen, SEXP a, SEXP b, SEXP al
      error("a is not a real.");
   if ( ! isReal(b) )
      error("b is not a real.");
+
+  if ( ! isNull(correlation) )
+    {
+      printf("HERE %d\n", length(correlation));
+      if ( length(correlation) != length_a )
+	error("The vectors correlation and a should be of equal size.");
+
+      if ( ! isInteger(correlation))
+	error("correlation is not an integer.");
+    }
 
   if ( ! isInteger(pvalue_i) )
      error("pvalue_i is not an integer.");
@@ -419,10 +457,35 @@ rrho_r_permutation(SEXP i, SEXP j, SEXP ilen, SEXP jlen, SEXP a, SEXP b, SEXP al
       ptr_params = &params_ea;
     }
 
-  rrho_permutation_generic(&rrho, c.i, c.j, c.ilen, c.jlen, ptr_params, c.mode, c.direction, c.algorithm,
+  if ( isNull(correlation) )
+    {
+      stats_permutation_init(&permutation, length_a, c.b);
+    }
+  else if ( ! isInteger(correlation) )
+    {
+      ssize_t *corr = malloc(sizeof(ssize_t) * length_a);
+      
+      ret = stats_permutation_correlated_init(&permutation, length_a, c.b, -1, predict_ld, &permutation);
+      if ( 0 != ret )
+	error("Unable to initialize permutation.");
+
+      for (size_t i = 0 ; i < length_a ; i++)
+	corr[i] = INTEGER(correlation)[i];
+      
+      stats_permutation_correlated_set(&permutation, corr);
+      free(corr);
+    }
+  else
+    {
+      // should never reach here, already tested previously
+      error("correlation is not an integer.");
+    }
+ 
+  rrho_permutation_generic(&rrho, c.i, c.j, c.ilen, c.jlen, ptr_params, &permutation, c.mode, c.direction, c.algorithm,
 			   c.niter, c.pvalue, &perm_res);
   rrho_destroy(&rrho);
-  
+  stats_permutation_destroy(&permutation);
+
 
   const char *names[] = {"pvalue", "log_pvalue", "pvalue_ks", "stat_ks", ""};
   ret = PROTECT(Rf_mkNamed(VECSXP, names));
@@ -612,7 +675,7 @@ static const R_CallMethodDef callMethods[]  = {
   {"rrho_r_rectangle", (DL_FUNC) &rrho_r_rectangle, 10},
   {"rrho_r_rectangle_min", (DL_FUNC) &rrho_r_rectangle_min, 10},
   {"rrho_r_rectangle_min_ea", (DL_FUNC) &rrho_r_rectangle_min_ea, 8},
-  {"rrho_r_permutation", (DL_FUNC) &rrho_r_permutation, 13},
+  {"rrho_r_permutation", (DL_FUNC) &rrho_r_permutation, 14},
   {"rrho_r_rrho", (DL_FUNC) &rrho_r_rrho, 5},
   {"rrho_r_intersect", (DL_FUNC) &rrho_r_intersect, 5},
   {NULL, NULL, 0}
