@@ -464,16 +464,25 @@ rrho_r_permutation(SEXP i, SEXP j, SEXP ilen, SEXP jlen, SEXP a, SEXP b, SEXP al
   else if ( ! isInteger(correlation) )
     {
       ssize_t *corr = malloc(sizeof(ssize_t) * length_a);
-      
-      ret = stats_permutation_correlated_init(&permutation, length_a, c.b, -1, predict_ld, &permutation);
+      struct prediction pred;
+
+      stats_ecdf_init(&pred.ecdf, length_a, c.b);
+      for (size_t i = 0 ; i < length_a ; i++)
+	{
+	  corr[i] = INTEGER(correlation)[i];
+	  pred.r[i] = 0;
+	  pred.beta0[i] = 0;
+	  pred.beta1[i] = 1;
+	}
+
+      ret = stats_permutation_correlated_init(&permutation, length_a, c.b, -1, predict_ld, &pred);
       if ( 0 != ret )
 	error("Unable to initialize permutation.");
 
-      for (size_t i = 0 ; i < length_a ; i++)
-	corr[i] = INTEGER(correlation)[i];
       
       stats_permutation_correlated_set(&permutation, corr);
       free(corr);
+      stats_ecdf_destroy(&pred.ecdf);
     }
   else
     {
