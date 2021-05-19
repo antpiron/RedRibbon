@@ -300,13 +300,27 @@ getListElement(SEXP list, const char *str)
     return elmt;
 }
 
+enum { PERMUTATION_SHUFFLE = 0, PERMUTATION_LD_FIT,  PERMUTATION_LD};
+
 struct prediction
 {
+  int tag; // 1: 
   size_t n;
-  double *r;
-  double *beta0;
-  double *beta1;
-  struct stats_ecdf ecdf;
+  union
+  {
+    struct
+    {
+      double *pos;
+    } dist;
+    
+    struct
+    {
+      double *r;
+      double *beta0;
+      double *beta1;
+    } linear;
+  };
+    struct stats_ecdf ecdf;
 };
 
 static
@@ -315,11 +329,24 @@ predict_ld(size_t i, size_t j, int flags, double x,
 		  struct stats_predict_results *res, void *cls)
 {
   struct prediction *p = cls;
-  
-  res->pvalue = 0;
-  res->mse = 0;
-  res->r = p->r[i];
-  res->y = fabs(p->r[i]) * (p->beta0[i] + p->beta1[i] * x) + (1 - fabs(p->r[i]) ) * stats_ecdf_rand(& p->ecdf);
+
+  if (PERMUTATION_LD == p->tag)
+    {
+      res->pvalue = 0;
+      res->mse = 0;
+      res->r = p->linear.r[i];
+      res->y = fabs(p->linear.r[i]) * (p->linear.beta0[i] + p->linear.beta1[i] * x) + (1 - fabs(p->linear.r[i]) ) * stats_ecdf_rand(& p->ecdf);
+    }
+  else
+    {
+      const double half = 6480.306;
+      double distance = fabs(p->dist.pos[i] - p->dist.pos[j]);
+      double r = half / (half + distance);
+      res->pvalue = 0;
+      res->mse = 0;
+      res->r = r;
+      res->y = r * x + (1 - r) * stats_ecdf_rand(& p->ecdf);
+    }
   
   return 0;
 }
@@ -470,9 +497,9 @@ rrho_r_permutation(SEXP i, SEXP j, SEXP ilen, SEXP jlen, SEXP a, SEXP b, SEXP al
       for (size_t i = 0 ; i < length_a ; i++)
 	{
 	  corr[i] = INTEGER(correlation)[i];
-	  pred.r[i] = 0;
-	  pred.beta0[i] = 0;
-	  pred.beta1[i] = 1;
+	  pred.linear.r[i] = 0;
+	  pred.linear.beta0[i] = 0;
+	  pred.linear.beta1[i] = 1;
 	}
 
       ret = stats_permutation_correlated_init(&permutation, length_a, c.b, -1, predict_ld, &pred);
