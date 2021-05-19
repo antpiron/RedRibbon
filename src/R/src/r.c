@@ -320,7 +320,7 @@ struct prediction
       double *beta1;
     } linear;
   };
-    struct stats_ecdf ecdf;
+  struct stats_ecdf ecdf;
 };
 
 static
@@ -332,10 +332,11 @@ predict_ld(size_t i, size_t j, int flags, double x,
 
   if (PERMUTATION_LD == p->tag)
     {
+      double r = fabs(p->linear.r[i]);
       res->pvalue = 0;
       res->mse = 0;
       res->r = p->linear.r[i];
-      res->y = fabs(p->linear.r[i]) * (p->linear.beta0[i] + p->linear.beta1[i] * x) + (1 - fabs(p->linear.r[i]) ) * stats_ecdf_rand(& p->ecdf);
+      res->y = r * (p->linear.beta0[i] + p->linear.beta1[i] * x) + (1 - r) * stats_ecdf_rand(& p->ecdf);
     }
   else
     {
