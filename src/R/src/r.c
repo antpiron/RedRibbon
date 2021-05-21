@@ -340,8 +340,21 @@ predict_ld(size_t i, size_t j, int flags, double x,
       res->mse = 0;
       res->r = p->linear.r[i];
       res->y = r * (p->linear.beta0[i] + p->linear.beta1[i] * x) + (1 - r) * stats_ecdf_rand(& p->ecdf);
+
+      return 0;
     }
-  else
+
+  return -1;
+}
+
+static
+int
+predict_ld_fit(size_t i, size_t j, int flags, double x,
+		  struct stats_predict_results *res, void *cls)
+{
+  struct prediction *p = cls;
+
+  if (PERMUTATION_LD_FIT == p->tag)
     {
       const double half = p->dist.half; // 6480.306
       double distance = fabs(p->dist.pos[i] - p->dist.pos[j]);
@@ -350,9 +363,11 @@ predict_ld(size_t i, size_t j, int flags, double x,
       res->mse = 0;
       res->r = r;
       res->y = r * x + (1 - r) * stats_ecdf_rand(& p->ecdf);
+
+      return 0;
     }
   
-  return 0;
+  return -1;
 }
 
 static
@@ -365,7 +380,7 @@ prediction_init_distance(struct prediction *pred, SEXP distance, double *vec)
 
   pred->tag = PERMUTATION_LD_FIT;
   
-  ret = stats_permutation_correlated_init(&pred->permutation, n, vec, -1, predict_ld, pred);
+  ret = stats_permutation_correlated_init(&pred->permutation, n, vec, -1, predict_ld_fit, pred);
   if ( 0 != ret )
     error("Unable to initialize permutation.");
 
