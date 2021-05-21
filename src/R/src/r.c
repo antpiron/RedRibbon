@@ -360,21 +360,37 @@ void
 prediction_init_distance(struct prediction *pred, SEXP distance, double *vec)
 {
   size_t n = length(distance);
-  ssize_t *corr = malloc(sizeof(ssize_t) * n);
+  ssize_t *corr;
   int ret;
-  
-  stats_ecdf_init(&pred->ecdf, n, vec);
-  for (size_t i = 0 ; i < n ; i++)
-    corr[i] = INTEGER(distance)[i];
+
+  pred->tag = PERMUTATION_LD_FIT;
   
   ret = stats_permutation_correlated_init(&pred->permutation, n, vec, -1, predict_ld, pred);
   if ( 0 != ret )
     error("Unable to initialize permutation.");
+
+  stats_ecdf_init(&pred->ecdf, n, vec);
   
-  
+  corr = malloc(sizeof(ssize_t) * n);
+
+  for (size_t i = 0 ; i < n ; i++)
+    corr[i] = INTEGER(distance)[i];
+
   stats_permutation_correlated_set(&pred->permutation, corr);
   free(corr);
 }
+
+static
+void
+prediction_destroy(struct prediction *pred)
+{
+  if ( PERMUTATION_LD_FIT == pred->tag )
+    {
+      stats_permutation_destroy(&pred->permutation);
+      stats_ecdf_destroy(&pred->ecdf);
+    }
+}
+
 
 // int rrho_permutation_generic(struct rrho *rrho, size_t i, size_t j, size_t ilen, size_t jlen,
 //			     void *params, int mode, int direction, int algorithm,
