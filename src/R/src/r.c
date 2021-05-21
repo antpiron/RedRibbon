@@ -310,6 +310,7 @@ struct prediction
   {
     struct
     {
+      double half;
       double *pos;
     } dist;
     
@@ -321,7 +322,9 @@ struct prediction
     } linear;
   };
   struct stats_ecdf ecdf;
+  struct stats_permutation permutation;
 };
+
 
 static
 int
@@ -340,7 +343,7 @@ predict_ld(size_t i, size_t j, int flags, double x,
     }
   else
     {
-      const double half = 6480.306;
+      const double half = p->dist.half; // 6480.306
       double distance = fabs(p->dist.pos[i] - p->dist.pos[j]);
       double r = half / (half + distance);
       res->pvalue = 0;
@@ -350,6 +353,27 @@ predict_ld(size_t i, size_t j, int flags, double x,
     }
   
   return 0;
+}
+
+static
+void
+prediction_init_distance(struct prediction *pred, SEXP distance, double *vec)
+{
+  size_t n = length(distance);
+  ssize_t *corr = malloc(sizeof(ssize_t) * n);
+  int ret;
+  
+  stats_ecdf_init(&pred->ecdf, n, vec);
+  for (size_t i = 0 ; i < n ; i++)
+    corr[i] = INTEGER(distance)[i];
+  
+  ret = stats_permutation_correlated_init(&pred->permutation, n, vec, -1, predict_ld, pred);
+  if ( 0 != ret )
+    error("Unable to initialize permutation.");
+  
+  
+  stats_permutation_correlated_set(&pred->permutation, corr);
+  free(corr);
 }
 
 // int rrho_permutation_generic(struct rrho *rrho, size_t i, size_t j, size_t ilen, size_t jlen,
