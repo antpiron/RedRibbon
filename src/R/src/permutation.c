@@ -4,7 +4,8 @@
 
 #include "RedRibbon.h"
 
-static void rrho_prediction_init_distance(struct rrho_prediction *pred, SEXP distance, double *vec);
+static void rrho_prediction_init_shuffle(struct rrho_prediction *pred, size_t n, double *pvalues_or_fc);
+static void rrho_prediction_init_distance(struct rrho_prediction *pred, double half, size_t n, size_t *pos, double *pvalues_or_fc);
 static void rrho_prediction_destroy(struct rrho_prediction *pred);
 static int predict_ld(size_t i, size_t j, int flags, double x,
 		      struct stats_predict_results *res, void *cls);
@@ -19,7 +20,7 @@ predict_ld(size_t i, size_t j, int flags, double x,
 {
   struct rrho_prediction *p = cls;
 
-  if (PERMUTATION_LD == p->tag)
+  if (RRHO_PERMUTATION_LD == p->tag)
     {
       double r = fabs(p->linear.r[i]);
       res->pvalue = 0;
@@ -40,7 +41,7 @@ predict_ld_fit(size_t i, size_t j, int flags, double x,
 {
   struct rrho_prediction *p = cls;
 
-  if (PERMUTATION_LD_FIT == p->tag)
+  if (RRHO_PERMUTATION_LD_FIT == p->tag)
     {
       const double half = p->dist.half; // 6480.306
       double distance = fabs(p->dist.pos[i] - p->dist.pos[j]);
@@ -56,37 +57,54 @@ predict_ld_fit(size_t i, size_t j, int flags, double x,
   return -1;
 }
 
+static
 void
-rrho_prediction_init_distance(struct rrho_prediction *pred, SEXP distance, double *vec)
+rrho_prediction_init_shuffle(struct rrho_prediction *pred, size_t n, double *pvalues_or_fc)
 {
-  size_t n = length(distance);
-  ssize_t *corr;
-  int ret;
+  pred->tag = RRHO_PERMUTATION_SHUFFLE;
 
-  pred->tag = PERMUTATION_LD_FIT;
-  
-  ret = stats_permutation_correlated_init(&pred->permutation, n, vec, -1, predict_ld_fit, pred);
-  if ( 0 != ret )
-    error("Unable to initialize permutation.");
-
-  stats_ecdf_init(&pred->ecdf, n, vec);
-  
-  corr = malloc(sizeof(ssize_t) * n);
-
-  for (size_t i = 0 ; i < n ; i++)
-    corr[i] = INTEGER(distance)[i];
-
-  stats_permutation_correlated_set(&pred->permutation, corr);
-  free(corr);
+  stats_permutation_init(&pred->permutation, n, pvalues_or_fc);
 }
 
+static
+void
+rrho_prediction_init_distance(struct rrho_prediction *pred, double half, size_t n, size_t *pos, double *pvalues_or_fc)
+{
+  int ret;
+  size_t *corr;
+  size_t *pos_cpy;
+
+  pred->tag = RRHO_PERMUTATION_LD_FIT;
+  pred->dist.half = half;
+    
+  ret = stats_permutation_correlated_init(&pred->permutation, n, pvalues_or_fc, -1, predict_ld_fit, pred);
+  if ( 0 != ret )
+    error("Unable to initialize distance permutation.");
+
+  pred->dist.pos = malloc(n  * sizeof(size_t));
+  memcpy(pred->dist.pos, pos, n  * sizeof(size_t));
+  
+  corr = malloc(n * sizeof(size_t));
+  // TODO: compute corr
+  stats_permutation_correlated_set(&pred->permutation, corr);
+  free(corr);
+
+  stats_ecdf_init(&pred->ecdf, n, pvalues_or_fc);
+}
+
+static
 void
 rrho_prediction_destroy(struct rrho_prediction *pred)
 {
-  if ( PERMUTATION_LD_FIT == pred->tag )
+  if ( RRHO_PERMUTATION_SHUFFLE == pred->tag )
+    {
+      stats_permutation_destroy(&pred->permutation);
+    }
+  else if ( RRHO_PERMUTATION_LD_FIT == pred->tag )
     {
       stats_permutation_destroy(&pred->permutation);
       stats_ecdf_destroy(&pred->ecdf);
+      free(pred->dist.pos);
     }
 }
 
@@ -108,6 +126,7 @@ rrho_r_permutation(SEXP i, SEXP j, SEXP ilen, SEXP jlen, SEXP a, SEXP b, SEXP al
   struct rrho_rectangle_params params_classic;
   struct rrho_permutation_result perm_res;
   struct stats_permutation permutation;
+  struct rrho_prediction pred;
   SEXP ret;
 
   if ( length_a != length_b )
@@ -117,14 +136,9 @@ rrho_r_permutation(SEXP i, SEXP j, SEXP ilen, SEXP jlen, SEXP a, SEXP b, SEXP al
   if ( ! isReal(b) )
      error("b is not a real.");
 
-  if ( ! isNull(correlation) )
+  if ( ! isNull(correlation) && ! isNewList(correlation))
     {
-      printf("HERE %d\n", length(correlation));
-      if ( length(correlation) != length_a )
-	error("The vectors correlation and a should be of equal size.");
-
-      if ( ! isInteger(correlation))
-	error("correlation is not an integer.");
+      error("The vectors correlation and a should be NULL or a list.");
     }
 
   if ( ! isInteger(pvalue_i) )
@@ -226,42 +240,38 @@ rrho_r_permutation(SEXP i, SEXP j, SEXP ilen, SEXP jlen, SEXP a, SEXP b, SEXP al
 
   if ( isNull(correlation) )
     {
-      stats_permutation_init(&permutation, length_a, c.b);
+      rrho_prediction_init_shuffle(&pred, length_b, c.b);
     }
-  else if ( ! isInteger(correlation) )
+  else if ( isNewList(correlation) )
     {
-      ssize_t *corr = malloc(sizeof(ssize_t) * length_a);
-      struct rrho_prediction pred;
-
-      stats_ecdf_init(&pred.ecdf, length_a, c.b);
-      for (size_t i = 0 ; i < length_a ; i++)
+      if ( Rf_inherits(correlation, "ld_fit") )
 	{
-	  corr[i] = INTEGER(correlation)[i];
-	  pred.linear.r[i] = 0;
-	  pred.linear.beta0[i] = 0;
-	  pred.linear.beta1[i] = 1;
+	  ssize_t *pos = malloc(sizeof(ssize_t) * length_b);
+	  SEXP shalf, spos;
+	  
+	  // half = 6480.306
+	  shalf = rrho_getListElement(correlation, "half");
+	  spos = rrho_getListElement(correlation, "pos");
+	  for (size_t i = 0 ; i < length_b ; i++)
+	    pos[i] = INTEGER(spos)[i];
+
+	  rrho_prediction_init_distance(&pred, REAL(shalf)[0], length_b, pos, c.b);
+	  
+	  free(pos);
 	}
-
-      ret = stats_permutation_correlated_init(&permutation, length_a, c.b, -1, predict_ld, &pred);
-      if ( 0 != ret )
-	error("Unable to initialize permutation.");
-
-      
-      stats_permutation_correlated_set(&permutation, corr);
-      free(corr);
-      stats_ecdf_destroy(&pred.ecdf);
+      else
+	error("correlation is not if class `ld_fit`.");
     }
   else
     {
       // should never reach here, already tested previously
-      error("correlation is not an integer.");
+      error("correlation is not an list.");
     }
  
-  rrho_permutation_generic(&rrho, c.i, c.j, c.ilen, c.jlen, ptr_params, &permutation, c.mode, c.direction, c.algorithm,
+  rrho_permutation_generic(&rrho, c.i, c.j, c.ilen, c.jlen, ptr_params, &pred.permutation, c.mode, c.direction, c.algorithm,
 			   c.niter, c.pvalue, &perm_res);
   rrho_destroy(&rrho);
-  stats_permutation_destroy(&permutation);
-
+  rrho_prediction_destroy(&pred);
 
   const char *names[] = {"pvalue", "log_pvalue", "pvalue_ks", "stat_ks", ""};
   ret = PROTECT(Rf_mkNamed(VECSXP, names));

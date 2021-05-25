@@ -26,7 +26,7 @@ struct rrho_c
   int pvalue_i, pvalue_j;
 };
 
-enum { PERMUTATION_SHUFFLE = 0, PERMUTATION_LD_FIT,  PERMUTATION_LD};
+enum { RRHO_PERMUTATION_SHUFFLE = 0, RRHO_PERMUTATION_LD_FIT,  RRHO_PERMUTATION_LD};
 
 struct rrho_prediction
 {
@@ -37,7 +37,7 @@ struct rrho_prediction
     struct
     {
       double half;
-      double *pos;
+      size_t *pos;
     } dist;
     
     struct
