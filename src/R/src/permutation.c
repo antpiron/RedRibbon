@@ -95,6 +95,7 @@ rrho_prediction_init_distance(struct rrho_prediction *pred, double half, size_t 
   
   stats_permutation_correlated_set(&pred->permutation, corr);
   
+  free(index);
   free(corr);
 
   stats_ecdf_init(&pred->ecdf, n, pvalues_or_fc);
