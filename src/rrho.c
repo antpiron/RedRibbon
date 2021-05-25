@@ -4,9 +4,9 @@
 #include <float.h>
 
 #include "rrho.h"
-#include "ale.h"
-#include "ale/ea.h"
-#include "ale/sort.h"
+#include <ale.h>
+#include <ale/ea.h>
+#include <ale/sort.h>
 
 
 int
