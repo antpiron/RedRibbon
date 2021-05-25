@@ -49,8 +49,11 @@ predict_ld_fit(size_t i, size_t j, int flags, double x,
       double r = half / (half + distance);
       res->pvalue = 0;
       res->mse = 0;
-      res->r = r;
-      res->y = r * x + (1 - r) * stats_ecdf_rand(& p->ecdf);
+      if (0 != (STATS_PFLAGS_R & flags) )
+	  res->r = r;
+      
+      if (0 != (STATS_PFLAGS_PREDICT & flags) )
+	res->y = r * x + (1 - r) * stats_ecdf_rand(& p->ecdf);
 
       return 0;
     }
@@ -72,7 +75,7 @@ void
 rrho_prediction_init_distance(struct rrho_prediction *pred, double half, size_t n, size_t *pos, double *pvalues_or_fc)
 {
   int ret;
-  size_t *corr;
+  ssize_t *corr;
   size_t *index;
 
   pred->tag = RRHO_PERMUTATION_LD_FIT;
@@ -82,15 +85,40 @@ rrho_prediction_init_distance(struct rrho_prediction *pred, double half, size_t 
   if ( 0 != ret )
     error("Unable to initialize distance permutation.");
 
+  stats_ecdf_init(&pred->ecdf, n, pvalues_or_fc);
+
   pred->dist.pos = malloc(n  * sizeof(size_t));
   memcpy(pred->dist.pos, pos, n  * sizeof(size_t));
   
-  corr = malloc(n * sizeof(size_t));
+  corr = malloc(n * sizeof(ssize_t));
+  for (size_t i = 0 ; i < n ; i++)
+    corr[i] = n;
   index = malloc(n * sizeof(size_t));
   sort_q_indirect(index, pvalues_or_fc, n, sizeof(double), sort_compar_double, NULL);
   for (size_t i = 0 ; i < n ; i++)
     {
-      // TODO
+      size_t current = index[i];
+      if ( corr[i] == n )
+	{
+	  struct stats_predict_results res;
+	  corr[current] = -1;
+	  for (size_t j = current + 1 ; j < n ; j++)
+	    {
+	      predict_ld_fit(j, current, STATS_PFLAGS_R, pvalues_or_fc[current], &res, pred);
+	      if ( fabs(res.r) < 0.25)
+		break;
+	      
+	      corr[j] = current;
+	    }
+	  for (ssize_t j = current - 1 ; j >= 0 ; j--)
+	    {
+	      predict_ld_fit(j, current, STATS_PFLAGS_R, pvalues_or_fc[current], &res, pred);
+	      if ( fabs(res.r) < 0.25)
+		break;
+	      
+	      corr[j] = current;
+	    }
+	}
     }
   
   stats_permutation_correlated_set(&pred->permutation, corr);
@@ -98,7 +126,6 @@ rrho_prediction_init_distance(struct rrho_prediction *pred, double half, size_t 
   free(index);
   free(corr);
 
-  stats_ecdf_init(&pred->ecdf, n, pvalues_or_fc);
 }
 
 static
