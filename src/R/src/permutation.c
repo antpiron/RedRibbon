@@ -102,7 +102,7 @@ rrho_prediction_init_distance(struct rrho_prediction *pred, double half, size_t 
 	{
 	  struct stats_predict_results res;
 	  corr[current] = -1;
-	  for (size_t j = current + 1 ; j < n ; j++)
+	  for (size_t j = current + 1 ; j < n &&  corr[j] == n ; j++)
 	    {
 	      predict_ld_fit(j, current, STATS_PFLAGS_R, pvalues_or_fc[current], &res, pred);
 	      if ( fabs(res.r) < 0.25)
@@ -110,7 +110,7 @@ rrho_prediction_init_distance(struct rrho_prediction *pred, double half, size_t 
 	      
 	      corr[j] = current;
 	    }
-	  for (ssize_t j = current - 1 ; j >= 0 ; j--)
+	  for (ssize_t j = current - 1 ; j >= 0  &&  corr[j] == n ; j--)
 	    {
 	      predict_ld_fit(j, current, STATS_PFLAGS_R, pvalues_or_fc[current], &res, pred);
 	      if ( fabs(res.r) < 0.25)
