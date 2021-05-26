@@ -21,9 +21,11 @@ rrho_rectangle_min_ea  <- function (i, j, i.len, j.len, a, b, mode=c("hyper"), d
              as.double(a), as.double(b), as.character(mode), as.character(direction))
 }
 
-## SEXP
-## rrho_r_permutation(SEXP i, SEXP j, SEXP ilen, SEXP jlen, SEXP a, SEXP b, SEXP algo_params,
-## 		   SEXP mode, SEXP direction, SEXP algorithm,  SEXP correlation, SEXP niter, SEXP pvalue)
+
+## SEXP rrho_r_permutation(SEXP i, SEXP j, SEXP ilen, SEXP jlen, SEXP a, SEXP b, SEXP algo_params,
+##		   SEXP mode, SEXP direction, SEXP algorithm,
+##		   SEXP correlation,
+##		   SEXP niter, SEXP pvalue_i, SEXP pvalue_j)
 rrho_permutation <- function (i, j, i.len, j.len, a, b, algo_params=NULL, mode=c("hyper"), direction="enrichment", algorithm="classic", correlation=NULL,
                               niter=96, pvalue_i, pvalue_j)
 {
@@ -39,8 +41,8 @@ rrho_permutation <- function (i, j, i.len, j.len, a, b, algo_params=NULL, mode=c
     else
         algo_params[["n"]] <- as.integer(algo_params[["n"]])
 
-    if (! is.null(correlation) )
-        correlation  <- as.integer(correlation)
+    if (! is.null(correlation) && class(correlation) != "ld_fit")
+        stop("Correlation should be NULL or of `ld_fit` class")
     
     .Call("rrho_r_permutation", as.integer(i), as.integer(j), as.integer(i.len), as.integer(j.len),
           as.double(a), as.double(b), algo_params, as.character(mode), as.character(direction),
@@ -64,7 +66,7 @@ rrho_intersect  <- function (i, j, a, b, directions=c("downdown"))
 ### S3
 ###
 
-### S3 Methods
+### S3 Methods RRHO
 
 newRRHO <- function (self, ...)
 {
@@ -396,4 +398,14 @@ enrichment.rrho <- function(self, i, j, directions="downdown")
     res$positions <- rrho_intersect(i, j, self$data$a, self$data$b, directions)
     
     return(res)
+}
+
+newLDFIT  <- function (position, half = 6480.306)
+{
+    structure(
+        list(half = as.double(half),
+             pos = as.integer(position)
+             ),
+        class = "ld_fit"
+    )
 }

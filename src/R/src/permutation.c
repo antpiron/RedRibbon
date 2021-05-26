@@ -49,11 +49,15 @@ predict_ld_fit(size_t i, size_t j, int flags, double x,
       double r = half / (half + distance);
       res->pvalue = 0;
       res->mse = 0;
-      if (0 != (STATS_PFLAGS_R & flags) )
-	  res->r = r;
+      // if (0 != ( (STATS_PFLAGS_R | STATS_PFLAGS_PREDICT) & flags ) )
+      res->r = r;
       
       if (0 != (STATS_PFLAGS_PREDICT & flags) )
-	res->y = r * x + (1 - r) * stats_ecdf_rand(& p->ecdf);
+	{
+	  double rand = stats_ecdf_rand(& p->ecdf);
+	  res->y = r * x + (1 - r) * rand;
+	  // printf("\nP %f = %f * %f + %f * %f\n\n", res->y, r, x, 1-r, rand);
+	}
 
       return 0;
     }
@@ -76,7 +80,8 @@ rrho_prediction_init_distance(struct rrho_prediction *pred, double half, size_t 
 {
   int ret;
   ssize_t *corr;
-  size_t *index;
+  size_t *index_pvalues_or_fc;
+  size_t *index_pos;
 
   pred->tag = RRHO_PERMUTATION_LD_FIT;
   pred->dist.half = half;
@@ -93,37 +98,71 @@ rrho_prediction_init_distance(struct rrho_prediction *pred, double half, size_t 
   corr = malloc(n * sizeof(ssize_t));
   for (size_t i = 0 ; i < n ; i++)
     corr[i] = n;
-  index = malloc(n * sizeof(size_t));
-  sort_q_indirect(index, pvalues_or_fc, n, sizeof(double), sort_compar_double, NULL);
+  /* for (size_t i = 0 ; i < n ; i++) */
+  /*   printf("%zd\t", corr[i]); */
+  
+  
+  index_pos = malloc(n * sizeof(size_t));
+  sort_q_indirect(index_pos, pos, n, sizeof(double), sort_compar_size_t, NULL);
+  /* printf("index_pos\n");; */
+  /* for (size_t i = 0 ; i < n ; i++) */
+  /*   printf("%zu\t", index_pos[i]); */
+  
+  index_pvalues_or_fc = malloc(n * sizeof(size_t));
+  sort_q_indirect(index_pvalues_or_fc, pvalues_or_fc, n, sizeof(double), sort_compar_double, NULL);
+  /* printf("index_pvalues_or_fc\n"); */
+  /* for (size_t i = 0 ; i < n ; i++) */
+  /*   printf("%zu\t", index_pvalues_or_fc[i]); */
+
+  /* printf("pvalues_or_fc\n"); */
+  /* for (size_t i = 0 ; i < n ; i++) */
+  /*   printf("%f\t", pvalues_or_fc[i]); */
+
+  /* printf("Before\n"); */
   for (size_t i = 0 ; i < n ; i++)
     {
-      size_t current = index[i];
+      size_t ref = index_pvalues_or_fc[i];
       if ( corr[i] == n )
 	{
 	  struct stats_predict_results res;
-	  corr[current] = -1;
-	  for (size_t j = current + 1 ; j < n &&  corr[j] == n ; j++)
+	  corr[ref] = -1;
+	  for (size_t j = ref + 1 ; j < n  ; j++)
 	    {
-	      predict_ld_fit(j, current, STATS_PFLAGS_R, pvalues_or_fc[current], &res, pred);
+	      size_t current = index_pos[j];
+
+	      if ( corr[current] != n )
+		break;
+	      
+	      predict_ld_fit(current, ref, STATS_PFLAGS_R, pvalues_or_fc[ref], &res, pred);
 	      if ( fabs(res.r) < 0.25)
 		break;
 	      
-	      corr[j] = current;
+	      corr[current] = ref;
 	    }
-	  for (ssize_t j = current - 1 ; j >= 0  &&  corr[j] == n ; j--)
+	  for (ssize_t j = ref - 1 ; j >= 0 ; j--)
 	    {
-	      predict_ld_fit(j, current, STATS_PFLAGS_R, pvalues_or_fc[current], &res, pred);
+	      size_t current = index_pos[j];
+	      
+	      if ( corr[current] != n )
+		break;
+	      
+	      predict_ld_fit(current, ref, STATS_PFLAGS_R, pvalues_or_fc[ref], &res, pred);
 	      if ( fabs(res.r) < 0.25)
 		break;
 	      
-	      corr[j] = current;
+	      corr[current] = ref;
 	    }
 	}
     }
-  
+  /* printf("After\n"); */
+  /* for (size_t i = 0 ; i < n ; i++) */
+  /*   printf("%zd\t", corr[i]); */
+  /* printf("\n"); */
   stats_permutation_correlated_set(&pred->permutation, corr);
-  
-  free(index);
+  // printf("After 2\n");
+
+  free(index_pvalues_or_fc);
+  free(index_pos);
   free(corr);
 
 }

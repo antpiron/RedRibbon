@@ -359,11 +359,16 @@ rrho_permutation_generic(struct rrho *rrho, size_t i, size_t j, size_t ilen, siz
   const long double alpha_ks = 0.05;
   struct beta_params bparams;
 
+  /* printf("b = "); */
+  /* for (size_t i = 0 ; i <  (rrho->n < 10?rrho->n:10) ; i++) */
+  /*   printf("%f\t", rrho->b[i]); */
+  /* printf("\n"); */
+
 #pragma omp parallel
   {
     size_t sizeb = sizeof(double) * rrho->n;
     double *b = malloc(sizeb);
-    memcpy(b, rrho->b, sizeb);
+    // memcpy(b, rrho->b, sizeb);
     
 #pragma omp for
     for (size_t iter = 0 ; iter < niter ; iter++)
@@ -376,28 +381,50 @@ rrho_permutation_generic(struct rrho *rrho, size_t i, size_t j, size_t ilen, siz
 	
 	// stats_shuffle(b, rrho->n, sizeof(double));
 	stats_permutation(permutation, b);
+	/* printf("ITER %zd:\n", iter); */
+	/* for (size_t i = 0 ; i <  (rrho->n < 10?rrho->n:10) ; i++) */
+	/*   printf("%f\t", rrho->a[i]); */
+	/* printf("\n"); */
+	/* for (size_t i = 0 ; i <  (rrho->n < 10?rrho->n:rrho->n) ; i++) */
+	/*   printf("%f\t", b[i]); */
+	/* printf("\n"); */
 	
 	rrho_init(&rrho_perm, rrho->n, rrho->a, b);
 
 	ret = rrho_rectangle_min_generic(&rrho_perm, i, j, ilen, jlen, params_ptr, mode, direction, algorithm, &coord);
 	if (ret < 0)
-	  res.pvalue = 1;
+	  {
+	    // printf("rrho_rectangle_min_generic returned -1\n");
+	    res.pvalue = 1;
+	  }
 	else
-	  rrho_generic(&rrho_perm, coord.i, coord.j, mode, &res);
+	  {
+	    // printf("(%zu, %zu)\n", coord.i, coord.j);
+	    rrho_generic(&rrho_perm, coord.i, coord.j, mode, &res);
+	  }
 	
 	pvalues[iter] = res.pvalue;
+	// printf("pvalues %Le\n", res.pvalue);
 	
 	rrho_destroy(&rrho_perm);
       }
     free(b);
   }
 
+  /* printf("End of iter\n"); */
+  /* for (size_t i = 0 ; i < niter ; i++) */
+  /*   printf("%Le\t", pvalues[i]); */
+  /* printf("\n"); */
+
   stats_beta_fitl(niter, pvalues, &bparams.alpha, &bparams.beta);
+  // printf("End of stats_beta_fitl\n");
   stats_ks_testl(niter, pvalues, beta_cdfl, &bparams, &res_perm->pvalue_ks, &res_perm->stat_ks);
+  // printf("End of stats_ks_testl\n");
 
   if (res_perm->pvalue_ks > alpha_ks)
     {
-      threshold = stats_beta_F_inv(alpha, bparams.alpha, bparams.beta);
+      threshold = stats_beta_F_invl(alpha, bparams.alpha, bparams.beta);
+      // printf("End of stats_beta_F_inv\n");
     }
   else
     {
@@ -417,7 +444,9 @@ rrho_permutation_generic(struct rrho *rrho, size_t i, size_t j, size_t ilen, siz
     res_perm->pvalue = 1;
   
   free(pvalues);
-  
+
+  // printf("End of rrho_permutation_generic\n");
+
   return 0;
 }
 
