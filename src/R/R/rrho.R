@@ -68,6 +68,14 @@ rrho_intersect  <- function (i, j, a, b, directions=c("downdown"))
 
 ### S3 Methods RRHO
 
+#' Create a rrho S3 object.
+#' 
+#' @return A rrho S3 object.
+#' @examples
+#' newRRHO(c(0.5, 0.7,0.3, 0.8),
+#'         c(0.6, 0.6, 0.4, 0.7))
+#' newRRHO(data.frame(a = c(0.5, 0.7, 0.3, 0.8),
+#'                    b = c(0.6, 0.6, 0.4, 0.7)))
 newRRHO <- function (self, ...)
 {
     UseMethod("newRRHO")
@@ -123,8 +131,8 @@ newRRHO.data.frame <- function (df)
 
 #' Create a rrho S3 object from two vectors of values
 #' 
-#' @param a A vector of float.
-#' @param y A vector of float.
+#' @param a is a vector of double.
+#' @param b is a vector of double.
 #' @return A rrho S3 object.
 #' @examples
 #' newRRHO(c(0.5, 0.7,0.3, 0.8), c(0.6,0.6,0.4,0.7))
@@ -135,6 +143,25 @@ newRRHO.numeric <- function (a, b)
     newRRHO(data.frame(a=a, b=b))
 }
 
+#' Set rrho options a rrho S3 object from two vectors of values
+#' 
+#' @param self is a rrho object.
+#' @param enrichment_mode A string. "enrichment" for one tailed hypergeometric test,
+#'    "hyper-two-tailed" for one tailed hypergeometric test, "hyper-two-tailed-old", for
+#'    the original R package two tailed test.
+#' @param ggplot_colours is the color palette used for the plots. The default is
+#'    \code{
+#'    colfunc <- grDevices::colorRampPalette(c("#eb3434", "#eb9334", "#ebeb34", "#49eb34", "#34eba5", "#34b4eb", "#3446eb"))
+#'    colors  <-  colfunc(1000)
+#'    ggplot_colours = c(colors, rev(colors))
+#'    }
+#' @param draw_quadrants if not NULLdraw the dotted lines separating the quadrants. The lines split the rrho map into quadrants based on the sign of the data vectors.
+#' @param draw_minimal_pvalue 
+#' @param labels 
+#' @return The updated rrho S3 object.
+#' @examples
+#' library(magrittr)
+#' newRRHO(c(0.5, 0.7,0.3, 0.8), c(0.6,0.6,0.4,0.7)) %>% setoptions(enrichment_mode="hyper-two-tailed",  draw_quadrants = TRUE)
 setoptions.rrho <- function(self, enrichment_mode=NULL, ggplot_colours = NULL, draw_quadrants = NULL,  draw_minimal_pvalue = NULL, labels = NULL)
 {
     if (! is.null(enrichment_mode) )
@@ -155,6 +182,23 @@ setoptions.rrho <- function(self, enrichment_mode=NULL, ggplot_colours = NULL, d
     return(self)
 }
 
+#' Compute the best coordinates.
+#' 
+#' @param m is the number of coordinates to compute on the y axis (b)
+#' @param n is the number of coordinates to compute on the x axis (a)
+#' @param whole if TRUE run the whole list otherwise run by quadrants.
+#' @param threshold
+#' @param algorithm is the algorithm used to find the minimal p-value: "classic" or "ea" (evolutionary algorithm).
+#' @param permutation is TRUE if the permutation mode is run.
+#' @param niter is the number of iteration for the permutation mode.
+#' @return A rrho S3 object.
+#' @examples
+#' a <- as.double(1:1000) - 450
+#' b <- as.double(1:1000) - 460
+#' 
+#' rr <- newRRHO(a, b)
+#' 
+#' quad <- quadrants(rr, m=1000, n=1000)
 quadrants.rrho <- function(self, m=NULL, n=NULL,
                            whole=TRUE, threshold=0.05, algorithm="classic", permutation=FALSE, niter=96)
 {
@@ -220,6 +264,12 @@ quadrants.rrho <- function(self, m=NULL, n=NULL,
     return(quadrants)
 }
 
+#' Compute the RRHO map.
+#' 
+#' @param n is the number of coordinates to compute on the x and y axis
+#' @param repel.force is the value of the repel force for the p-value ploting
+#' @param base_size is the size of the text fields
+#' @return A ggplot object.
 ggplot.rrho <- function (self, n = NULL, labels = c("a", "b"), show.quadrants=TRUE, quadrants=NULL, show.pval=TRUE,
                          repel.force=150, base_size=20)
 {
@@ -298,31 +348,31 @@ ggplot.rrho <- function (self, n = NULL, labels = c("a", "b"), show.quadrants=TR
         {
             if (! is.null(quadrants) )
             {
-            pval_size  <- as.integer(base_size * 1/5)
-            quadrants_df <- as.data.frame(
-                do.call(rbind, lapply(quadrants,
-                                      function (quadrant)
-                                      {
-                                          pvalue <- quadrant$log_pvalue
-                                          pvalue.formatted <-  formatC(pvalue, format = "f", digits = 1)
-
-                                          if (! is.null(quadrant$padj) )
+                pval_size  <- as.integer(base_size * 1/5)
+                quadrants_df <- as.data.frame(
+                    do.call(rbind, lapply(quadrants,
+                                          function (quadrant)
                                           {
-                                              padj <- quadrant$log_padj
-                                              pvalue.formatted <-  paste(pvalue.formatted,
-                                                                         "(padj =", formatC(padj, format = "f", digits = 1), ")")
-                                          }
-                                          data.frame(i=quadrant$i, j=quadrant$j,
-                                                     pvalue=pvalue.formatted, value=pvalue)
-                                      })))
-            gg <- gg +
-                ggrepel::geom_text_repel(data=quadrants_df,
-                                         aes(x=i * n.i / len, y=j * n.j / len,
-                                             label=formatC(pvalue,
-                                                           format = "e", digits = 1),
-                                             colour = "gray"),
-                                         hjust=1, vjust=1, colour = "black",
-                                         force = repel.force, show.legend = FALSE, size = pval_size)
+                                              pvalue <- quadrant$log_pvalue
+                                              pvalue.formatted <-  formatC(pvalue, format = "f", digits = 1)
+                                              
+                                              if (! is.null(quadrant$padj) )
+                                              {
+                                                  padj <- quadrant$log_padj
+                                                  pvalue.formatted <-  paste(pvalue.formatted,
+                                                                             "(padj =", formatC(padj, format = "f", digits = 1), ")")
+                                              }
+                                              data.frame(i=quadrant$i, j=quadrant$j,
+                                                         pvalue=pvalue.formatted, value=pvalue)
+                                          })))
+                gg <- gg +
+                    ggrepel::geom_text_repel(data=quadrants_df,
+                                             aes(x=i * n.i / len, y=j * n.j / len,
+                                                 label=formatC(pvalue,
+                                                               format = "e", digits = 1),
+                                                 colour = "gray"),
+                                             hjust=1, vjust=1, colour = "black",
+                                             force = repel.force, show.legend = FALSE, size = pval_size)
             }
         }
     }
