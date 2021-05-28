@@ -122,10 +122,7 @@ newRRHO.data.frame <- function (df, enrichment_mode=NULL, correlation=NULL)
         list(data = df,
              enrichment_mode = ifelse(is.null( enrichment_mode), c("hyper"), enrichment_mode[[1]]),
              correlation=correlation,
-             ggplot_colours = c(colors, rev(colors)),
-             draw_quadrants = FALSE,
-             draw_minimal_pvalue = FALSE,
-             labels <- c("a", "b")
+             ggplot_colours = c(colors, rev(colors))
              ),
         class = "rrho"
     )
