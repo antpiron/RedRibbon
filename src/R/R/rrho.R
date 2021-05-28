@@ -108,7 +108,7 @@ enrichment <- function (self, ...)
 
 ### S3 Body
 
-newRRHO.data.frame <- function (df)
+newRRHO.data.frame <- function (df, enrichment_mode=NULL, correlation=NULL)
 {
     if ( ! "a" %in% colnames(df))
         stop("Column 'a' is missing!")
@@ -120,10 +120,12 @@ newRRHO.data.frame <- function (df)
     
     structure(
         list(data = df,
-             enrichment_mode = c("hyper"),
+             enrichment_mode = ifelse(is.null( enrichment_mode), c("hyper"), enrichment_mode[[1]]),
+             correlation=correlation,
              ggplot_colours = c(colors, rev(colors)),
              draw_quadrants = FALSE,
-             draw_minimal_pvalue = FALSE
+             draw_minimal_pvalue = FALSE,
+             labels <- c("a", "b")
              ),
         class = "rrho"
     )
@@ -136,11 +138,11 @@ newRRHO.data.frame <- function (df)
 #' @return A rrho S3 object.
 #' @examples
 #' newRRHO(c(0.5, 0.7,0.3, 0.8), c(0.6,0.6,0.4,0.7))
-newRRHO.numeric <- function (a, b)
+newRRHO.numeric <- function (a, b, ...)
 {
     if (length(a) != length(b))
         stop("'a' and 'b' parameters should be of same length!")
-    newRRHO(data.frame(a=a, b=b))
+    newRRHO(data.frame(a=a, b=b), ...)
 }
 
 #' Set rrho options a rrho S3 object from two vectors of values
@@ -155,29 +157,17 @@ newRRHO.numeric <- function (a, b)
 #'    colors  <-  colfunc(1000)
 #'    ggplot_colours = c(colors, rev(colors))
 #'    }
-#' @param draw_quadrants if not NULLdraw the dotted lines separating the quadrants. The lines split the rrho map into quadrants based on the sign of the data vectors.
-#' @param draw_minimal_pvalue 
-#' @param labels 
 #' @return The updated rrho S3 object.
 #' @examples
 #' library(magrittr)
 #' newRRHO(c(0.5, 0.7,0.3, 0.8), c(0.6,0.6,0.4,0.7)) %>% setoptions(enrichment_mode="hyper-two-tailed",  draw_quadrants = TRUE)
-setoptions.rrho <- function(self, enrichment_mode=NULL, ggplot_colours = NULL, draw_quadrants = NULL,  draw_minimal_pvalue = NULL, labels = NULL)
+setoptions.rrho <- function(self, enrichment_mode=NULL, ggplot_colours = NULL)
 {
     if (! is.null(enrichment_mode) )
         self$enrichment_mode <- enrichment_mode
 
     if (! is.null(ggplot_colours) )
         self$ggplot_colours <- ggplot_colours
-
-    if (! is.null(draw_quadrants) )
-        self$draw_quadrants <- draw_quadrants
-
-    if (! is.null(draw_minimal_pvalue) )
-        self$draw_minimal_pvalue <- draw_minimal_pvalue
-
-    if (! is.null(labels) )
-        self$labels <- labels
     
     return(self)
 }
@@ -187,7 +177,6 @@ setoptions.rrho <- function(self, enrichment_mode=NULL, ggplot_colours = NULL, d
 #' @param m is the number of coordinates to compute on the y axis (b)
 #' @param n is the number of coordinates to compute on the x axis (a)
 #' @param whole if TRUE run the whole list otherwise run by quadrants.
-#' @param threshold
 #' @param algorithm is the algorithm used to find the minimal p-value: "classic" or "ea" (evolutionary algorithm).
 #' @param permutation is TRUE if the permutation mode is run.
 #' @param niter is the number of iteration for the permutation mode.
@@ -200,7 +189,7 @@ setoptions.rrho <- function(self, enrichment_mode=NULL, ggplot_colours = NULL, d
 #' 
 #' quad <- quadrants(rr, m=1000, n=1000)
 quadrants.rrho <- function(self, m=NULL, n=NULL,
-                           whole=TRUE, threshold=0.05, algorithm="classic", permutation=FALSE, niter=96)
+                           whole=TRUE, algorithm="classic", permutation=FALSE, niter=96)
 {
     len <- length(self$data$a)
 
@@ -220,7 +209,7 @@ quadrants.rrho <- function(self, m=NULL, n=NULL,
                 if (permutation)
                 {
                     perm <- permutation(self, i, j, i.len, j.len, self$data$a, self$data$b, algo_params=list(m=m, n=n),
-                                        direction="enrichment", algorithm=algorithm, niter=niter, pvalue_i=ret$i, pvalue_j=ret$j)
+                                        direction="enrichment", algorithm=algorithm, correlation=self$correlation, niter=niter, pvalue_i=ret$i, pvalue_j=ret$j)
                     ret$padj <- perm$pvalue
                     ret$log_padj <- perm$log_pvalue
                 }
@@ -421,7 +410,7 @@ rectangle_min.rrho <- function(self, i, j, i.len, j.len, m=NULL, n=NULL, directi
     return(result)
 }
 
-permutation.rrho <- function (self, i, j, i.len, j.len, a, b, algo_params=NULL, direction="enrichment", algorithm="classic", niter=96, pvalue_i, pvalue_j)
+permutation.rrho <- function (self, i, j, i.len, j.len, a, b, algo_params=NULL, direction="enrichment", algorithm="classic", correlation=NULL, niter=96, pvalue_i, pvalue_j)
 {
     if ( is.null( algo_params ) )
         algo_params <- list()
@@ -432,7 +421,7 @@ permutation.rrho <- function (self, i, j, i.len, j.len, a, b, algo_params=NULL, 
         algo_params[["n"]] <- as.integer(sqrt(j.len))
 
     rrho_permutation(i, j, i.len, j.len, a, b, algo_params=algo_params, mode=self$enrichment_mode, direction=direction, algorithm=algorithm,
-                     niter=niter, pvalue_i=pvalue_i, pvalue_j=pvalue_j)
+                     correlation=correlation, niter=niter, pvalue_i=pvalue_i, pvalue_j=pvalue_j)
 }
 
 enrichment.rrho <- function(self, i, j, directions="downdown")
