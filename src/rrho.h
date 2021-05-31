@@ -121,8 +121,8 @@ rrho_generic(struct rrho *rrho, size_t i, size_t j, int mode, struct rrho_result
 static inline void
 rrho_init_params_ea(struct rrho *rrho, struct rrho_rectangle_params_ea *params)
 {
-  params->min_pop_size = 100;
-  params->max_pop_size = 500 + sqrt(rrho->n);
+  params->min_pop_size = 200;
+  params->max_pop_size = 1000 + 10*sqrt(rrho->n);
   params->prob_mutation = 0.2;
   params->sigma = 4.0;
   params->niter = 200;

@@ -193,6 +193,10 @@ quadrants.rrho <- function(self, m=NULL, n=NULL,
     do.quadrant <- function (i, j, i.len, j.len, direction="enrichment", directions="downdown")
     {
         ret  <- NA
+        if ( is.null(m) )
+            m  <- i.len
+        if ( is.null(n) )
+            n  <- j.len
         coord <- rectangle_min(self, i, j, i.len, j.len, m=m, n=n, direction=direction, algorithm=algorithm)
         if (! all(is.na(coord)) )
         {
