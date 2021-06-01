@@ -76,10 +76,12 @@ rrho_r_rectangle_min_ea(SEXP i, SEXP j, SEXP ilen, SEXP jlen, SEXP a, SEXP b, SE
   struct rrho_rectangle_params_ea params;
   
   rrho_init(&rrho, length_a, c.a, c.b);
+  
   rrho_init_params_ea(&rrho, &params);
-  rrho_rectangle_min_ea(&rrho, c.i, c.j, c.ilen, c.jlen, &params, c.mode, c.direction, &coord);
   params.initial_population_func = rrho_initial_population_func;
   params.initial_population_cls = &rrho;
+  
+  rrho_rectangle_min_ea(&rrho, c.i, c.j, c.ilen, c.jlen, &params, c.mode, c.direction, &coord);
 
   // rrho_rectangle(&rrho, c.i, c.j, c.ilen, c.jlen, c.m, c.n, array, RRHO_HYPER);
   INTEGER(ret)[0] = coord.i + 1;
