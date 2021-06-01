@@ -65,8 +65,11 @@ SEXP rrho_r_rrho(SEXP i, SEXP j, SEXP a, SEXP b, SEXP mode);
 SEXP rrho_r_intersect(SEXP i, SEXP j, SEXP a, SEXP b, SEXP directions);
 
 
+// Helper functions
 SEXP rrho_getListElement(SEXP list, const char *str);
 void R_init_RedRibbon(DllInfo *info);
+int rrho_initial_population_func(struct rrho_coord *coord, size_t index,
+				 struct rrho_rectangle_params_ea *params, void *cls);
 
 
 #endif

@@ -183,7 +183,6 @@ rrho_prediction_destroy(struct rrho_prediction *pred)
     }
 }
 
-
 // int rrho_permutation_generic(struct rrho *rrho, size_t i, size_t j, size_t ilen, size_t jlen,
 //			     void *params, int mode, int direction, int algorithm,
 //			     size_t niter, long double pvalue, struct rrho_permutation_result *res);
@@ -310,6 +309,8 @@ rrho_r_permutation(SEXP i, SEXP j, SEXP ilen, SEXP jlen, SEXP a, SEXP b, SEXP al
   else
     {
       rrho_init_params_ea(&rrho, &params_ea);
+      params_ea.initial_population_func = rrho_initial_population_func;
+      params_ea.initial_population_cls = &rrho;
       ptr_params = &params_ea;
     }
 

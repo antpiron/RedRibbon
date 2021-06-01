@@ -358,8 +358,7 @@ ggplot.rrho <- function (self, n = NULL, labels = c("a", "b"), show.quadrants=TR
                 gg <- gg +
                     ggrepel::geom_text_repel(data=quadrants_df,
                                              aes(x=i * n.i / len, y=j * n.j / len,
-                                                 label=formatC(pvalue,
-                                                               format = "e", digits = 1),
+                                                 label=pvalue,
                                                  colour = "gray"),
                                              hjust=1, vjust=1, colour = "black",
                                              force = repel.force, show.legend = FALSE, size = pval_size)
