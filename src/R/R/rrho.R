@@ -194,9 +194,9 @@ quadrants.rrho <- function(self, m=NULL, n=NULL,
     {
         ret  <- NA
         if ( is.null(m) )
-            m  <- i.len
+           m  <- ifelse(sqrt(i.len) < 500, 500, sqrt(i.len) )
         if ( is.null(n) )
-            n  <- j.len
+           n  <- ifelse(sqrt(j.len) < 500, 500, sqrt(j.len) )
         coord <- rectangle_min(self, i, j, i.len, j.len, m=m, n=n, direction=direction, algorithm=algorithm)
         if (! all(is.na(coord)) )
         {
@@ -285,6 +285,8 @@ ggplot.rrho <- function (self, n = NULL, labels = c("a", "b"), show.quadrants=TR
     len.colors <- length(self$ggplot_colours)
     half.len.colors <- len.colors %/% 2
     colors.values <- seq(0, len.colors) /  len.colors
+
+
     gg <-  ggplot2::ggplot(reshape2::melt(rrho),  ggplot2::aes(Var1,Var2, fill=value)) +
         ggplot2::geom_raster() +
         ## ggplot2::scale_fill_gradientn(colours=self$ggplot_colours, name="-log p.val") +
@@ -295,20 +297,25 @@ ggplot.rrho <- function (self, n = NULL, labels = c("a", "b"), show.quadrants=TR
                                       name="-log p.val",
                                       values=colors.values) +
         xlab(labels[1]) + ylab(labels[2]) +
-        scale_x_continuous(labels = label_percent(accuracy = 1, scale = 100/n.i)) +
-        scale_y_continuous(labels = label_percent(accuracy = 1, scale = 100/n.j) ) +
+        ## scale_x_continuous(labels = label_percent(accuracy = 1, scale = 100/n.i)) +
+        ## scale_y_continuous(labels = label_percent(accuracy = 1, scale = 100/n.j) ) +
+        scale_x_continuous(breaks = c(0 + n * 0.1, n - n * 0.1), labels = c("down", "up"), expand = c(0, 0)) +
+        scale_y_continuous(breaks = c(0 + n * 0.1, n - n * 0.1), labels = c("down", "up"), expand = c(0, 0)) +
         ## ggplot2::theme_bw() +
         ggplot2::theme(axis.title=element_text(size=base_size,face="bold"),
                        legend.title = element_text(size = base_size * 7 / 10),
                        legend.text = element_text(size = base_size * 1 / 2),
                        ) +
-        ggplot2::theme(axis.text.x=ggplot2::element_blank(),
+        ggplot2::theme(axis.text.x=ggplot2::element_text(size=base_size* 7 / 10, face="bold"),
                        axis.ticks.x=ggplot2::element_blank(),
-                       axis.text.y=ggplot2::element_blank(),
+                       axis.text.y=ggplot2::element_text(size=base_size * 7 / 10, face="bold", angle=90),
                        axis.ticks.y=ggplot2::element_blank(),
+                       axis.ticks.length = unit(0, "pt"),
                        panel.grid.major = ggplot2::element_blank(),
-                       panel.grid.minor = ggplot2::element_blank(),
-                       panel.background = ggplot2::element_blank())
+                       panel.grid.minor = ggplot2::element_blank(), 
+                       panel.spacing = unit(0, "cm"),
+                       plot.margin = margin(0, 0, 0, 0, "cm"))
+        
 
     ## find the middle of the plots
     if (show.quadrants || show.pval)
@@ -362,6 +369,7 @@ ggplot.rrho <- function (self, n = NULL, labels = c("a", "b"), show.quadrants=TR
                                                  colour = "gray"),
                                              hjust=1, vjust=1, colour = "black",
                                              force = repel.force, show.legend = FALSE, size = pval_size)
+
             }
         }
     }
