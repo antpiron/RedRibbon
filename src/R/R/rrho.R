@@ -350,6 +350,9 @@ ggplot.rrho <- function (self, n = NULL, labels = c("a", "b"), show.quadrants=TR
                     do.call(rbind, lapply(quadrants,
                                           function (quadrant)
                                           {
+                                              if ( quadrant$pvalue > 0.05 || (! is.null(quadrant$padj) && quadrant$padj > 0.05) )
+                                                  return(NULL)
+                                              
                                               pvalue <- quadrant$log_pvalue
                                               pvalue.formatted <-  formatC(pvalue, format = "f", digits = 1)
                                               
@@ -362,13 +365,15 @@ ggplot.rrho <- function (self, n = NULL, labels = c("a", "b"), show.quadrants=TR
                                               data.frame(i=quadrant$i, j=quadrant$j,
                                                          pvalue=pvalue.formatted, value=pvalue)
                                           })))
-                gg <- gg +
-                    ggrepel::geom_text_repel(data=quadrants_df,
-                                             aes(x=i * n.i / len, y=j * n.j / len,
-                                                 label=pvalue,
-                                                 colour = "gray"),
-                                             hjust=1, vjust=1, colour = "black",
-                                             force = repel.force, show.legend = FALSE, size = pval_size)
+                
+                if ( nrow(quadrants_df) > 0 )
+                    gg <- gg +
+                        ggrepel::geom_text_repel(data=quadrants_df,
+                                                 aes(x=i * n.i / len, y=j * n.j / len,
+                                                     label=pvalue,
+                                                     colour = "gray"),
+                                                 hjust=1, vjust=1, colour = "black",
+                                                 force = repel.force, show.legend = FALSE, size = pval_size)
 
             }
         }
