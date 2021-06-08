@@ -11,7 +11,7 @@ rrho_initial_population_func(struct rrho_coord *coord, size_t index,
   size_t m = (max_n < params->ilen) ? max_n : params->ilen;
   size_t n = (max_n < params->jlen) ? max_n : params->jlen;
 
-  if (index < max_n)
+  if (index < m && index < n)
     {
       size_t term = floor(index * (params->ilen / (double) m));
       coord->i = params->i + term;
