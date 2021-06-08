@@ -13,11 +13,11 @@ rrho_initial_population_func(struct rrho_coord *coord, size_t index,
 
   if (index < max_n)
     {
-
-      coord->i = floor(index * (params->ilen / (double) m));
+      size_t term = floor(index * (params->ilen / (double) m));
+      coord->i = params->i + term;
       if (params->direction < 0)
-	coord->i = params->i + params->ilen - 1 - coord->i;
-      coord->j = floor(index * (params->jlen / (double) n));
+	coord->i = params->i + params->ilen - 1 - term;
+      coord->j = params->j + floor(index * (params->jlen / (double) n));
 
       return 1;
     }
