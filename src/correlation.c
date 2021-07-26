@@ -24,12 +24,14 @@ rrho_expression_prediction(size_t m, size_t n, const double mat[m][n], ssize_t i
 	}
       
       ret = alg_AX_B_OLS_solve(2, n, m, D, Y, betas);
+      if ( 0 == ret )
+	break;
     }
 
 
   free(Y);
   free(D);
-  free(beta);
+  free(betas);
 
   return ret;
 }
