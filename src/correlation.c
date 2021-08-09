@@ -1,14 +1,54 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ale/algebra.h>
+#include <ale/vector.h>
 
 #include "correlation.h"
+
+VECTOR_INIT(ssize_t,ssize_t)
+
+static void
+remove_loop(size_t n, ssize_t index[n])
+{
+  struct vector_ssize_t stack;
+  ssize_t len = 0;
+  char *mark = malloc(sizeof(char) * n);
+
+  vector_ssize_t_init(&stack);
+  memset(mark, 0, sizeof(char) * n);
+
+  for (size_t i = 0 ; i < n ; i++)
+    {
+      if ( 0 != mark[i] )
+	continue;
+
+      for (ssize_t j = i ; j >= 0 ; j = index[j] )
+	{
+	  if ( 1 == mark[j] )
+	    break;
+
+	  if ( 2 == mark[j] )
+	    {
+	      index[j] = -1;
+	      break;
+	    }
+	  
+	  mark[j] = 2;
+	  vector_ssize_t_set(&stack, len++, j);
+	}
+
+      while ( len > 0 )
+	mark[ stack.data[--len] ] = 1;
+    }
+
+  vector_ssize_t_destroy(&stack);
+  free(mark);
+}
 
 int
 rrho_expression_prediction(size_t m, size_t n, const double mat[m][n], ssize_t index[m], double beta[2][m])
 {
   int ret = 0;
-  struct alg_ols ols;
   struct mem_pool pool;
   mem_init(&pool);
   
@@ -23,6 +63,8 @@ rrho_expression_prediction(size_t m, size_t n, const double mat[m][n], ssize_t i
   
   for (size_t i = 0 ; i < m ; i++)
     {
+      struct alg_ols ols;
+      
       alg_transpose(m, n, mat, Y);
       
       ALG_INIT_M(n, 2, D, (0 == j) ? 1  : mat[i][j] );
@@ -39,20 +81,24 @@ rrho_expression_prediction(size_t m, size_t n, const double mat[m][n], ssize_t i
 
       double *pvalue = ols.pvalue;
       for ( size_t j = 0 ; j < m ; j++ )
-	if ( pvalue[j] < 0.05 )
+	if ( pvalue[j] < (0.05d / m) ) // Bonferroni corrected
 	  {
 	    double *loocv = ols.loocv;
 	    if ( index[j] < 0 || loocv[j] < loocv_cur[j] )
 	      {
-		loocv_cur[j] =  loocv[j];
 		index[j] = i;
+		loocv_cur[j] =  loocv[j];
 		beta[0][j] = betas[0][j];
 		beta[1][j] = betas[1][j];
 	      }
 	  }
+
+      alg_AX_B_OLS_destroy(&ols);
     }
+
+  remove_loop(m, index);
   
   mem_destroy(&pool);
     
-  return ret;
+  return 0;
 }
