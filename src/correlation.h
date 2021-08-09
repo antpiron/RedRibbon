@@ -4,6 +4,6 @@
 #include <stddef.h>
 #include <unistd.h>
 
-int rrho_expression_prediction(size_t m, size_t n, const double mat[m][n], ssize_t index[m], double beta[m][2]);
+int rrho_expression_prediction(size_t m, size_t n, const double mat[m][n], ssize_t index[m], double beta[2][m]);
 
 #endif
