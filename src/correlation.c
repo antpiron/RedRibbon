@@ -1,9 +1,10 @@
 #include <stdlib.h>
+#include <float.h>
 #include <string.h>
 #include <ale/algebra.h>
 #include <ale/vector.h>
+#include <ale/error.h>
 
-#include "correlation.h"
 
 VECTOR_INIT(ssize_t,ssize_t)
 
@@ -29,6 +30,7 @@ remove_loop(size_t n, ssize_t index[n])
 
 	  if ( 2 == mark[j] )
 	    {
+	      // printf("Remove loop for %zu\n", j);
 	      index[j] = -1;
 	      break;
 	    }
@@ -60,40 +62,55 @@ rrho_expression_prediction(size_t m, size_t n, const double mat[m][n], ssize_t i
 
   for (size_t i = 0 ; i < m ; i++)
     index[i] = -1;
-  
+
+  for ( size_t j = 0 ; j < m ; j++ )
+    loocv_cur[j] = DBL_MAX;
+
   for (size_t i = 0 ; i < m ; i++)
     {
       struct alg_ols ols;
       
       alg_transpose(m, n, mat, Y);
+
+      size_t ii = i;
+      ALG_INIT_M(n, 2, D, (0 == j) ? 1  : mat[ii][i] );
+      // print_m(m, n, mat);
+      // print_m(n, 2, D);
       
-      ALG_INIT_M(n, 2, D, (0 == j) ? 1  : mat[i][j] );
-      
-      ret = alg_AX_B_OLS_init(&ols, 2, n, m, D, Y, betas);
+      ret = alg_AX_B_OLS_init(&ols, n, 2, m, D, Y, betas);
       if ( ret < 0)
-	continue;
-      // ERROR_UNDEF_FATAL_FMT(ret < 0, "FAIL: %s alg_AX_B_OLS_init ret = %d\n != 0", name, ret);
+	{
+	  ERROR_MSG_FMT(ret < 0, "FAIL: rrho_expression_prediction(), alg_AX_B_OLS_init() ret = %d != 0\n", ret);
+	  continue;
+	}
       
       ret = alg_AX_B_OLS_statistics(&ols, 1);
       if (ret < 0)
-	continue;
+	{
+	  ERROR_MSG_FMT(ret < 0, "FAIL: rrho_expression_prediction(), alg_AX_B_OLS_statistics() ret = %d != 0\n", ret);
+	  continue;
+	}
       // ERROR_UNDEF_FATAL_FMT(ret < 0, "FAIL: %s alg_AX_B_OLS_statistics() ret = %d\n != 0", name, ret);
-
+      
       double *pvalue = ols.pvalue;
+      double *loocv = ols.loocv;
+      print_v(m, pvalue);
       for ( size_t j = 0 ; j < m ; j++ )
-	if ( pvalue[j] < (0.05d / m) ) // Bonferroni corrected
-	  {
-	    double *loocv = ols.loocv;
-	    if ( index[j] < 0 || loocv[j] < loocv_cur[j] )
-	      {
-		index[j] = i;
-		loocv_cur[j] =  loocv[j];
-		beta[0][j] = betas[0][j];
-		beta[1][j] = betas[1][j];
-	      }
-	  }
+	{
+	  if ( i != j  && pvalue[j] < (0.05d / ( m * (m-1) ) ) ) // Bonferroni corrected m * (m-1)
+	    {
+	      if ( index[j] < 0 || loocv[j] < loocv_cur[j] )
+		{
+		  index[j] = i;
+		  loocv_cur[j] =  loocv[j];
+		  beta[0][j] = betas[0][j];
+		  beta[1][j] = betas[1][j];
+		}
+	    }
+	}
 
       alg_AX_B_OLS_destroy(&ols);
+      
     }
 
   remove_loop(m, index);

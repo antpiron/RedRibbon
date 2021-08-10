@@ -2,7 +2,8 @@ LDADD = $(top_srcdir)/src/librrho.la
 AM_LDFLAGS = -static
 AM_CFLAGS = $(OPENMP_CFLAGS) -g -O0 -fsanitize=bounds -I$(top_srcdir)/src
 
-check_PROGRAMS = t-rrho t-rrho-hyper t-rrho-generic t-rrho-permutation-generic t-rrho-permutation-generic-shuffle t-rrho-intersect t-rrho-rectangle  t-rrho-rectangle-min t-rrho-rectangle-min-ea
+check_PROGRAMS = t-rrho t-rrho-hyper t-rrho-generic t-rrho-permutation-generic t-rrho-permutation-generic-shuffle t-rrho-intersect t-rrho-rectangle  t-rrho-rectangle-min t-rrho-rectangle-min-ea \
+	t-expression-prediction
 
 TESTS = $(check_PROGRAMS)
 
