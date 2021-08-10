@@ -10,7 +10,7 @@ int
 main(int argc, char *argv[argc])
 {
   int ret;
-  size_t m = 12, n = 10000;
+  size_t m = 14, n = 10000;
   double (*expr)[n] = malloc(sizeof(double) * m * n);
   ssize_t *index = malloc(sizeof(ssize_t) * m );
   double (*beta)[m] = malloc(sizeof(double) * m * 2);
@@ -51,7 +51,8 @@ main(int argc, char *argv[argc])
     }
   ERROR_UNDEF_FATAL_FMT(1 < count,  "FAIL: rrho_expression_prediction() count = %d > 1\n", count);
  
-  ERROR_UNDEF_FATAL_FMT(0 != index[m-1],  "FAIL: rrho_expression_prediction() index[%zu] = %d != 0\n", m-1, index[m-1]);
+  ERROR_UNDEF_FATAL_FMT(0 != index[m-1] && m-1 != index[0],
+			"FAIL: rrho_expression_prediction() index[%zu] = %d != 0\n", m-1, index[m-1]);
  
 
   // ====================
@@ -67,10 +68,9 @@ main(int argc, char *argv[argc])
   count = 0;
   for (size_t i = 0 ; i < m ; i++)
     {
-      count += ( i-1 != index[i] && i+1 != index[i] && -1 != index[i] );
-      // ERROR_UNDEF_FATAL_FMT(-1 != index[i],  "FAIL: rrho_expression_prediction() index[%zu] = %d != -1\n", i, index[i]);
+      count += ( index[i] == -1) ? 0 : labs(i - index[i]) - 1  ;
     }
-  ERROR_UNDEF_FATAL_FMT(1 < count,  "FAIL: rrho_expression_prediction() count = %d > 1\n", count);
+  ERROR_UNDEF_FATAL_FMT(count > 5,  "FAIL: rrho_expression_prediction() count = %d > 5\n", count);
 
   free(expr);
   free(index);

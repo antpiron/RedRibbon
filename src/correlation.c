@@ -72,13 +72,8 @@ rrho_expression_prediction(size_t m, size_t n, const double mat[m][n], ssize_t i
   mem_init(&pool);
   
   size_t mat_size = sizeof(double) * m * n;
-  double (*Y)[m] = mem_malloc(&pool, mat_size);
-  double (*D)[2] = mem_malloc(&pool, sizeof(double) * n * 2);
-  double (*betas)[m] = mem_malloc(&pool, sizeof(double) * m * 2);
   double *loocv_cur = mem_malloc(&pool, sizeof(double) * m );
-  struct bitset bs;
-  bitset_init(&bs, m);
-  
+ 
  
   for (size_t i = 0 ; i < m ; i++)
     index[i] = -1;
@@ -86,65 +81,80 @@ rrho_expression_prediction(size_t m, size_t n, const double mat[m][n], ssize_t i
   for ( size_t i = 0 ; i < m ; i++ )
     loocv_cur[i] = DBL_MAX;
 
-  for (size_t i = 0 ; i < m ; i++)
-    {
-      struct alg_ols ols;
-      
-      alg_transpose(m, n, mat, Y);
+#pragma omp parallel 
+  {
+    int ret = 0;
+    struct mem_pool pool2;
+    mem_init(&pool2);
+    double (*Y)[m] = mem_malloc(&pool2, mat_size);
+    double (*D)[2] = mem_malloc(&pool2, sizeof(double) * n * 2);
+    double (*betas)[m] = mem_malloc(&pool2, sizeof(double) * m * 2);
+    struct bitset bs;
+    bitset_init(&bs, m);
 
-      size_t ii = i;
-      ALG_INIT_M(n, 2, D, (0 == j) ? 1  : mat[ii][i] );
-      // print_m(m, n, mat);
-      // print_m(n, 2, D);
+#pragma omp for
+    for (size_t i = 0 ; i < m ; i++)
+      {
+	struct alg_ols ols;
       
-      ret = alg_AX_B_OLS_init(&ols, n, 2, m, D, Y, betas);
-      if ( ret < 0)
-	{
-	  ERROR_MSG_FMT(ret < 0, "FAIL: rrho_expression_prediction(), alg_AX_B_OLS_init() ret = %d != 0\n", ret);
-	  continue;
-	}
+	alg_transpose(m, n, mat, Y);
+	
+	size_t ii = i;
+	ALG_INIT_M(n, 2, D, (0 == j) ? 1  : mat[ii][i] );
+	// print_m(m, n, mat);
+	// print_m(n, 2, D);
+	
+	ret = alg_AX_B_OLS_init(&ols, n, 2, m, D, Y, betas);
+	if ( ret < 0)
+	  {
+	    ERROR_MSG_FMT(ret < 0, "FAIL: rrho_expression_prediction(), alg_AX_B_OLS_init() ret = %d != 0\n", ret);
+	    continue;
+	  }
       
-      ret = alg_AX_B_OLS_statistics(&ols, 1);
-      if (ret < 0)
-	{
-	  ERROR_MSG_FMT(ret < 0, "FAIL: rrho_expression_prediction(), alg_AX_B_OLS_statistics() ret = %d != 0\n", ret);
-	  continue;
-	}
-      // ERROR_UNDEF_FATAL_FMT(ret < 0, "FAIL: %s alg_AX_B_OLS_statistics() ret = %d\n != 0", name, ret);
+	ret = alg_AX_B_OLS_statistics(&ols, 1);
+	if (ret < 0)
+	  {
+	    ERROR_MSG_FMT(ret < 0, "FAIL: rrho_expression_prediction(), alg_AX_B_OLS_statistics() ret = %d != 0\n", ret);
+	    continue;
+	  }
+	// ERROR_UNDEF_FATAL_FMT(ret < 0, "FAIL: %s alg_AX_B_OLS_statistics() ret = %d\n != 0", name, ret);
       
-      double *pvalue = ols.pvalue;
-      double *loocv = ols.loocv;
-      // print_v(m, pvalue);
-      for ( size_t j = 0 ; j < m ; j++ )
-	{
-	  if ( i != j  && pvalue[j] < (0.05d / ( m * (m-1) ) ) ) // Bonferroni corrected m * (m-1)
-	    {
-	      if ( index[j] < 0 || loocv[j] < loocv_cur[j] )
-		{
-		  ssize_t old = index[j];
-		  
-		  index[j] = i;
-		  if ( has_loop(&bs, m, index, j) )
-		    {
-		      index[j] = old;
-		      continue;
-		    } 
+	double *pvalue = ols.pvalue;
+	double *loocv = ols.loocv;
+	// print_v(m, pvalue);
+#pragma omp critical
+	for ( size_t j = 0 ; j < m ; j++ )
+	  {
+	    if ( i != j  && pvalue[j] < (0.05d / ( m * (m-1) ) ) ) // Bonferroni corrected m * (m-1)
+	      {
+		if ( index[j] < 0 || loocv[j] < loocv_cur[j] )
+		  {
+		    ssize_t old = index[j];
 		    
-		  loocv_cur[j] =  loocv[j];
-		  beta[0][j] = betas[0][j];
-		  beta[1][j] = betas[1][j];
-		}
-	    }
-	}
+		    index[j] = i;
+		    if ( has_loop(&bs, m, index, j) )
+		      {
+			index[j] = old;
+			continue;
+		      } 
+		  
+		    loocv_cur[j] =  loocv[j];
+		    beta[0][j] = betas[0][j];
+		    beta[1][j] = betas[1][j];
+		  }
+	      }
+	  } 
+	
+	alg_AX_B_OLS_destroy(&ols);
+      }
 
-      alg_AX_B_OLS_destroy(&ols);
-      
-    }
+    bitset_destroy(&bs);
+    mem_destroy(&pool2);
+  }
 
   // remove_loop(m, index);
 
-  bitset_destroy(&bs);
-  mem_destroy(&pool);
+   mem_destroy(&pool);
     
   return 0;
 }
