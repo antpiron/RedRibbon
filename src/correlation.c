@@ -4,6 +4,7 @@
 #include <ale/algebra.h>
 #include <ale/vector.h>
 #include <ale/error.h>
+#include <ale/bitset.h>
 
 
 VECTOR_INIT(ssize_t,ssize_t)
@@ -47,6 +48,22 @@ remove_loop(size_t n, ssize_t index[n])
   free(mark);
 }
 
+static int
+has_loop(struct bitset *bs, size_t n, ssize_t index[n], ssize_t i)
+{
+  bitset_reset(bs);
+  
+  for ( ; i >= 0 ; i = index[i]  )
+    {
+      if ( bitset_isset(bs, i) )
+	return 1;
+
+      bitset_set(bs, i);
+    }
+
+  return 0;
+}
+
 int
 rrho_expression_prediction(size_t m, size_t n, const double mat[m][n], ssize_t index[m], double beta[2][m])
 {
@@ -59,7 +76,10 @@ rrho_expression_prediction(size_t m, size_t n, const double mat[m][n], ssize_t i
   double (*D)[2] = mem_malloc(&pool, sizeof(double) * n * 2);
   double (*betas)[m] = mem_malloc(&pool, sizeof(double) * m * 2);
   double *loocv_cur = mem_malloc(&pool, sizeof(double) * m );
-
+  struct bitset bs;
+  bitset_init(&bs, m);
+  
+ 
   for (size_t i = 0 ; i < m ; i++)
     index[i] = -1;
 
@@ -101,7 +121,15 @@ rrho_expression_prediction(size_t m, size_t n, const double mat[m][n], ssize_t i
 	    {
 	      if ( index[j] < 0 || loocv[j] < loocv_cur[j] )
 		{
+		  ssize_t old = index[j];
+		  
 		  index[j] = i;
+		  if ( has_loop(&bs, m, index, j) )
+		    {
+		      index[j] = old;
+		      continue;
+		    } 
+		    
 		  loocv_cur[j] =  loocv[j];
 		  beta[0][j] = betas[0][j];
 		  beta[1][j] = betas[1][j];
@@ -113,8 +141,9 @@ rrho_expression_prediction(size_t m, size_t n, const double mat[m][n], ssize_t i
       
     }
 
-  remove_loop(m, index);
-  
+  // remove_loop(m, index);
+
+  bitset_destroy(&bs);
   mem_destroy(&pool);
     
   return 0;
