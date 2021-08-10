@@ -83,8 +83,8 @@ rrho_expression_prediction(size_t m, size_t n, const double mat[m][n], ssize_t i
   for (size_t i = 0 ; i < m ; i++)
     index[i] = -1;
 
-  for ( size_t j = 0 ; j < m ; j++ )
-    loocv_cur[j] = DBL_MAX;
+  for ( size_t i = 0 ; i < m ; i++ )
+    loocv_cur[i] = DBL_MAX;
 
   for (size_t i = 0 ; i < m ; i++)
     {
@@ -114,7 +114,7 @@ rrho_expression_prediction(size_t m, size_t n, const double mat[m][n], ssize_t i
       
       double *pvalue = ols.pvalue;
       double *loocv = ols.loocv;
-      print_v(m, pvalue);
+      // print_v(m, pvalue);
       for ( size_t j = 0 ; j < m ; j++ )
 	{
 	  if ( i != j  && pvalue[j] < (0.05d / ( m * (m-1) ) ) ) // Bonferroni corrected m * (m-1)
