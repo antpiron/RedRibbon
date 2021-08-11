@@ -10,7 +10,7 @@
 
 VECTOR_INIT(ssize_t,ssize_t)
 
-static void
+/* static void
 remove_loop(size_t n, ssize_t index[n])
 {
   struct vector_ssize_t stack;
@@ -47,7 +47,7 @@ remove_loop(size_t n, ssize_t index[n])
 
   vector_ssize_t_destroy(&stack);
   free(mark);
-}
+  } */
 
 static int
 has_loop(struct bitset *bs, size_t n, ssize_t index[n], ssize_t i)
