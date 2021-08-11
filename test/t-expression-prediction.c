@@ -18,7 +18,7 @@ main(int argc, char *argv[argc])
 
   ALG_INIT_M(m, n, expr, stats_norm_std_rand() );
  
-  ret = rrho_expression_prediction(m, n, expr, index, beta);
+  ret = rrho_expression_prediction(m, n, expr, -1, index, beta);
   ERROR_UNDEF_FATAL_FMT(0 != ret,  "FAIL: rrho_expression_prediction() ret = %du\n", ret);
 
   for (size_t i = 0 ; i < m ; i++)
@@ -36,7 +36,7 @@ main(int argc, char *argv[argc])
   // ====================
   ALG_INIT_M(m, n, expr, (i == m-1) ? expr[0][j] : stats_norm_std_rand() );
 
-  ret = rrho_expression_prediction(m, n, expr, index, beta);
+  ret = rrho_expression_prediction(m, n, expr, -1, index, beta);
   ERROR_UNDEF_FATAL_FMT(0 != ret,  "FAIL: rrho_expression_prediction() ret = %du\n", ret);
 
   for (size_t i = 0 ; i < m ; i++)
@@ -58,7 +58,7 @@ main(int argc, char *argv[argc])
   // ====================
   ALG_INIT_M(m, n, expr, (i > 0 && stats_unif_std_rand() < 0.2 ) ? expr[i-1][j] + stats_norm_rand(0, 0.1) : stats_norm_std_rand() );
  
-  ret = rrho_expression_prediction(m, n, expr, index, beta);
+  ret = rrho_expression_prediction(m, n, expr, -1, index, beta);
   ERROR_UNDEF_FATAL_FMT(0 != ret,  "FAIL: rrho_expression_prediction() ret = %du\n", ret);
 
   for (size_t i = 0 ; i < m ; i++)
@@ -71,6 +71,24 @@ main(int argc, char *argv[argc])
       count += ( index[i] == -1) ? 0 : labs(i - index[i]) - 1  ;
     }
   ERROR_UNDEF_FATAL_FMT(count > 5,  "FAIL: rrho_expression_prediction() count = %d > 5\n", count);
+
+
+  // ====================
+  ALG_INIT_M(m, n, expr, (i > 0 && stats_unif_std_rand() < 0.2 ) ? expr[i-1][j] + stats_norm_rand(0, 0.1) : stats_norm_std_rand() );
+  ret = rrho_expression_prediction(m, n, expr, m / 2, index, beta);
+  ERROR_UNDEF_FATAL_FMT(0 != ret,  "FAIL: rrho_expression_prediction() ret = %du\n", ret);
+
+  for (size_t i = 0 ; i < m ; i++)
+    printf("%d\t", index[i]);
+  printf("\n");
+
+  count = 0;
+  for (size_t i = 0 ; i < m ; i++)
+    {
+      count += ( index[i] == -1) ? 0 : labs(i - index[i]) - 1  ;
+    }
+  ERROR_UNDEF_FATAL_FMT(count > 5,  "FAIL: half of the model, rrho_expression_prediction() count = %d > 5\n", count);
+
 
   free(expr);
   free(index);

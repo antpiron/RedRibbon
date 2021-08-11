@@ -5,6 +5,7 @@
 #include <ale/vector.h>
 #include <ale/error.h>
 #include <ale/bitset.h>
+#include <ale/stats.h>
 
 
 VECTOR_INIT(ssize_t,ssize_t)
@@ -64,21 +65,28 @@ has_loop(struct bitset *bs, size_t n, ssize_t index[n], ssize_t i)
   return 0;
 }
 
+
 int
-rrho_expression_prediction(size_t m, size_t n, const double mat[m][n], ssize_t index[m], double beta[2][m])
+rrho_expression_prediction(size_t m, size_t n, const double mat[m][n], ssize_t nbr_tested, ssize_t index[m], double beta[2][m])
 {
   struct mem_pool pool;
   mem_init(&pool);
   
   size_t mat_size = sizeof(double) * m * n;
   double *loocv_cur = mem_malloc(&pool, sizeof(double) * m );
- 
- 
+  size_t *permutation = mem_malloc(&pool, sizeof(size_t) * m );
+
+  if ( nbr_tested > (ssize_t) m || nbr_tested < 0)
+    nbr_tested = m;
+  
+  shuffle_n_size_t(m, permutation);
+
   for (size_t i = 0 ; i < m ; i++)
     index[i] = -1;
 
   for ( size_t i = 0 ; i < m ; i++ )
     loocv_cur[i] = DBL_MAX;
+
 
 #pragma omp parallel 
   {
@@ -92,9 +100,10 @@ rrho_expression_prediction(size_t m, size_t n, const double mat[m][n], ssize_t i
     bitset_init(&bs, m);
 
 #pragma omp for
-    for (size_t i = 0 ; i < m ; i++)
+    for (size_t iter = 0 ; iter < (size_t) nbr_tested ; iter++)
       {
 	struct alg_ols ols;
+	size_t i = permutation[iter];
       
 	alg_transpose(m, n, mat, Y);
 	
