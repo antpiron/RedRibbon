@@ -10,7 +10,7 @@ int
 main(int argc, char *argv[argc])
 {
   int ret;
-  size_t m = 14, n = 10000;
+  size_t m = 15, n = 10000;
   double (*expr)[n] = malloc(sizeof(double) * m * n);
   ssize_t *index = malloc(sizeof(ssize_t) * m );
   double (*beta)[m] = malloc(sizeof(double) * m * 2);

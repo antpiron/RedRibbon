@@ -67,7 +67,6 @@ has_loop(struct bitset *bs, size_t n, ssize_t index[n], ssize_t i)
 int
 rrho_expression_prediction(size_t m, size_t n, const double mat[m][n], ssize_t index[m], double beta[2][m])
 {
-  int ret = 0;
   struct mem_pool pool;
   mem_init(&pool);
   
