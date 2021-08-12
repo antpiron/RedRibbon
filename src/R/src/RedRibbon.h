@@ -26,30 +26,26 @@ struct rrho_c
   int pvalue_i, pvalue_j;
 };
 
-enum { RRHO_PERMUTATION_SHUFFLE = 0, RRHO_PERMUTATION_LD_FIT,  RRHO_PERMUTATION_LD};
+enum { RRHO_PERMUTATION_SHUFFLE = 0, RRHO_PERMUTATION_FC, RRHO_PERMUTATION_LD_FIT,  RRHO_PERMUTATION_LD};
 
-struct rrho_prediction
+struct rrho_predict_fc_cls
 {
-  int tag; // 1: 
-  size_t n;
-  union
-  {
-    struct
-    {
-      double half;
-      size_t *pos;
-    } dist;
-    
-    struct
-    {
-      double *r;
-      double *beta0;
-      double *beta1;
-    } linear;
-  };
-  struct stats_ecdf ecdf;
-  struct stats_permutation permutation;
+  double *beta;
 };
+
+struct rrho_predict_ld_cls
+{
+  struct stats_permutation *permutation;
+  double *r;
+};
+
+struct rrho_predict_ld_fit_cls
+{
+  struct stats_permutation *permutation;
+  double half;
+  ssize_t *position;
+};
+
 
 
 SEXP rrho_r_rectangle(SEXP i, SEXP j, SEXP ilen, SEXP jlen, SEXP m, SEXP n, SEXP a, SEXP b, SEXP mode, SEXP log_flag);

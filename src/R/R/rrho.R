@@ -452,11 +452,12 @@ enrichment.rrho <- function(self, i, j, directions="downdown")
     return(res)
 }
 
-newLDFIT  <- function (position, half = 6480.306)
+newLDFIT  <- function (position, deps, half = 6480.306)
 {
     structure(
         list(half = as.double(half),
-             pos = as.integer(position)
+             pos = as.integer(position),
+             deps = as.integer(deps)
              ),
         class = "ld_fit"
     )

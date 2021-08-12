@@ -27,7 +27,8 @@ res <- rrho_ij(coord[1], coord[2], a, b, "hyper")
 perm_res <- rrho_permutation(1, 1, 1000, 1000, a, b, algo_params=list(m=100, n=100), pvalue_i=coord[1], pvalue_j=coord[2])
 ## print(perm_res)
 
-corr <- newLDFIT(position=0:999, half=10)
+deps  <- c(-1, rep(1, 999))
+corr <- newLDFIT(position=0:999, deps=deps, half=10)
 perm_res_corr <- rrho_permutation(1, 1, 1000, 1000, a, b, algo_params=list(m=100, n=100), correlation=corr, pvalue_i=coord[1], pvalue_j=coord[2])
 ## print(perm_res_corr)
 
