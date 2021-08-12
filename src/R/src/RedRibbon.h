@@ -60,6 +60,8 @@ SEXP rrho_r_permutation(SEXP i, SEXP j, SEXP ilen, SEXP jlen, SEXP a, SEXP b, SE
 SEXP rrho_r_rrho(SEXP i, SEXP j, SEXP a, SEXP b, SEXP mode);
 SEXP rrho_r_intersect(SEXP i, SEXP j, SEXP a, SEXP b, SEXP directions);
 
+SEXP rrho_r_expression_prediction(SEXP mat, SEXP nbr_tested);
+
 
 // Helper functions
 SEXP rrho_getListElement(SEXP list, const char *str);
