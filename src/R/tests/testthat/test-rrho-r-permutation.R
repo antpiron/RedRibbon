@@ -39,7 +39,6 @@ res <- rrho_ij(coord[1], coord[2], a, b, "hyper")
 perm_res <- rrho_permutation(1, 1, N, N, a, b, algo_params=list(m=100, n=100), pvalue_i=coord[1], pvalue_j=coord[2])
 ## print(perm_res)
 
-corr <- newLDFIT(position=0:999, deps=deps, half=10)
 perm_res_corr <- rrho_permutation(1, 1, N, N, a, b, algo_params=list(m=100, n=100), correlation=corr, pvalue_i=coord[1], pvalue_j=coord[2])
 ## print(perm_res_corr)
 
@@ -53,5 +52,42 @@ test_that(paste("padj (permutation) < padj (LD)"), {
   expect(perm_res$pvalue < perm_res_corr$pvalue, paste("pval =", perm_res$pvalue,  ">=", perm_res_corr$pvalue))
 })
 
+## test permutation correlated FC
+## N  <- 100
+## N4  <- N %/% 4
+
+a <- as.double((1:N)) - N / 2
+b <- a
+b[ (N4 + 1):N ]  <- rnorm(N - N4, sd = N / 2 / qnorm(0.995))
+deps <- ifelse( (1:N %% 2) == 1, -1, 0:(N-1)  )
+beta.expected <- runif(N) * 2 
+b  <- ifelse( (1:N %% 2) == 1, b, c(-1, beta.expected[2:N] * b[1:(N-1)]) )
+
+## print(a)
+## print(b)
+## print(deps)
+## print(beta.expected)
+
+
+corr <- newFC(beta=beta.expected, deps=deps)
+
+coord <- rrho_rectangle_min(1, 1, N, N, 100, 100, a, b, "hyper", "enrichment")
+res <- rrho_ij(coord[1], coord[2], a, b, "hyper")
+## print(res)
+
+perm_res <- rrho_permutation(1, 1, N, N, a, b, algo_params=list(m=100, n=100), pvalue_i=coord[1], pvalue_j=coord[2])
+## print(perm_res)
+
+
+perm_res_corr <- rrho_permutation(1, 1, N, N, a, b, algo_params=list(m=100, n=100), correlation=corr, pvalue_i=coord[1], pvalue_j=coord[2])
+
+print(paste("pval =", res$pvalue,  "; padj =", perm_res$pvalue, "; padj (FC) =", perm_res_corr$pvalue))
+test_that(paste("pval < padj (permutation)"), {
+  expect(res$pvalue < perm_res$pvalue, paste("pval =", res$pvalue,  ">=", perm_res$pvalue))
+})
+
+test_that(paste("padj (permutation) < padj (FC)"), {
+  expect(perm_res$pvalue < perm_res_corr$pvalue, paste("pval =", perm_res$pvalue,  ">=", perm_res_corr$pvalue))
+})
 
 #> Test passed

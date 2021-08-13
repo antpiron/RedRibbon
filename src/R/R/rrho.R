@@ -41,8 +41,8 @@ rrho_permutation <- function (i, j, i.len, j.len, a, b, algo_params=NULL, mode=c
     else
         algo_params[["n"]] <- as.integer(algo_params[["n"]])
 
-    if (! is.null(correlation) && class(correlation) != "ld_fit")
-        stop("Correlation should be NULL or of `ld_fit` class")
+    if (! is.null(correlation) && ! class(correlation) %in% c("ld", "ld_fit", "fc") )
+        stop("Correlation should be NULL or of 'ld', `ld_fit or 'fc'` class")
     
     .Call("rrho_r_permutation", as.integer(i), as.integer(j), as.integer(i.len), as.integer(j.len),
           as.double(a), as.double(b), algo_params, as.character(mode), as.character(direction),
@@ -466,5 +466,16 @@ newLDFIT  <- function (position, deps, half = 6480.306)
              deps = as.integer(deps)
              ),
         class = "ld_fit"
+    )
+}
+
+newFC  <- function (deps, beta)
+{
+    structure(
+        list(
+            deps = as.integer(deps),
+            beta = as.double(beta)
+        ),
+        class = "fc"
     )
 }

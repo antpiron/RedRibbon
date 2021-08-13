@@ -195,7 +195,6 @@ rrho_r_permutation(SEXP i, SEXP j, SEXP ilen, SEXP jlen, SEXP a, SEXP b, SEXP al
 	  ssize_t *deps = mem_malloc(&pool, sizeof(ssize_t) * length_b);
 	  SEXP deps_sexp = rrho_getListElement(correlation, "deps");
 	  
-	  deps_sexp = rrho_getListElement(correlation, "deps");
 	  for (size_t i = 0 ; i < length_b ; i++)
 	    {
 	      deps[i] = INTEGER(deps_sexp)[i];
@@ -224,6 +223,9 @@ rrho_r_permutation(SEXP i, SEXP j, SEXP ilen, SEXP jlen, SEXP a, SEXP b, SEXP al
 	  else if ( Rf_inherits(correlation, "ld") )
 	    {
 	      SEXP r_sexp = rrho_getListElement(correlation, "r");
+	      
+	      predict_ld_cls.r = mem_malloc(&pool, sizeof(double) * length_b);
+	      
 	      for (size_t i = 0 ; i < length_b ; i++)
 		predict_ld_cls.r[i] = REAL(r_sexp)[i];
 	      predict_ld_fit_cls.permutation = &permutation;
@@ -233,6 +235,9 @@ rrho_r_permutation(SEXP i, SEXP j, SEXP ilen, SEXP jlen, SEXP a, SEXP b, SEXP al
 	  else if ( Rf_inherits(correlation, "fc") )
 	    {
 	      SEXP beta_sexp = rrho_getListElement(correlation, "beta");
+
+	      predict_fc_cls.beta = mem_malloc(&pool, sizeof(double) * length_b);
+	      
 	      for (size_t i = 0 ; i < length_b ; i++)
 		predict_fc_cls.beta[i] = REAL(beta_sexp)[i];
 

@@ -113,14 +113,14 @@ rrho_expression_prediction_col_major(size_t m, size_t n, double mat[n][m], ssize
 	ret = alg_AX_B_OLS_init(&ols, n, 2, m, D, Y, betas);
 	if ( ret < 0)
 	  {
-	    ERROR_MSG_FMT(ret < 0, "FAIL: rrho_expression_prediction(), alg_AX_B_OLS_init() ret = %d != 0\n", ret);
+	    // ERROR_MSG_FMT(ret < 0, "FAIL: rrho_expression_prediction(), alg_AX_B_OLS_init() ret = %d != 0\n", ret);
 	    continue;
 	  }
       
 	ret = alg_AX_B_OLS_statistics(&ols, 1);
 	if (ret < 0)
 	  {
-	    ERROR_MSG_FMT(ret < 0, "FAIL: rrho_expression_prediction(), alg_AX_B_OLS_statistics() ret = %d != 0\n", ret);
+	    // ERROR_MSG_FMT(ret < 0, "FAIL: rrho_expression_prediction(), alg_AX_B_OLS_statistics() ret = %d != 0\n", ret);
 	    continue;
 	  }
 	// ERROR_UNDEF_FATAL_FMT(ret < 0, "FAIL: %s alg_AX_B_OLS_statistics() ret = %d\n != 0", name, ret);
