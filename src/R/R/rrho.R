@@ -61,6 +61,12 @@ rrho_intersect  <- function (i, j, a, b, directions=c("downdown"))
     .Call("rrho_r_intersect", as.integer(i), as.integer(j), as.double(a), as.double(b), as.character(directions))
 }
 
+## SEXP rrho_r_expression_prediction(SEXP mat, SEXP nbr_tested)
+rrho_expression_prediction <- function (mat, nbr.tested = -1)
+{
+    .Call("rrho_r_expression_prediction", as.matrix(mat), as.integer(nbr.tested))
+}
+
 
 ###############################
 ### S3

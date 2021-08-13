@@ -67,15 +67,14 @@ has_loop(struct bitset *bs, size_t n, ssize_t index[n], ssize_t i)
 
 
 int
-rrho_expression_prediction(size_t m, size_t n, const double mat[m][n], ssize_t nbr_tested, ssize_t index[m], double beta[2][m])
+rrho_expression_prediction_col_major(size_t m, size_t n, double mat[n][m], ssize_t nbr_tested, ssize_t index[m], double beta[2][m])
 {
   struct mem_pool pool;
   mem_init(&pool);
   
-  size_t mat_size = sizeof(double) * m * n;
   double *loocv_cur = mem_malloc(&pool, sizeof(double) * m );
   size_t *permutation = mem_malloc(&pool, sizeof(size_t) * m );
-  double (*Y)[m] = mem_malloc(&pool, mat_size);
+  double (*Y)[m] = mat;
 
   if ( nbr_tested > (ssize_t) m || nbr_tested < 0)
     nbr_tested = m;
@@ -88,7 +87,7 @@ rrho_expression_prediction(size_t m, size_t n, const double mat[m][n], ssize_t n
   for ( size_t i = 0 ; i < m ; i++ )
     loocv_cur[i] = DBL_MAX;
 
-  alg_transpose(m, n, mat, Y);
+  // alg_transpose(m, n, mat, Y);
 
 #pragma omp parallel 
   {
@@ -107,7 +106,7 @@ rrho_expression_prediction(size_t m, size_t n, const double mat[m][n], ssize_t n
 	size_t i = permutation[iter];
       
 	size_t ii = i;
-	ALG_INIT_M(n, 2, D, (0 == j) ? 1  : mat[ii][i] );
+	ALG_INIT_M(n, 2, D, (0 == j) ? 1  : mat[i][ii] );
 	// print_m(m, n, mat);
 	// print_m(n, 2, D);
 	
@@ -164,4 +163,18 @@ rrho_expression_prediction(size_t m, size_t n, const double mat[m][n], ssize_t n
    mem_destroy(&pool);
     
   return 0;
+}
+
+int
+rrho_expression_prediction(size_t m, size_t n, double mat[m][n], ssize_t nbr_tested, ssize_t index[m], double beta[2][m])
+{
+  int ret = 0;
+  size_t mat_size = sizeof(double) * m * n;
+  double (*Y)[m] = malloc(mat_size);
+
+  alg_transpose(m, n, mat, Y);
+  ret = rrho_expression_prediction_col_major(m, n, Y, nbr_tested, index, beta);
+
+  free(Y);
+  return ret;
 }
