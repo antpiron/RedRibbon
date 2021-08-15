@@ -67,6 +67,12 @@ rrho_expression_prediction <- function (mat, nbr.tested = -1)
     .Call("rrho_r_expression_prediction", as.matrix(mat), as.integer(nbr.tested))
 }
 
+## SEXP rrho_r_normalize(SEXP mat, SEXP ref, SEXP mode)
+rrho_normalize <- function (mat, ref)
+{
+    .Call("rrho_r_normalize", as.matrix(mat), as.integer(ref))
+}
+
 
 ###############################
 ### S3

@@ -62,6 +62,8 @@ SEXP rrho_r_intersect(SEXP i, SEXP j, SEXP a, SEXP b, SEXP directions);
 
 SEXP rrho_r_expression_prediction(SEXP mat, SEXP nbr_tested);
 
+SEXP rrho_r_normalize(SEXP mat, SEXP ref, SEXP mode);
+
 
 // Helper functions
 SEXP rrho_getListElement(SEXP list, const char *str);

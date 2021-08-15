@@ -10,10 +10,9 @@
 
 // TODO: move to the refgene package
 SEXP
-rrho_normalize(SEXP mat, SEXP ref, SEXP mode)
+rrho_r_normalize(SEXP mat, SEXP ref, SEXP mode)
 {
   struct mem_pool pool;
-  mem_init(&pool);
 
   SEXP ret;
 
@@ -21,13 +20,19 @@ rrho_normalize(SEXP mat, SEXP ref, SEXP mode)
   size_t n = ncols(mat);
   size_t r = length(ref);
 
+  if (r > m)
+    error("Normalization error: ref length should be less or equal than mat row number.");
+  
+  mem_init(&pool);
+
   double (*mat_r)[m] = ( double (*)[m] ) REAL(mat);
   int *ref_r = INTEGER(ref);
 
+  
   size_t *ref_c = mem_malloc(&pool, sizeof(size_t) * r);
 
   for (size_t i = 0 ; i < r; i++)
-    ref_c[i] = ref_r[i]; 
+    ref_c[i] = ref_r[i] - 1; 
   
   double (*mat_c)[n] = mem_malloc(&pool, sizeof(double) * m * n);
   double *beta_c = mem_malloc(&pool, sizeof(double) * n );
@@ -39,23 +44,22 @@ rrho_normalize(SEXP mat, SEXP ref, SEXP mode)
   //  STATS_LS_VARIANCE,
   //  STATS_POISSON
   int err = stats_normalize_beta(m, n, r, mat_c, ref_c, beta_c, STATS_POISSON);
-  ERROR_GOTO(err < 0, ERR_NORM);
-  stats_normalize_samples(m, n, mat_c, mat_c, beta_c);
+  if ( 0 <= err )
+    {
+      stats_normalize_samples(m, n, mat_c, mat_c, beta_c);
+      ret = PROTECT(allocMatrix(REALSXP, m, n));
 
+      ret_r = ( double (*)[m] ) REAL(ret);
+      alg_transpose(m, n, mat_c, ret_r);
+
+      mem_destroy(&pool);
+      UNPROTECT(1);
   
-  ret = PROTECT(allocMatrix(REALSXP, m, n));
+      return ret;
+    }
 
-  ret_r = ( double (*)[m] ) REAL(ret);
-  alg_transpose(m, n, mat_c, ret_r);
-
-  mem_destroy(&pool);
-  UNPROTECT(1);
-  
-  return ret;
-
- ERR_NORM:
-  
   mem_destroy(&pool);
   error("Normalization error.");
+
   return R_NilValue;
 }
