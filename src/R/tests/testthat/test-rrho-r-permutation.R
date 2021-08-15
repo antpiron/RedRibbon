@@ -43,7 +43,7 @@ perm_res_corr <- rrho_permutation(1, 1, N, N, a, b, algo_params=list(m=100, n=10
 ## print(perm_res_corr)
 
 
-print(paste("pval =", res$pvalue,  "; padj =", perm_res$pvalue, "; padj (LD) =", perm_res_corr$pvalue))
+# print(paste("pval =", res$pvalue,  "; padj =", perm_res$pvalue, "; padj (LD) =", perm_res_corr$pvalue))
 test_that(paste("pval < padj (permutation)"), {
   expect(res$pvalue < perm_res$pvalue, paste("pval =", res$pvalue,  ">=", perm_res$pvalue))
 })
@@ -81,7 +81,7 @@ perm_res <- rrho_permutation(1, 1, N, N, a, b, algo_params=list(m=100, n=100), p
 
 perm_res_corr <- rrho_permutation(1, 1, N, N, a, b, algo_params=list(m=100, n=100), correlation=corr, pvalue_i=coord[1], pvalue_j=coord[2])
 
-print(paste("pval =", res$pvalue,  "; padj =", perm_res$pvalue, "; padj (FC) =", perm_res_corr$pvalue))
+## print(paste("pval =", res$pvalue,  "; padj =", perm_res$pvalue, "; padj (FC) =", perm_res_corr$pvalue))
 test_that(paste("pval < padj (permutation)"), {
   expect(res$pvalue < perm_res$pvalue, paste("pval =", res$pvalue,  ">=", perm_res$pvalue))
 })
