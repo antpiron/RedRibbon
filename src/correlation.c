@@ -87,6 +87,10 @@ rrho_expression_prediction_col_major(size_t m, size_t n, double mat[n][m], ssize
   for ( size_t i = 0 ; i < m ; i++ )
     loocv_cur[i] = DBL_MAX;
 
+  for (size_t i = 0 ; i < 2 ; i++)
+    for (size_t j = 0 ; j < m ; j++)
+      beta[i][j] = 0;
+
   // alg_transpose(m, n, mat, Y);
 
 #pragma omp parallel 
@@ -99,6 +103,7 @@ rrho_expression_prediction_col_major(size_t m, size_t n, double mat[n][m], ssize
     struct bitset bs;
     bitset_init(&bs, m);
 
+    
 #pragma omp for
     for (size_t iter = 0 ; iter < (size_t) nbr_tested ; iter++)
       {
