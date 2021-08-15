@@ -17,13 +17,13 @@ res <- rrho_expression_prediction(mat)
 print(res)
 
 
-test_that(paste("index"), {
+test_that(paste("index1"), {
    expect(res$index[1] * res$index[2] < 0, paste("index[1] =", res$index[1],  "; index[2]", res$index[2]))
    expect( (2 == res$index[1] && -1 == res$index[2]) || (-1 == res$index[1] && 1 == res$index[2]),
           paste("index[1] =", res$index[1],  "; index[2]", res$index[2]))
 })
 
-test_that(paste("beta"), {
+test_that(paste("beta1"), {
     expect( ( abs(1 - res$beta[1,2]) < eps && abs(res$beta[2,2]) < eps) ||
             ( abs(res$beta[1,2]) < eps && abs(1 - res$beta[2,2]) < eps),
            paste("abs[1,2] =", res$beta[1,2],  "; beta[2,2]", res$beta[2,2]))
@@ -40,13 +40,13 @@ res <- rrho_expression_prediction(mat)
 print(res)
 
 
-test_that(paste("index"), {
+test_that(paste("index2"), {
    expect(res$index[1] * res$index[2] < 0, paste("index[1] =", res$index[1],  "; index[2]", res$index[2]))
    expect( (2 == res$index[1] && -1 == res$index[2]) || (-1 == res$index[1] && 1 == res$index[2]),
           paste("index[1] =", res$index[1],  "; index[2]", res$index[2]))
 })
 
-test_that(paste("beta"), {
+test_that(paste("beta2"), {
     expect( ( abs(1 - res$beta[1,2]) < eps && abs(res$beta[2,2]) < eps) ||
             ( abs(res$beta[1,2]) < eps && abs(1 - res$beta[2,2]) < eps),
            paste("abs[1,2] =", res$beta[1,2],  "; beta[2,2]", res$beta[2,2]))
