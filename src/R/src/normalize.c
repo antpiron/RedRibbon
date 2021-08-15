@@ -43,6 +43,7 @@ rrho_r_normalize(SEXP mat, SEXP ref, SEXP mode)
   //  STATS_LS_MEAN = 0,
   //  STATS_LS_VARIANCE,
   //  STATS_POISSON
+  // TODO: add other modes
   int err = stats_normalize_beta(m, n, r, mat_c, ref_c, beta_c, STATS_POISSON);
   if ( 0 <= err )
     {

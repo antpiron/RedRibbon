@@ -68,9 +68,9 @@ rrho_expression_prediction <- function (mat, nbr.tested = -1)
 }
 
 ## SEXP rrho_r_normalize(SEXP mat, SEXP ref, SEXP mode)
-rrho_normalize <- function (mat, ref)
+rrho_normalize <- function (mat, ref, mode="poisson")
 {
-    .Call("rrho_r_normalize", as.matrix(mat), as.integer(ref))
+    .Call("rrho_r_normalize", as.matrix(mat), as.integer(ref), as.character(mode))
 }
 
 
