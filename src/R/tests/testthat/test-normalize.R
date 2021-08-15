@@ -14,9 +14,9 @@ mat <- do.call(cbind, lapply(1:n, function (x) beta[x] * ref ) )
 
 norm.mat <- rrho_normalize(mat, 1:3)
 
-print(beta)
-print(mat)
-print(norm.mat)
+## print(beta)
+## print(mat)
+## print(norm.mat)
 
 test_that(paste("Diff"), {
     res <- sum( (norm.mat - rowMeans(mat))^2 )
