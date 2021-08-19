@@ -7,6 +7,7 @@
 #include <ale/error.h>
 #include <ale/bitset.h>
 #include <ale/stats.h>
+#include <ale/sort.h>
 
 
 VECTOR_INIT(ssize_t,ssize_t)
@@ -183,4 +184,77 @@ rrho_expression_prediction(size_t m, size_t n, double mat[m][n], ssize_t nbr_tes
 
   free(Y);
   return ret;
+}
+
+int
+rrho_ldfit_prediction(size_t m, double half, double pval[m], size_t position[m], ssize_t index[m])
+{
+  struct mem_pool pool;
+  mem_init(&pool);
+
+  size_t *pval_index = mem_malloc(&pool, sizeof(size_t) * m);
+  size_t *position_index = mem_malloc(&pool, sizeof(size_t) * m);
+  size_t *reverse_position_index = mem_malloc(&pool, sizeof(size_t) * m);
+  double *best_r = mem_malloc(&pool, sizeof(double) * m);
+  struct bitset bs;
+  bitset_init(&bs, m);
+
+  sort_q_indirect(pval_index, pval, m, sizeof(double), sort_compar_double, NULL);
+  sort_q_indirect(reverse_position_index, position, m, sizeof(size_t), sort_compar_ssize_t, NULL);
+  for (size_t i = 0 ; i < m ; i++)
+    position_index[reverse_position_index[i]] = i;
+
+  for (size_t i = 0 ; i < m ; i++)
+    best_r[i] = -1;
+
+  for (size_t i = 0 ; i < m ; i++)
+    index[i] = -1;
+  
+  for (size_t i = 0 ; i < m ; i++)
+    {
+      size_t current = pval_index[i];
+      ssize_t current_position = position[current];
+
+      if ((ssize_t) m <= index[current] || index[current] < 0 )
+	continue;
+      
+      index[current] = -1;
+      for (ssize_t sign = -1 ; sign <= 1 ; sign +=2)
+	{
+	  ssize_t last_adj = current;
+	  
+	  for (ssize_t j = 1 ; j < (ssize_t) m ; j++)
+	    {
+	      ssize_t next = position_index[current] + sign * j;
+	      if ( next >= (ssize_t) m || next < 0)
+		break;
+	      
+	      size_t adj = reverse_position_index[next];
+	      ssize_t position_adj = position[adj];
+	      ssize_t position_last_adj = position[last_adj];
+	      double distance = fabs( (double) (current_position - position_adj) );
+	      double distance_adj = fabs( (double) (position_last_adj - position_adj) );
+	      double r = half / (half + distance);
+	      double r_adj = half / (half + distance_adj);
+	      if ( r > 0.1 && r_adj > best_r[adj])
+		{
+		  ssize_t old = index[adj];
+		  index[adj] = last_adj;
+		  if ( has_loop(&bs, m, index, adj) )
+		    {
+		      index[adj] = old;
+		      continue;
+		    } 
+		  best_r[adj] = r_adj;
+		  last_adj = adj;
+		}
+	      else
+		break;
+	    }
+	}
+    }
+  
+  bitset_destroy(&bs);
+  mem_destroy(&pool);
+  return 0;
 }
