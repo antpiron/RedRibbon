@@ -67,6 +67,12 @@ rrho_expression_prediction <- function (mat, nbr.tested = -1)
     .Call("rrho_r_expression_prediction", as.matrix(mat), as.integer(nbr.tested))
 }
 
+## SEXP rrho_r_ldfit_prediction(SEXP half, SEXP pval, SEXP position)
+rrho_ldfit_prediction <- function (half, pval, position)
+{
+    .Call("rrho_r_ldfit_prediction", as.double(half), as.double(pval), as.integer(position))
+}
+
 ## SEXP rrho_r_normalize(SEXP mat, SEXP ref, SEXP mode)
 rrho_normalize <- function (mat, ref, mode="poisson")
 {
@@ -169,7 +175,7 @@ newRRHO.numeric <- function (a, b, ...)
 #' @return The updated rrho S3 object.
 #' @examples
 #' library(magrittr)
-#' newRRHO(c(0.5, 0.7,0.3, 0.8), c(0.6,0.6,0.4,0.7)) %>% setoptions(enrichment_mode="hyper-two-tailed",  draw_quadrants = TRUE)
+#' newRRHO(c(0.5, 0.7,0.3, 0.8), c(0.6,0.6,0.4,0.7)) %>% setoptions(enrichment_mode="hyper-two-tailed")
 setoptions.rrho <- function(self, enrichment_mode=NULL, ggplot_colours = NULL)
 {
     if (! is.null(enrichment_mode) )
