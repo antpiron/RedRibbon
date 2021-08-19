@@ -215,20 +215,18 @@ rrho_ldfit_prediction(size_t m, double half, double pval[m], size_t position[m],
       size_t current = pval_index[i];
       ssize_t current_position = position[current];
 
-      if ((ssize_t) m <= index[current] || index[current] < 0 )
-	continue;
-      
-      index[current] = -1;
+      // printf("current = %zu ; current_position = %zd\n", current, current_position);
+
       for (ssize_t sign = -1 ; sign <= 1 ; sign +=2)
 	{
 	  ssize_t last_adj = current;
 	  
 	  for (ssize_t j = 1 ; j < (ssize_t) m ; j++)
 	    {
-	      ssize_t next = position_index[current] + sign * j;
+	      ssize_t next = (ssize_t) position_index[current] + sign * j;
 	      if ( next >= (ssize_t) m || next < 0)
 		break;
-	      
+
 	      size_t adj = reverse_position_index[next];
 	      ssize_t position_adj = position[adj];
 	      ssize_t position_last_adj = position[last_adj];
@@ -236,7 +234,7 @@ rrho_ldfit_prediction(size_t m, double half, double pval[m], size_t position[m],
 	      double distance_adj = fabs( (double) (position_last_adj - position_adj) );
 	      double r = half / (half + distance);
 	      double r_adj = half / (half + distance_adj);
-	      if ( r > 0.1 && r_adj > best_r[adj])
+	      if ( r > 0.2 && r_adj > best_r[adj])
 		{
 		  ssize_t old = index[adj];
 		  index[adj] = last_adj;
