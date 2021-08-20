@@ -61,6 +61,7 @@ SEXP rrho_r_rrho(SEXP i, SEXP j, SEXP a, SEXP b, SEXP mode);
 SEXP rrho_r_intersect(SEXP i, SEXP j, SEXP a, SEXP b, SEXP directions);
 
 SEXP rrho_r_expression_prediction(SEXP mat, SEXP nbr_tested);
+SEXP rrho_r_ldfit_prediction(SEXP half, SEXP pval, SEXP position);
 
 SEXP rrho_r_normalize(SEXP mat, SEXP ref, SEXP mode);
 
