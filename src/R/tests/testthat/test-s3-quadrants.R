@@ -8,7 +8,7 @@ EPS  <- 0.000001
 a <- as.double(1:1000) - 450
 b <- as.double(1:1000) - 460
 
-rr <- newRRHO(a, b)
+rr <- RedRibbon(a, b)
 
 quad <- quadrants(rr, m=1000, n=1000)
 
@@ -46,7 +46,7 @@ test_that(paste("Testing quadrants"), {
 a <- as.double(1:1000) - 500 - 1
 b <-rev(a)
 
-rr <- newRRHO(a, b)
+rr <- RedRibbon(a, b)
 rr <- setoptions(rr, enrichment_mode="hyper-two-tailed")
 
 quad <- quadrants(rr, whole=FALSE, m=1000, n=1000)

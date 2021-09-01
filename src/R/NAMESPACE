@@ -3,8 +3,8 @@ useDynLib(RedRibbon)
 
 import(ggplot2)
 
-S3method(newRRHO, data.frame)
-S3method(newRRHO, numeric)
+S3method(RedRibbon, data.frame)
+S3method(RedRibbon, numeric)
 S3method(ggplot, rrho)
 S3method(setoptions, rrho)
 S3method(rectangle_min, rrho)
@@ -14,7 +14,7 @@ S3method(enrichment, rrho)
 
 export("rrho_rectangle", "rrho_rectangle_min", "rrho_rectangle_min_ea", "rrho_permutation", "rrho_ij",
        "rrho_intersect", "rrho_expression_prediction", "rrho_ldfit_prediction", "rrho_normalize",
-       "newRRHO", "setoptions", "rectangle_min", "enrichment", "quadrants",
-       "newRRHO.data.frame", "newRRHO.numeric",
+       "RedRibbon", "setoptions", "rectangle_min", "enrichment", "quadrants",
+       "RedRibbon.data.frame", "RedRibbon.numeric",
        "ggplot.rrho", "setoptions.rrho", "rectangle_min.rrho", "enrichment.rrho", "permutation.rrho", "quadrants.rrho",
        "newLDFIT", "newFC")

@@ -90,13 +90,13 @@ rrho_normalize <- function (mat, ref, mode="poisson")
 #' 
 #' @return A rrho S3 object.
 #' @examples
-#' newRRHO(c(0.5, 0.7,0.3, 0.8),
+#' RedRibbon(c(0.5, 0.7,0.3, 0.8),
 #'         c(0.6, 0.6, 0.4, 0.7))
-#' newRRHO(data.frame(a = c(0.5, 0.7, 0.3, 0.8),
+#' RedRibbon(data.frame(a = c(0.5, 0.7, 0.3, 0.8),
 #'                    b = c(0.6, 0.6, 0.4, 0.7)))
-newRRHO <- function (self, ...)
+RedRibbon <- function (self, ...)
 {
-    UseMethod("newRRHO")
+    UseMethod("RedRibbon")
 }
 
 setoptions <- function (self, ...)
@@ -126,7 +126,7 @@ enrichment <- function (self, ...)
 
 ### S3 Body
 
-newRRHO.data.frame <- function (df, enrichment_mode=NULL, correlation=NULL)
+RedRibbon.data.frame <- function (df, enrichment_mode=NULL, correlation=NULL)
 {
     if ( ! "a" %in% colnames(df))
         stop("Column 'a' is missing!")
@@ -152,12 +152,12 @@ newRRHO.data.frame <- function (df, enrichment_mode=NULL, correlation=NULL)
 #' @param b is a vector of double.
 #' @return A rrho S3 object.
 #' @examples
-#' newRRHO(c(0.5, 0.7,0.3, 0.8), c(0.6,0.6,0.4,0.7))
-newRRHO.numeric <- function (a, b, ...)
+#' RedRibbon(c(0.5, 0.7,0.3, 0.8), c(0.6,0.6,0.4,0.7))
+RedRibbon.numeric <- function (a, b, ...)
 {
     if (length(a) != length(b))
         stop("'a' and 'b' parameters should be of same length!")
-    newRRHO(data.frame(a=a, b=b), ...)
+    RedRibbon(data.frame(a=a, b=b), ...)
 }
 
 #' Set rrho options a rrho S3 object from two vectors of values
@@ -175,7 +175,7 @@ newRRHO.numeric <- function (a, b, ...)
 #' @return The updated rrho S3 object.
 #' @examples
 #' library(magrittr)
-#' newRRHO(c(0.5, 0.7,0.3, 0.8), c(0.6,0.6,0.4,0.7)) %>% setoptions(enrichment_mode="hyper-two-tailed")
+#' RedRibbon(c(0.5, 0.7,0.3, 0.8), c(0.6,0.6,0.4,0.7)) %>% setoptions(enrichment_mode="hyper-two-tailed")
 setoptions.rrho <- function(self, enrichment_mode=NULL, ggplot_colours = NULL)
 {
     if (! is.null(enrichment_mode) )
@@ -200,7 +200,7 @@ setoptions.rrho <- function(self, enrichment_mode=NULL, ggplot_colours = NULL)
 #' a <- as.double(1:1000) - 450
 #' b <- as.double(1:1000) - 460
 #' 
-#' rr <- newRRHO(a, b)
+#' rr <- RedRibbon(a, b)
 #' 
 #' quad <- quadrants(rr, m=1000, n=1000)
 quadrants.rrho <- function(self, m=NULL, n=NULL,

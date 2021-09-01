@@ -11,7 +11,7 @@ nh <- n / 2
 ############### Perfect
 
 ## New
-rr <- newRRHO(1:n, 1:n) 
+rr <- RedRibbon(1:n, 1:n) 
 gg <- ggplot(rr)
 ggsave("/tmp/new-rrho-perfect-10000.png", gg)
 rectangle_min(rr,1,1,n,n)
@@ -30,7 +30,7 @@ ggsave("/tmp/old-rrho-perfect-10000.png", gg)
 
 
 ############### Perfect reversed
-rr <- newRRHO(1:n, n:1) 
+rr <- RedRibbon(1:n, n:1) 
 ggplot(rr)
 rectangle_min(rr,1,1,n,n, direction="")
 rrho_ij(nh,nh, rr$data$a, rr$data$b)
@@ -46,7 +46,7 @@ a <- c(aq, aq, raq, raq)
 b <- c(aq, raq, aq, raq)
 names(a)  <- 1:n
 names(b)  <- 1:n
-rr <-  newRRHO(a, b) %>% setoptions(enrichment_mode = "hyper-two-tailed")
+rr <-  RedRibbon(a, b) %>% setoptions(enrichment_mode = "hyper-two-tailed")
 quadrants <- quadrants(rr, whole=FALSE, m=100, n=100, permutation=TRUE)
 gg <- ggplot(rr, quadrants=quadrants)
 ggsave("/tmp/new-rrho-perfect-quad-10000.png", gg)
@@ -66,7 +66,7 @@ a <- c(aq, aq)
 b <- c(aq, raq)
 names(a)  <- 1:n
 names(b)  <- 1:n
-rr <-  newRRHO(a, b) ## %>% setoptions(enrichment_mode = "hyper-two-tailed")
+rr <-  RedRibbon(a, b) ## %>% setoptions(enrichment_mode = "hyper-two-tailed")
 quadrants <- quadrants(rr, whole=FALSE)
 gg <- ggplot(rr, quadrants=quadrants)
 ggsave("/tmp/new-rrho-perfect-quad-10000.png", gg)
@@ -76,7 +76,7 @@ ggsave("/tmp/new-rrho-perfect-quad-10000.png", gg)
 n.perf <-  n * 10 / n
 a <- c(1:n.perf, sample(n-n.perf))
 b <- c(1:n.perf, sample(n-n.perf))
-rr <-  newRRHO(a, b)
+rr <-  RedRibbon(a, b)
 quadrants <- quadrants(rr, whole=TRUE)
 gg <- ggplot(rr, quadrants=quadrants)
 
@@ -85,6 +85,6 @@ gg
 n <- 1000
 a <- (1:n) - 500
 b <- (1:n) - 500
-rr <- newRRHO(a, b)
+rr <- RedRibbon(a, b)
 quadrants <- quadrants(rr, whole=FALSE)
 ggplot(rr, quadrants=quadrants)

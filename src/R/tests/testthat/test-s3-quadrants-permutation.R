@@ -8,7 +8,7 @@ EPS  <- 0.000001
 a <- as.double(1:1000) - 450
 b <- as.double(1:1000) - 460
 
-rr <- newRRHO(a, b)
+rr <- RedRibbon(a, b)
 
 quad <- quadrants(rr, m=100, n=100, permutation=TRUE)
 test_that(paste("Testing whole quadrants"), {
@@ -32,7 +32,7 @@ test_that(paste("Testing quadrants"), {
 a <- as.double(1:2000) - 500 - 1
 b <-rev(a)
 
-rr <- newRRHO(a, b)
+rr <- RedRibbon(a, b)
 rr <- setoptions(rr, enrichment_mode="hyper-two-tailed")
 
 quad <- quadrants(rr, whole=FALSE, m=100, n=100, permutation=TRUE)

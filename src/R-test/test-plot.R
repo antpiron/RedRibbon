@@ -11,7 +11,7 @@ nh <- n / 2
 ############### Perfect
 
 ## New
-rr <- newRRHO(1:n, 1:n) 
+rr <- RedRibbon(1:n, 1:n) 
 gg <- ggplot(rr)
 ggsave("/tmp/new-rrho-perfect-10000.png", gg)
 rectangle_min(rr,1,1,n,n)
@@ -30,7 +30,7 @@ ggsave("/tmp/old-rrho-perfect-10000.png", gg)
 
 
 ############### Perfect reversed
-rr <- newRRHO(1:n, n:1) 
+rr <- RedRibbon(1:n, n:1) 
 ggplot(rr)
 rectangle_min(rr,1,1,n,n, direction="")
 rrho_ij(nh,nh, rr$data$a, rr$data$b)
@@ -46,7 +46,7 @@ a <- c(aq, aq, raq, raq)
 b <- c(aq, raq, aq, raq)
 names(a)  <- 1:n
 names(b)  <- 1:n
-rr <-  newRRHO(a, b) ## %>% setoptions(enrichment_mode = "hyper-two-tailed")
+rr <-  RedRibbon(a, b) ## %>% setoptions(enrichment_mode = "hyper-two-tailed")
 gg <- ggplot(rr)
 ggsave("/tmp/new-rrho-perfect-quad-10000.png", gg)
 rectangle_min(rr,1,1,n,n)
