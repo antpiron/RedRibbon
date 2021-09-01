@@ -170,7 +170,10 @@ RedRibbon.numeric <- function (a, b, ...)
     RedRibbon(data.frame(a=a, b=b), ...)
 }
 
-#' Set rrho options a rrho S3 object from two vectors of values
+#' Set RedRibbon options on a RedRibbon S3 object
+#' 
+#' This helper function allows you to change the enrichment method that you wish to use as well as the color scheme
+#' for the RedRibbon level map.
 #' 
 #' @param self A RedRibbon object.
 #' @param enrichment_mode A string (default = NULL). 
@@ -178,6 +181,7 @@ RedRibbon.numeric <- function (a, b, ...)
 #'    \item{"enrichment"} {for one tailed hypergeometric test}
 #'    \item{"hyper-two-tailed"} {for one tailed hypergeometric test, "hyper-two-tailed-old", for the original R package two tailed test.}
 #' }
+#' [TODO] Describe pros and cons of each method (time, efficacity, ...)
 #' @param ggplot_colours is the color palette used for the plots. The default is
 #'    \code{
 #'    colfunc <- grDevices::colorRampPalette(c("#eb3434", "#eb9334", "#ebeb34", "#49eb34", "#34eba5", "#34b4eb", "#3446eb"))
