@@ -126,6 +126,14 @@ enrichment <- function (self, ...)
 
 ### S3 Body
 
+#' Creates a RedRibbon object from 2 numeric vectors
+#' 
+#' 
+#' @param a is a vector of double sanitized by \code{RedRibbon.numeric}.
+#' @param b is a vector of double sanitized by \code{RedRibbon.numeric}.
+#' @return A rrho S3 object.
+#' @examples
+#' RedRibbon(c(0.5, 0.7,0.3, 0.8), c(0.6,0.6,0.4,0.7))
 RedRibbon.data.frame <- function (df, enrichment_mode=NULL, correlation=NULL)
 {
     if ( ! "a" %in% colnames(df))
@@ -148,7 +156,7 @@ RedRibbon.data.frame <- function (df, enrichment_mode=NULL, correlation=NULL)
 
 #' Creates a RedRibbon objects from 2 numeric vectors
 #' 
-#' Blablabla
+#' A helper function to check that \code{a} and \code{b} input parameters are of the same length.
 #' @param a is a vector of double.
 #' @param b is a vector of double.
 #' @return A rrho S3 object.
@@ -164,17 +172,19 @@ RedRibbon.numeric <- function (a, b, ...)
 
 #' Set rrho options a rrho S3 object from two vectors of values
 #' 
-#' @param self is a rrho object.
-#' @param enrichment_mode A string. "enrichment" for one tailed hypergeometric test,
-#'    "hyper-two-tailed" for one tailed hypergeometric test, "hyper-two-tailed-old", for
-#'    the original R package two tailed test.
+#' @param self A RedRibbon object.
+#' @param enrichment_mode A string (default = NULL). 
+#'    \itemize{
+#'    \item{"enrichment"} {for one tailed hypergeometric test}
+#'    \item{"hyper-two-tailed"} {for one tailed hypergeometric test, "hyper-two-tailed-old", for the original R package two tailed test.}
+#' }
 #' @param ggplot_colours is the color palette used for the plots. The default is
 #'    \code{
 #'    colfunc <- grDevices::colorRampPalette(c("#eb3434", "#eb9334", "#ebeb34", "#49eb34", "#34eba5", "#34b4eb", "#3446eb"))
 #'    colors  <-  colfunc(1000)
 #'    ggplot_colours = c(colors, rev(colors))
 #'    }
-#' @return The updated rrho S3 object.
+#' @return A RedRibbon S3 object with updated parameters.
 #' @examples
 #' library(magrittr)
 #' RedRibbon(c(0.5, 0.7,0.3, 0.8), c(0.6,0.6,0.4,0.7)) %>% setoptions(enrichment_mode="hyper-two-tailed")
@@ -194,10 +204,15 @@ setoptions.rrho <- function(self, enrichment_mode=NULL, ggplot_colours = NULL)
 #' @param m is the number of coordinates to compute on the y axis (b)
 #' @param n is the number of coordinates to compute on the x axis (a)
 #' @param whole if TRUE run the whole list otherwise run by quadrants.
-#' @param algorithm is the algorithm used to find the minimal p-value: "classic" or "ea" (evolutionary algorithm).
+#' @param algorithm is the algorithm used to find the minimal p-value: 
+#' \itemize{
+#' 
+#' \item{"classic"} {Naive research} 
+#' \item{"ea"} {Evolutionary algorithm, faster but }.
+#' }
 #' @param permutation is TRUE if the permutation mode is run.
 #' @param niter is the number of iteration for the permutation mode.
-#' @return A rrho S3 object.
+#' @return A RedRibbon S3 object.
 #' @examples
 #' a <- as.double(1:1000) - 450
 #' b <- as.double(1:1000) - 460
