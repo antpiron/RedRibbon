@@ -146,13 +146,15 @@ RedRibbon.data.frame <- function (df, enrichment_mode=NULL, correlation=NULL)
     )
 }
 
-#' Create a rrho S3 object from two vectors of values
+#' Creates a RedRibbon objects from 2 numeric vectors
 #' 
+#' Blablabla
 #' @param a is a vector of double.
 #' @param b is a vector of double.
 #' @return A rrho S3 object.
 #' @examples
 #' RedRibbon(c(0.5, 0.7,0.3, 0.8), c(0.6,0.6,0.4,0.7))
+#' @export
 RedRibbon.numeric <- function (a, b, ...)
 {
     if (length(a) != length(b))

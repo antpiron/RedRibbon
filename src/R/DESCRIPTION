@@ -13,4 +13,4 @@ Description: This package provides a very fast and accurate
 License: BSD_3_clause
 Suggests: 
     testthat
-RoxygenNote: 7.1.0
+RoxygenNote: 7.1.1

@@ -29,3 +29,7 @@ Makevars
 autom4te.cache
 test-driver
 ..*
+src/R.Rcheck/
+src/R/NAMESPACE.old
+src/R/man/
+src/R/src/symbols.rds
