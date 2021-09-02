@@ -1,7 +1,16 @@
-
+#' mypackage: A package for computating the notorious bar statistic.
+#'
+#' RedRibbon documentation
+#' 
+#' @section RedRibbon functions:
+#' The mypackage functions ...
+#'
+#' @docType package
+#' @name RedRibbon
+#' @import ggplot2 reshape2 scales ggrepel
+#' @useDynLib RedRibbon
 
 ## SEXP rrho_r_rectangle(SEXP i, SEXP j, SEXP ilen, SEXP jlen, SEXP m, SEXP n, SEXP a, SEXP b, SEXP mode, SEXP log_flag)
-
 rrho_rectangle  <- function (i, j, i.len, j.len, m, n, a, b, mode=c("hyper"), LOG=FALSE)
 {
     .Call("rrho_r_rectangle", as.integer(i), as.integer(j), as.integer(i.len), as.integer(j.len),
@@ -26,6 +35,12 @@ rrho_rectangle_min_ea  <- function (i, j, i.len, j.len, a, b, mode=c("hyper"), d
 ##		   SEXP mode, SEXP direction, SEXP algorithm,
 ##		   SEXP correlation,
 ##		   SEXP niter, SEXP pvalue_i, SEXP pvalue_j)
+
+#' RedRibbon Permutation
+#' 
+#' TODO: Description
+#' @useDynLib RedRibbon rrho_r_permutation
+#' @export
 rrho_permutation <- function (i, j, i.len, j.len, a, b, algo_params=NULL, mode=c("hyper"), direction="enrichment", algorithm="classic", correlation=NULL,
                               niter=96, pvalue_i, pvalue_j)
 {
@@ -50,30 +65,60 @@ rrho_permutation <- function (i, j, i.len, j.len, a, b, algo_params=NULL, mode=c
 }
 
 ## SEXP rrho_r_rrho(SEXP i, SEXP j, SEXP a, SEXP b, SEXP mode)
+
+#' RedRibbon rrho_ij
+#' 
+#' TODO: Description
+#' @useDynLib RedRibbon rrho_r_rrho
+#' @export
 rrho_ij  <- function (i, j, a, b, mode=c("hyper"))
 {
     .Call("rrho_r_rrho", as.integer(i), as.integer(j), as.double(a), as.double(b), as.character(mode))
 }
 
 ## SEXP rrho_r_intersect(SEXP i, SEXP j, SEXP a, SEXP b, SEXP directions)
+
+#' RedRibbon rrho_intersect
+#' 
+#' TODO: Description
+#' @useDynLib RedRibbon rrho_r_intersect
+#' @export
 rrho_intersect  <- function (i, j, a, b, directions=c("downdown"))
 {
     .Call("rrho_r_intersect", as.integer(i), as.integer(j), as.double(a), as.double(b), as.character(directions))
 }
 
 ## SEXP rrho_r_expression_prediction(SEXP mat, SEXP nbr_tested)
+
+#' RedRibbon rrho_r_expression_prediction
+#' 
+#' TODO: Description
+#' @useDynLib RedRibbon rrho_r_expression_prediction
+#' @export
 rrho_expression_prediction <- function (mat, nbr.tested = -1)
 {
     .Call("rrho_r_expression_prediction", as.matrix(mat), as.integer(nbr.tested))
 }
 
 ## SEXP rrho_r_ldfit_prediction(SEXP half, SEXP pval, SEXP position)
+
+#' RedRibbon rrho_ldfit_prediction
+#' 
+#' TODO: Description
+#' @useDynLib RedRibbon rrho_r_ldfit_prediction
+#' @export
 rrho_ldfit_prediction <- function (half, pval, position)
 {
     .Call("rrho_r_ldfit_prediction", as.double(half), as.double(pval), as.integer(position))
 }
 
 ## SEXP rrho_r_normalize(SEXP mat, SEXP ref, SEXP mode)
+
+#' RedRibbon rrho_normalize
+#' 
+#' TODO: Description
+#' @useDynLib RedRibbon rrho_r_normalize
+#' @export
 rrho_normalize <- function (mat, ref, mode="poisson")
 {
     .Call("rrho_r_normalize", as.matrix(mat), as.integer(ref), as.character(mode))
@@ -84,41 +129,57 @@ rrho_normalize <- function (mat, ref, mode="poisson")
 ### S3
 ###
 
-### S3 Methods RRHO
+### S3 Methods RedRibbon
 
-#' Create a rrho S3 object.
+#' RedRibbon generic
 #' 
-#' @return A rrho S3 object.
-#' @examples
-#' RedRibbon(c(0.5, 0.7,0.3, 0.8),
-#'         c(0.6, 0.6, 0.4, 0.7))
-#' RedRibbon(data.frame(a = c(0.5, 0.7, 0.3, 0.8),
-#'                    b = c(0.6, 0.6, 0.4, 0.7)))
+#' TODO: Description
+#' @export
 RedRibbon <- function (self, ...)
 {
     UseMethod("RedRibbon")
 }
 
+#' setoptions generic
+#' 
+#' TODO: Description
+#' @export
 setoptions <- function (self, ...)
 {
     UseMethod("setoptions")
 }
 
+#' quadrants generic
+#' 
+#' TODO: Description
+#' @export
 quadrants <- function (self, ...)
 {
     UseMethod("quadrants")
 }
 
+#' rectangle_min generic
+#' 
+#' TODO: Description
+#' @export
 rectangle_min <- function (self, ...)
 {
     UseMethod("rectangle_min")
 }
 
+#' permutation generic
+#' 
+#' TODO: Description
+#' @export
 permutation <- function (self, ...)
 {
     UseMethod("permutation")
 }
 
+#' enrichment generic
+#' 
+#' TODO: Description
+#' @export
 enrichment <- function (self, ...)
 {
     UseMethod("enrichment")
@@ -128,12 +189,14 @@ enrichment <- function (self, ...)
 
 #' Creates a RedRibbon object from 2 numeric vectors
 #' 
-#' 
+#' TODO: Description
 #' @param a is a vector of double sanitized by \code{RedRibbon.numeric}.
 #' @param b is a vector of double sanitized by \code{RedRibbon.numeric}.
 #' @return A rrho S3 object.
 #' @examples
+#' library(RedRibbon)
 #' RedRibbon(c(0.5, 0.7,0.3, 0.8), c(0.6,0.6,0.4,0.7))
+#' @export
 RedRibbon.data.frame <- function (df, enrichment_mode=NULL, correlation=NULL)
 {
     if ( ! "a" %in% colnames(df))
@@ -161,6 +224,7 @@ RedRibbon.data.frame <- function (df, enrichment_mode=NULL, correlation=NULL)
 #' @param b is a vector of double.
 #' @return A rrho S3 object.
 #' @examples
+#' library(RedRibbon)
 #' RedRibbon(c(0.5, 0.7,0.3, 0.8), c(0.6,0.6,0.4,0.7))
 #' @export
 RedRibbon.numeric <- function (a, b, ...)
@@ -172,7 +236,7 @@ RedRibbon.numeric <- function (a, b, ...)
 
 #' Set RedRibbon options on a RedRibbon S3 object
 #' 
-#' This helper function allows you to change the enrichment method that you wish to use as well as the color scheme
+#' Helper function allowing to change the enrichment method that you wish to use as well as the color scheme
 #' for the RedRibbon level map.
 #' 
 #' @param self A RedRibbon object.
@@ -181,7 +245,7 @@ RedRibbon.numeric <- function (a, b, ...)
 #'    \item{"enrichment"} {for one tailed hypergeometric test}
 #'    \item{"hyper-two-tailed"} {for one tailed hypergeometric test, "hyper-two-tailed-old", for the original R package two tailed test.}
 #' }
-#' [TODO] Describe pros and cons of each method (time, efficacity, ...)
+#' [TODO] Describe pros and cons of each method (time, efficacity, ...), what happens is there is no method specified? Set a default?
 #' @param ggplot_colours is the color palette used for the plots. The default is
 #'    \code{
 #'    colfunc <- grDevices::colorRampPalette(c("#eb3434", "#eb9334", "#ebeb34", "#49eb34", "#34eba5", "#34b4eb", "#3446eb"))
@@ -191,7 +255,10 @@ RedRibbon.numeric <- function (a, b, ...)
 #' @return A RedRibbon S3 object with updated parameters.
 #' @examples
 #' library(magrittr)
-#' RedRibbon(c(0.5, 0.7,0.3, 0.8), c(0.6,0.6,0.4,0.7)) %>% setoptions(enrichment_mode="hyper-two-tailed")
+#' library(RedRibbon)
+#' RedRibbon(c(0.5, 0.7,0.3, 0.8), c(0.6,0.6,0.4,0.7)) %>% 
+#'  setoptions(enrichment_mode="hyper-two-tailed")
+#' @export
 setoptions.rrho <- function(self, enrichment_mode=NULL, ggplot_colours = NULL)
 {
     if (! is.null(enrichment_mode) )
@@ -205,6 +272,7 @@ setoptions.rrho <- function(self, enrichment_mode=NULL, ggplot_colours = NULL)
 
 #' Compute the best coordinates.
 #' 
+#' TODO: Description
 #' @param m is the number of coordinates to compute on the y axis (b)
 #' @param n is the number of coordinates to compute on the x axis (a)
 #' @param whole if TRUE run the whole list otherwise run by quadrants.
@@ -218,18 +286,21 @@ setoptions.rrho <- function(self, enrichment_mode=NULL, ggplot_colours = NULL)
 #' @param niter is the number of iteration for the permutation mode.
 #' @return A RedRibbon S3 object.
 #' @examples
+#' library(RedRibbon)
+#' 
 #' a <- as.double(1:1000) - 450
 #' b <- as.double(1:1000) - 460
-#' 
 #' rr <- RedRibbon(a, b)
 #' 
 #' quad <- quadrants(rr, m=1000, n=1000)
+#' @export
 quadrants.rrho <- function(self, m=NULL, n=NULL,
                            whole=TRUE, algorithm="classic", permutation=FALSE, niter=96)
 {
     len <- length(self$data$a)
 
     do.quadrant <- function (i, j, i.len, j.len, direction="enrichment", directions="downdown")
+    # [TODO] direction = "enrichment?" So we do not use the parameter?
     {
         ret  <- NA
         if ( is.null(m) )
@@ -266,7 +337,8 @@ quadrants.rrho <- function(self, m=NULL, n=NULL,
         quadrant <- do.quadrant(1, 1, len, len, direction="enrichment", directions="downdown")
         if (! all(is.na(quadrant)) )
             quadrants$whole <- quadrant
-    } else
+    } 
+    else
     {
         a_ltzero <- sum(self$data$a < 0)
         b_ltzero <- sum(self$data$b < 0)
@@ -293,12 +365,16 @@ quadrants.rrho <- function(self, m=NULL, n=NULL,
     return(quadrants)
 }
 
-#' Compute the RRHO map.
+#' Render the RRHO map.
 #' 
-#' @param n is the number of coordinates to compute on the x and y axis
-#' @param repel.force is the value of the repel force for the p-value ploting
-#' @param base_size is the size of the text fields
-#' @return A ggplot object.
+#' You can choose to render the RedRibbon level map using \code{ggplot2}. 
+#' 
+#' @param self is the RedRibbon object
+#' @param n is the number of coordinates to compute on the x and y axis (Default = sqrt(len))
+#' @param repel.force is the value of the repel force for the p-value ploting (default = 150)
+#' @param base_size is the size of the text fields (default = 20)
+#' @return A \code{ggplot} object.
+#' @export
 ggplot.rrho <- function (self, n = NULL, labels = c("a", "b"), show.quadrants=TRUE, quadrants=NULL, show.pval=TRUE,
                          repel.force=150, base_size=20)
 {
@@ -335,11 +411,11 @@ ggplot.rrho <- function (self, n = NULL, labels = c("a", "b"), show.quadrants=TR
                                       ##limits=b[c(1,length(colors))],
                                       name="-log p.val",
                                       values=colors.values) +
-        xlab(labels[1]) + ylab(labels[2]) +
+        ggplot2::xlab(labels[1]) + ylab(labels[2]) +
         ## scale_x_continuous(labels = label_percent(accuracy = 1, scale = 100/n.i)) +
         ## scale_y_continuous(labels = label_percent(accuracy = 1, scale = 100/n.j) ) +
-        scale_x_continuous(breaks = c(0 + n * 0.1, n - n * 0.1), labels = c("down", "up"), expand = c(0, 0)) +
-        scale_y_continuous(breaks = c(0 + n * 0.1, n - n * 0.1), labels = c("down", "up"), expand = c(0, 0)) +
+        ggplot2::scale_x_continuous(breaks = c(0 + n * 0.1, n - n * 0.1), labels = c("down", "up"), expand = c(0, 0)) +
+        ggplot2::scale_y_continuous(breaks = c(0 + n * 0.1, n - n * 0.1), labels = c("down", "up"), expand = c(0, 0)) +
         ## ggplot2::theme_bw() +
         ggplot2::theme(axis.title=element_text(size=base_size,face="bold"),
                        legend.title = element_text(size = base_size * 7 / 10),
@@ -421,6 +497,11 @@ ggplot.rrho <- function (self, n = NULL, labels = c("a", "b"), show.quadrants=TR
     return(gg)
 }
 
+#' rectangle_min
+#' 
+#' TODO: Description
+#' 
+#' @export
 rectangle_min.rrho <- function(self, i, j, i.len, j.len, m=NULL, n=NULL, direction="enrichment", algorithm="classic")
 {
     len <- length(self$data$a)
@@ -462,6 +543,11 @@ rectangle_min.rrho <- function(self, i, j, i.len, j.len, m=NULL, n=NULL, directi
     return(result)
 }
 
+#' permutation
+#' 
+#' TODO: Description
+#' 
+#' @export
 permutation.rrho <- function (self, i, j, i.len, j.len, a, b, algo_params=NULL, direction="enrichment", algorithm="classic", correlation=NULL, niter=96, pvalue_i, pvalue_j)
 {
     if ( is.null( algo_params ) )
@@ -476,6 +562,11 @@ permutation.rrho <- function (self, i, j, i.len, j.len, a, b, algo_params=NULL, 
                      correlation=correlation, niter=niter, pvalue_i=pvalue_i, pvalue_j=pvalue_j)
 }
 
+#' enrichment
+#' 
+#' TODO: Description
+#' 
+#' @export
 enrichment.rrho <- function(self, i, j, directions="downdown")
 {
     len <- length(self$data$a)
@@ -491,6 +582,11 @@ enrichment.rrho <- function(self, i, j, directions="downdown")
     return(res)
 }
 
+#' newLDFIT
+#' 
+#' TODO: Description
+#' 
+#' @export
 newLDFIT  <- function (position, deps, half = 6480.306)
 {
     structure(
@@ -502,6 +598,11 @@ newLDFIT  <- function (position, deps, half = 6480.306)
     )
 }
 
+#' newFC
+#' 
+#' TODO: Description
+#' 
+#' @export
 newFC  <- function (deps, beta)
 {
     structure(

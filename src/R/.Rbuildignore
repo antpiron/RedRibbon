@@ -1,4 +1,5 @@
-.*\.o
-.*\.so
+src/.*\.o
+src/.*\.so
 .*~$
 .#.*$
+vignettes/.gitignore
