@@ -12,7 +12,7 @@ Imports:
     ggplot2
 Description: This package provides a very fast and accurate
   rank-rank hypergeometric overlap implementation.
-License: BSD_3_clause
+License: GPL (>= 3)
 Suggests: 
     testthat,
     knitr,
