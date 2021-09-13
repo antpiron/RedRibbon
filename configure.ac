@@ -19,9 +19,9 @@ AC_SEARCH_LIBS([stats_hyper_F], [ale],,[AC_MSG_ERROR([
  libale not found
 -------------------------])])
 
-AC_SEARCH_LIBS([rrho_init], [rrho],,[AC_MSG_ERROR([
+AC_SEARCH_LIBS([rrho_init], [redribbon],,[AC_MSG_ERROR([
 -------------------------
- librrho not found
+ libredribbon not found
 -------------------------])])
 
 
