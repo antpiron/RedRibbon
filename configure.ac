@@ -1,38 +1,16 @@
-#                                               -*- Autoconf -*-
-# Process this file with autoconf to produce a configure script.
-
-AC_PREREQ([2.68])
-AC_INIT([rrho], [1.0], [BUG-REPORT-ADDRESS])
-AM_INIT_AUTOMAKE
-AM_SILENT_RULES([yes])
-
-AC_CONFIG_MACRO_DIR([m4])
-AC_CONFIG_SRCDIR([src/rrho.h])
-AC_CONFIG_HEADERS([config.h])
-
-# Checks for programs.
-AC_PROG_CC
-# AC_PROG_CC_C11
-ALE_AC_PROG_CC_C11
-AC_OPENMP
-
-AC_CHECK_LIB([m],[cos])
+AC_INIT([RedRibbon], 0.1.0) dnl package name, version
 
 
-##
-
-AC_PROG_LIBTOOL
-AM_PROG_CC_C_O
-AC_DEFINE([_POSIX_C_SOURCE], [200809L], [Define the posix version])
-AC_DEFINE([_XOPEN_SOURCE], [500], [Define the XOPEN])
-
-
-
-# Checks for header files.
-AC_CHECK_HEADERS([ale.h],,[AC_MSG_ERROR(The ale header is required in order to build the program!)])
-
-# Checks for typedefs, structures, and compiler characteristics.
-
+dnl Now find the compiler and compiler flags to use
+: ${R_HOME=`R RHOME`}
+if test -z "${R_HOME}"; then
+  echo "could not determine R_HOME"
+  exit 1
+fi
+CC=`"${R_HOME}/bin/R" CMD config CC`
+CFLAGS=`"${R_HOME}/bin/R" CMD config CFLAGS`
+CPPFLAGS=`"${R_HOME}/bin/R" CMD config CPPFLAGS`
+LDFLAGS=`"${R_HOME}/bin/R" CMD config LDFLAGS`
 
 # Checks for library functions.
 
@@ -41,8 +19,16 @@ AC_SEARCH_LIBS([stats_hyper_F], [ale],,[AC_MSG_ERROR([
  libale not found
 -------------------------])])
 
-AM_CFLAGS="$AM_CFLAGS $OPENMP_CFLAGS"
-AC_SUBST([AM_CFLAGS])
+AC_SEARCH_LIBS([rrho_init], [rrho],,[AC_MSG_ERROR([
+-------------------------
+ librrho not found
+-------------------------])])
 
-AC_CONFIG_FILES([Makefile src/Makefile test/Makefile perf/Makefile])
+
+dnl substitute RODBC_CPPFLAGS and LIBS
+AC_SUBST([PKG_CFLAGS], ["${PKG_CFLAGS}"])
+AC_SUBST(LIBS)
+AC_CONFIG_HEADERS([src/config.h])
+dnl and do substitution in the src/Makevars.in and src/config.h
+AC_CONFIG_FILES([src/Makevars])
 AC_OUTPUT
