@@ -276,6 +276,7 @@ setoptions.rrho <- function(self, enrichment_mode=NULL, ggplot_colours = NULL)
 #' @param m is the number of coordinates to compute on the y axis (b)
 #' @param n is the number of coordinates to compute on the x axis (a)
 #' @param whole if TRUE run the whole list otherwise run by quadrants.
+#' @param whole.fraction is the fraction of the quadrant analysed.
 #' @param algorithm is the algorithm used to find the minimal p-value: 
 #' \itemize{
 #' 
@@ -295,7 +296,7 @@ setoptions.rrho <- function(self, enrichment_mode=NULL, ggplot_colours = NULL)
 #' quad <- quadrants(rr, m=1000, n=1000)
 #' @export
 quadrants.rrho <- function(self, m=NULL, n=NULL,
-                           whole=TRUE, algorithm="classic", permutation=FALSE, niter=96)
+                           whole=TRUE, whole.fraction = 1, algorithm="classic", permutation=FALSE, niter=96)
 {
     len <- length(self$data$a)
 
@@ -334,7 +335,8 @@ quadrants.rrho <- function(self, m=NULL, n=NULL,
     
     if (whole)
     {
-        quadrant <- do.quadrant(1, 1, len, len, direction="enrichment", directions="downdown")
+        len.fraction <- min(len * whole.fraction, len)
+        quadrant <- do.quadrant(1, 1, len.fraction, len.fraction, direction="enrichment", directions="downdown")
         if (! all(is.na(quadrant)) )
             quadrants$whole <- quadrant
     } 
