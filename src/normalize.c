@@ -19,16 +19,39 @@ rrho_r_normalize(SEXP mat, SEXP ref, SEXP mode)
   size_t m = nrows(mat);
   size_t n = ncols(mat);
   size_t r = length(ref);
+  int int_mode = STATS_POISSON;
 
   if (r > m)
     error("Normalization error: ref length should be less or equal than mat row number.");
-  
-  mem_init(&pool);
+
+  if ( ! isReal(mat) )
+    error("'mat' is not a real.");
+
+  if ( ! isInteger(ref) )
+    error("'ref' is not an vector of integer.");
+ 
+  if (! isNull(mode) )
+    {
+      const char *str_mode = CHAR(STRING_PTR(mode)[0]);
+      if ( 0 == strcmp("geometric_mean", str_mode) )
+	int_mode = STATS_GEOM_MEAN;
+      else if ( 0 == strcmp("poisson", str_mode) )
+	int_mode = STATS_POISSON;
+      else if ( 0 == strcmp("ls_mean", str_mode) )
+	int_mode = STATS_LS_MEAN;
+      else if ( 0 == strcmp("ls_variance", str_mode) )
+	int_mode = STATS_LS_VARIANCE;
+      else
+	error("Mode parameter should be 'geometric_mean', 'poisson', 'ls_mean', or 'ls_variance'.");
+    } 
+
+	
+  // Rprintf("After mem init. m = %zu, n = %zu, r = %zu\n", m, n , r);
 
   double (*mat_r)[m] = ( double (*)[m] ) REAL(mat);
   int *ref_r = INTEGER(ref);
 
-  
+  mem_init(&pool);
   size_t *ref_c = mem_malloc(&pool, sizeof(size_t) * r);
 
   for (size_t i = 0 ; i < r; i++)
@@ -43,8 +66,9 @@ rrho_r_normalize(SEXP mat, SEXP ref, SEXP mode)
   //  STATS_LS_MEAN = 0,
   //  STATS_LS_VARIANCE,
   //  STATS_POISSON
+  //   STATS_GEOM_MEAN
   // TODO: add other modes
-  int err = stats_normalize_beta(m, n, r, mat_c, ref_c, beta_c, STATS_POISSON);
+  int err = stats_normalize_beta(m, n, r, mat_c, ref_c, beta_c, int_mode);
   if ( 0 <= err )
     {
       stats_normalize_samples(m, n, mat_c, mat_c, beta_c);
