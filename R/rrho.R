@@ -157,7 +157,7 @@ setoptions.rrho <- function(self, enrichment_mode=NULL, ggplot_colours = NULL)
 #' @param m is the number of coordinates to compute on the y axis (b)
 #' @param n is the number of coordinates to compute on the x axis (a)
 #' @param whole if TRUE run the whole list otherwise run by quadrants.
-#' @param whole.fraction is the fraction of the quadrant analysed.
+#' @param whole.fraction is the fraction of the quadrant analysed in `whole` mode.
 #' @param algorithm is the algorithm used to find the minimal p-value: 
 #' \itemize{
 #' 
@@ -166,7 +166,7 @@ setoptions.rrho <- function(self, enrichment_mode=NULL, ggplot_colours = NULL)
 #' }
 #' @param permutation is TRUE if the permutation mode is run.
 #' @param niter is the number of iteration for the permutation mode.
-#' @return A RedRibbon S3 object.
+#' @return A list of coordinates, one by quadrant.
 #' @examples
 #' library(RedRibbon)
 #' 
