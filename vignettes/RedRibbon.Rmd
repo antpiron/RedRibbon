@@ -10,6 +10,7 @@ vignette: >
 ---
 
 ```{r setup, include = FALSE}
+library(kableExtra)
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
@@ -39,8 +40,10 @@ df <- data.frame(
 
 `df` contains half features perfectly matching perfectly between `a` and `b` and the remaining elements are random,
 	
-```{r df}
-head(df)
+```{r df, echo=FALSE}
+head(df) %>%
+  kbl() %>%
+  kable_styling()
 ```
 
 Create an S3 RedRibbon object,
@@ -53,7 +56,7 @@ Compute the enrichment and adjusted p-value with the `permutation` option,
 
 ```{r enrichment, results='hide'}
 ## computing the enrichment
-quad <- quadrants(rr, algorithm="ea", permutation=TRUE)
+quad <- quadrants(rr, algorithm="ea", permutation=TRUE, whole=FALSE)
 ```
 
 Plots the results,
