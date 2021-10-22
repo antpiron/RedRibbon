@@ -496,3 +496,50 @@ newFC  <- function (deps, beta)
         class = "fc"
     )
 }
+
+
+# TODO: improve this template to really be compatible
+#' Drop in replacement for original R function
+#'
+#' `RRHO` function preserve the compatibility with the original package but
+#' with the performance and accuracy of thi new method. The stepsize parameter is
+#' ignored as the evolutionary algorithm is used to determine the minimal p-values
+#' in the four quadrants.
+#' 
+#' @export
+RRHO  <- function (list1, list2,
+                   stepsize = NULL,
+                   labels,
+                   alternative,
+                   plots = FALSE,
+                   outputdir = NULL,
+                   BY = FALSE,
+                   log10.ind=FALSE)
+{
+    if ( ! is.data.frame(list1) )
+        stop("list1 is not a data.frame")
+    
+    if ( ! is.data.frame(list2) )
+        stop("list2 is not a data.frame")
+
+
+    dt1 <- data.table(list1[,1:2])
+    dt2 <- data.table(list2[,1:2])
+    
+    
+    dt <- merge(dt1, dt2, by=1)
+    colnames(dt) <- c("id", "a", "b")
+
+    if ( is.null(stepsize) )
+        stepsize <- floor(sqrt(nrow(dt)))
+    
+    rr <- RedRibbon(dt)
+    quad <- quadrants(rr, algorithm="ea", permutation=TRUE, whole=FALSE)
+
+    if (plots)
+    {
+        gg <- ggplot(rr, quadrants=quad) + coord_fixed(ratio = 1)
+    }
+
+    return(rr)
+}
