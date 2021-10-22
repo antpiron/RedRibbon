@@ -1,6 +1,6 @@
 ---
-title: "RedRibbon"
-author: "Vignette Author"
+title: "RedRibbon: a rank-rank hypergeometric overlap libray"
+author: "Anthony Piron"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
@@ -16,57 +16,58 @@ knitr::opts_chunk$set(
 )
 ```
 
-# Testing the vignette generation
-```{r test}
+# Synopsis
+
+
+Load the library with
+
+```{r Library loading}
 library(RedRibbon)
-rr <- RedRibbon(data.frame(a = c(0.5, 0.7, 0.3, 0.8),
-                   b = c(0.6, 0.6, 0.4, 0.7)))
-rr
-```
-Vignettes are long form documentation commonly included in packages. Because they are part of the distribution of the package, they need to be as compact as possible. The `html_vignette` output type provides a custom style sheet (and tweaks some options) to ensure that the resulting html is as small as possible. The `html_vignette` format:
-
-- Never uses retina figures
-- Has a smaller default figure size
-- Uses a custom CSS stylesheet instead of the default Twitter Bootstrap style
-
-## Vignette Info
-
-Note the various macros within the `vignette` section of the metadata block above. These are required in order to instruct R how to build the vignette. Note that you should change the `title` field and the `\VignetteIndexEntry` to match the title of your vignette.
-
-## Styles
-
-The `html_vignette` template includes a basic CSS theme. To override this theme you can specify your own CSS in the document metadata as follows:
-
-    output: 
-      rmarkdown::html_vignette:
-        css: mystyles.css
-
-## Figures
-
-The figure sizes have been customised so that you can easily put two images side-by-side. 
-
-```{r, fig.show='hold'}
-plot(1:10)
-plot(10:1)
 ```
 
-You can enable figure captions by `fig_caption: yes` in YAML:
+Prepare a synthetic dataset in a data.frame `df`,
 
-    output:
-      rmarkdown::html_vignette:
-        fig_caption: yes
-
-Then you can use the chunk option `fig.cap = "Your figure caption."` in **knitr**.
-
-## More Examples
-
-You can write math expressions, e.g. $Y = X\beta + \epsilon$, footnotes^[A footnote here.], and tables, e.g. using `knitr::kable()`.
-
-```{r, echo=FALSE, results='asis'}
-knitr::kable(head(mtcars, 10))
+```{r dataset, results='hide'}
+a <- (1:1000) - 500
+b <- a
+a[250:749] <- rnorm(500, sd=100)
+b[250:749] <- rnorm(500, sd=100)
+df <- data.frame(
+	a = a,
+	b = b)
 ```
 
-Also a quote using `>`:
+`df` contains half features perfectly matching perfectly between `a` and `b` and the remaining elements are random,
+	
+```{r df}
+head(df)
+```
 
-> "He who gives up [code] safety for [code] speed deserves neither."
-([via](https://twitter.com/hadleywickham/status/504368538874703872))
+Create an S3 RedRibbon object,
+
+```{r s3, results='hide'}
+rr <- RedRibbon(df)
+```
+
+Compute the enrichment and adjusted p-value with the `permutation` option,
+
+```{r enrichment, results='hide'}
+## computing the enrichment
+quad <- quadrants(rr, algorithm="ea", permutation=TRUE)
+```
+
+Plots the results,
+
+```{r ggplot}
+## ploting the map
+gg <- ggplot(rr, quadrants=quad) + coord_fixed(ratio = 1)
+gg
+```
+
+The `gg` variable contains a standard ggplot2 object,
+```{r class ggplot}
+class(gg)
+```
+
+It can be manipulated a such, for example, with `+ coord_fixed(ratio = 1)` to fix the aspect ratio of the plot.
+

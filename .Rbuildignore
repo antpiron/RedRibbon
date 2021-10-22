@@ -4,3 +4,5 @@ src/.*\.so
 .#.*$
 vignettes/.gitignore
 ^LICENSE\.md$
+^doc$
+^Meta$
