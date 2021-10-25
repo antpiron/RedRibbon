@@ -1,0 +1,15 @@
+
+src/*.so
+src/symbols.rds
+autom4te.cache/
+config.log
+config.status
+configure
+man/
+src/Makevars
+src/*.o
+src/config.h
+src/config.h.in
+vignettes/RedRibbon.R
+vignettes/RedRibbon.html
+
