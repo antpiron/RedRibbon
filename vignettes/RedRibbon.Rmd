@@ -17,6 +17,35 @@ knitr::opts_chunk$set(
 )
 ```
 
+# Synthetic dataset
+
+
+First, we prepare a synthetic dataset in a data.frame `df` for demonstration purpose. RedRibbon will be applied to this dataset in this vignette.
+
+The column `a` and `b` are mandatory. Those column are the two lists over which the rank-rank hyper-geometric is run.
+
+```{r dataset, results='hide'}
+n <- 1000
+n2 <- n %/% 2
+n4 <- n %/% 4
+a <- (1:n) - n2
+b <- a
+a[n4:(n4+n2-1)] <- rnorm(n2, sd=100)
+b[n4:(n4+n2-1)] <- rnorm(n2, sd=100)
+df <- data.frame(
+	id = paste0("gene", 1:n),
+	a = a,
+	b = b)
+```
+
+`df` contains half features perfectly matching perfectly between `a` and `b` and the remaining elements are random, `head(df)` gives
+	
+```{r df, echo=FALSE}
+head(df) %>%
+  kbl() %>%
+  kable_styling()
+```
+
 # Synopsis
 
 
@@ -26,43 +55,23 @@ Load the library with
 library(RedRibbon)
 ```
 
-Prepare a synthetic dataset in a data.frame `df`,
-
-```{r dataset, results='hide'}
-a <- (1:1000) - 500
-b <- a
-a[250:749] <- rnorm(500, sd=100)
-b[250:749] <- rnorm(500, sd=100)
-df <- data.frame(
-	a = a,
-	b = b)
-```
-
-`df` contains half features perfectly matching perfectly between `a` and `b` and the remaining elements are random,
-	
-```{r df, echo=FALSE}
-head(df) %>%
-  kbl() %>%
-  kable_styling()
-```
-
 Create an S3 RedRibbon object,
 
 ```{r s3, results='hide'}
-rr <- RedRibbon(df)
+rr <- RedRibbon(df, enrichment_mode="hyper-two-tailed")
 ```
 
-Compute the enrichment and adjusted p-value with the `permutation` option,
+Compute the enrichment and adjusted p-value with the `permutation` option set to compute the adjusted p-value and `whole` to split the overlap map into four quadrants (down-down, up-up, down-up, up-down),
 
 ```{r enrichment, results='hide'}
-## computing the enrichment
 quad <- quadrants(rr, algorithm="ea", permutation=TRUE, whole=FALSE)
 ```
+
+# Plots
 
 Plots the results,
 
 ```{r ggplot}
-## ploting the map
 gg <- ggplot(rr, quadrants=quad) + coord_fixed(ratio = 1)
 gg
 ```
@@ -73,4 +82,43 @@ class(gg)
 ```
 
 It can be manipulated a such, for example, with `+ coord_fixed(ratio = 1)` to fix the aspect ratio of the plot.
+
+
+# Enrichment statistics
+
+The list of genes enriched in the down-down direction given with `df[quad$downdown$positions,]`. Here are the 6 first rows,
+```{r genes, echo=FALSE}
+head(df[quad$downdown$positions,])  %>%
+  kbl() %>%
+  kable_styling()
+```
+
+The following statistics are available,
+
+```{r names}
+names(quad$downdown)
+```
+
+`(i , j)` is the  minimal p-value coordinate on the enrichment map, `pvalue` and `log_pvalue` are the minimal p-value, `direction` is the direction of the enrichment (same direction is postive -- up-up, down-down --, opposite is negative -- down-up, up-down) and `count` is the number of genes overlapping.
+
+# Compatibility mode
+
+
+This mode only exists for compatibility and is obsolete. Please use the new interface shown here above.
+
+```{r compat}
+compat <- RRHO(df[,c("id", "a")], df[,c("id", "b")], plots=TRUE, stepsize=n %/% 10)
+compat$gg
+```
+
+```{r hypermat, results='hide'}
+compat$hypermat
+```
+```{r hypermat2, echo=FALSE}
+compat$hypermat %>%
+  kbl() %>%
+  kable_styling()
+```
+
+
 

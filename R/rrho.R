@@ -71,14 +71,22 @@ enrichment <- function (self, ...)
 #' Creates a RedRibbon object from 2 numeric vectors
 #' 
 #' TODO: Description
-#' @param a is a vector of double sanitized by \code{RedRibbon.numeric}.
-#' @param b is a vector of double sanitized by \code{RedRibbon.numeric}.
-#' @return A rrho S3 object.
+#' @param df a data.frame with at least the column a and b.
+#' @param enrichment_mode 
+#'    \itemize{
+#'    \item{"hyper"} {for one tailed hypergeometric test}
+#'    \item{"hyper-two-tailed"} {for one tailed hypergeometric test}
+#'    \item{"hyper-two-tailed-old"} {for the original R package two tailed test.}
+#' }
+#' @param correlation the correlation
+#' @return A RedRibbon S3 object.
 #' @examples
 #' library(RedRibbon)
-#' RedRibbon(c(0.5, 0.7,0.3, 0.8), c(0.6,0.6,0.4,0.7))
+#' RedRibbon(data.frame(id=c("gene1", "gene2", "gene3", "gene4"),
+#'                      a=c(0.5, 0.7,0.3, 0.8),
+#'                      b=c(0.6,0.6,0.4,0.7))
 #' @export
-RedRibbon.data.frame <- function (df, enrichment_mode=NULL, correlation=NULL)
+RedRibbon.data.frame <- function (df, enrichment_mode=c("hyper", "hyper-two-tailed", "hyper-two-tailed-old"), correlation=NULL)
 {
     if ( ! "a" %in% colnames(df))
         stop("Column 'a' is missing!")
@@ -90,7 +98,7 @@ RedRibbon.data.frame <- function (df, enrichment_mode=NULL, correlation=NULL)
     
     structure(
         list(data = df,
-             enrichment_mode = ifelse(is.null( enrichment_mode), c("hyper"), enrichment_mode[[1]]),
+             enrichment_mode = ifelse(is.null( enrichment_mode), c("hyper"), enrichment_mode[1]),
              correlation=correlation,
              ggplot_colours = c(colors, rev(colors))
              ),
@@ -498,48 +506,96 @@ newFC  <- function (deps, beta)
 }
 
 
-# TODO: improve this template to really be compatible
+## TODO: improve this template to really be compatible
 #' Drop in replacement for original R function
 #'
 #' `RRHO` function preserve the compatibility with the original package but
-#' with the performance and accuracy of thi new method. The stepsize parameter is
-#' ignored as the evolutionary algorithm is used to determine the minimal p-values
-#' in the four quadrants.
+#' with the performance and accuracy of the new method. The stepsize parameter is
+#' used only to return the hypermat and ignored to determine the minimal p-values
+#' in the four quadrants as the evolutionary algorithm is used.
 #' 
 #' @export
 RRHO  <- function (list1, list2,
                    stepsize = NULL,
-                   labels,
-                   alternative,
+                   labels= c("a", "b"),
+                   alternative=c('two.sided', 'enrichment'),
                    plots = FALSE,
                    outputdir = NULL,
                    BY = FALSE,
                    log10.ind=FALSE)
 {
+
+    warning('This function only exists for compatibility. Please use instead the RedRibbon() call. See Vignette("RedRibbon") for details.')
     if ( ! is.data.frame(list1) )
         stop("list1 is not a data.frame")
     
     if ( ! is.data.frame(list2) )
         stop("list2 is not a data.frame")
-
+    
+    if(! alternative[1] %in% c('two.sided', 'enrichment') )
+        stop('Wrong alternative specified should be either `two.sided` or `enrichment`.')
 
     dt1 <- data.table(list1[,1:2])
+    colnames(dt1) <- c("id", "a")
     dt2 <- data.table(list2[,1:2])
+    colnames(dt2) <- c("id", "b")
     
     
-    dt <- merge(dt1, dt2, by=1)
-    colnames(dt) <- c("id", "a", "b")
+    dt <- merge(dt1, dt2, by="id")
 
     if ( is.null(stepsize) )
         stepsize <- floor(sqrt(nrow(dt)))
-    
-    rr <- RedRibbon(dt)
+
+    enrichment_mode  <- if (alternative[1] == "two.sided") "hyper-two-tailed" else "hyper"
+    rr <- RedRibbon(dt, enrichment_mode=enrichment_mode)
     quad <- quadrants(rr, algorithm="ea", permutation=TRUE, whole=FALSE)
+
+    result  <- list(rr = rr, quadrants = quad )
+    len <- nrow(dt)
+    n.i <- len %/% stepsize
+    n.j <- len %/% stepsize
+    result$hypermat <- rrho_rectangle(1, 1, len, len, n.i, n.j, rr$data$a, rr$data$b,  mode=rr$enrichment_mode, LOG=TRUE)
+
+    
+    if (! is.null(outputdir) )
+        dir.create(outputdir, showWarnings = FALSE, recursive = TRUE)
 
     if (plots)
     {
-        gg <- ggplot(rr, quadrants=quad) + coord_fixed(ratio = 1)
+        result$gg <- ggplot(rr, quadrants=quad) + coord_fixed(ratio = 1)
+
+
+        if (! is.null(outputdir) )
+        {
+            gg_fn <-file.path(outputdir, paste0("RRHOMap", labels[1], "_VS_", labels[2], ".jpg") )
+            ggsave(gg_fn, gg, width=8, height=8, units="in", quality=100, dpi=300)
+        }
+        
     }
 
-    return(rr)
+    ## Write out the gene lists of overlapping
+    if (! is.null(outputdir) )
+    {
+        write.overlap <- function (fn, direction="downdown")
+        {
+            if ( ! is.null(quad[[direction]]) )
+            {
+                ids <- dt[ quad[[direction]]$positions, ]$id
+                fwrite.table(ids, fn)
+            }
+        }
+
+        dir.create(outputdir, showWarnings = FALSE, recursive = TRUE)
+        
+        write.overlap(file.path(outputdir, paste0("RRHO_GO_MostDownregulated", labels[1], "_VS_", labels[2], ".csv")),
+                      "downdown")
+        write.overlap(file.path(outputdir, paste0("RRHO_GO_MostUpregulated", labels[1], "_VS_", labels[2], ".csv")),
+                      "upup")
+        write.overlap(file.path(outputdir, paste0("RRHO_GO_MostDownUpregulated", labels[1], "_VS_", labels[2], ".csv")),
+                      "downup")
+        write.overlap(file.path(outputdir, paste0("RRHO_GO_MostUpDownregulated", labels[1], "_VS_", labels[2], ".csv")),
+                      "updown")   
+    }
+
+    return (result)
 }

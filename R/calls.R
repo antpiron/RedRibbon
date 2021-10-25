@@ -35,6 +35,9 @@ rrho_permutation <- function (i, j, i.len, j.len, a, b, algo_params=NULL, mode=c
     if ( is.null( algo_params ) )
         algo_params <- list()
 
+    if (! mode %in% c("hyper", "hyper-two-tailed", "hyper-two-tailed-old") )
+        stop("`mode` should be either hyper, hyper-two-tailed or hyper-two-tailed-old")
+
     if ( is.null(algo_params[["m"]]) )
         algo_params[["m"]] <- as.integer(i.len)
     else
@@ -80,7 +83,8 @@ rrho_intersect  <- function (i, j, a, b, directions=c("downdown"))
 
 #' RedRibbon rrho_r_expression_prediction
 #' 
-#' TODO: Description
+#' @param mat an expression matrix
+#' @return correlation between gene to pass to RedRibbon(..., correlation=...) as correlation paramter
 #' @useDynLib RedRibbon rrho_r_expression_prediction
 #' @export
 rrho_expression_prediction <- function (mat, nbr.tested = -1)
