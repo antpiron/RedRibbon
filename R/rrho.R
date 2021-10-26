@@ -1,15 +1,3 @@
-#' mypackage: A package for computating the notorious bar statistic.
-#'
-#' RedRibbon documentation
-#'
-#' @section RedRibbon functions:
-#' The mypackage functions ...
-#'
-#' @docType package
-#' @name RedRibbon
-#' @import ggplot2 reshape2 scales ggrepel
-#' @useDynLib RedRibbon
-
 ### S3 Methods RedRibbon
 
 #' RedRibbon generic
@@ -71,20 +59,24 @@ enrichment <- function (self, ...)
 #' Creates a RedRibbon object from 2 numeric vectors
 #' 
 #' TODO: Description
-#' @param df a data.frame with at least the column a and b.
+#' @param df a data.frame. The real number columns a and b are mandatory.
 #' @param enrichment_mode 
 #'    \itemize{
 #'    \item{"hyper"} {for one tailed hypergeometric test}
 #'    \item{"hyper-two-tailed"} {for one tailed hypergeometric test}
 #'    \item{"hyper-two-tailed-old"} {for the original R package two tailed test.}
 #' }
-#' @param correlation the correlation
+#' @param correlation the correlation vector (see newFC function).
 #' @return A RedRibbon S3 object.
+#' 
 #' @examples
+#' 
 #' library(RedRibbon)
-#' RedRibbon(data.frame(id=c("gene1", "gene2", "gene3", "gene4"),
-#'                      a=c(0.5, 0.7,0.3, 0.8),
-#'                      b=c(0.6,0.6,0.4,0.7))
+#' rr <- RedRibbon(data.frame(id=c("gene1", "gene2", "gene3", "gene4"),
+#'                            a=c(0.5, 0.7,0.3, 0.8),
+#'                            b=c(0.6,0.6,0.4,0.7))
+#' 
+#' @method RedRibbon data.frame
 #' @export
 RedRibbon.data.frame <- function (df, enrichment_mode=c("hyper", "hyper-two-tailed", "hyper-two-tailed-old"), correlation=NULL)
 {
@@ -109,12 +101,18 @@ RedRibbon.data.frame <- function (df, enrichment_mode=c("hyper", "hyper-two-tail
 #' Creates a RedRibbon objects from 2 numeric vectors
 #' 
 #' A helper function to check that \code{a} and \code{b} input parameters are of the same length.
+#' The function is equivalent to RedRibbon(data.frame(a=a, b=b), ...) (see ).
+#' 
 #' @param a is a vector of double.
 #' @param b is a vector of double.
 #' @return A rrho S3 object.
+#' 
 #' @examples
+#' 
 #' library(RedRibbon)
-#' RedRibbon(c(0.5, 0.7,0.3, 0.8), c(0.6,0.6,0.4,0.7))
+#' rr <- RedRibbon(c(0.5, 0.7,0.3, 0.8), c(0.6,0.6,0.4,0.7))
+#' 
+#' @method RedRibbon numeric
 #' @export
 RedRibbon.numeric <- function (a, b, ...)
 {
@@ -147,6 +145,7 @@ RedRibbon.numeric <- function (a, b, ...)
 #' library(RedRibbon)
 #' RedRibbon(c(0.5, 0.7,0.3, 0.8), c(0.6,0.6,0.4,0.7)) %>% 
 #'  setoptions(enrichment_mode="hyper-two-tailed")
+#' @method setoptions rrho
 #' @export
 setoptions.rrho <- function(self, enrichment_mode=NULL, ggplot_colours = NULL)
 {
@@ -183,6 +182,7 @@ setoptions.rrho <- function(self, enrichment_mode=NULL, ggplot_colours = NULL)
 #' rr <- RedRibbon(a, b)
 #' 
 #' quad <- quadrants(rr, m=1000, n=1000)
+#' @method quadrants rrho
 #' @export
 quadrants.rrho <- function(self, m=NULL, n=NULL,
                            whole=TRUE, whole.fraction = 1, algorithm="classic", permutation=FALSE, niter=96)
@@ -265,6 +265,7 @@ quadrants.rrho <- function(self, m=NULL, n=NULL,
 #' @param repel.force is the value of the repel force for the p-value ploting (default = 150)
 #' @param base_size is the size of the text fields (default = 20)
 #' @return A \code{ggplot} object.
+#' @method ggplot rrho
 #' @export
 ggplot.rrho <- function (self, n = NULL, labels = c("a", "b"), show.quadrants=TRUE, quadrants=NULL, show.pval=TRUE,
                          repel.force=150, base_size=20)
@@ -489,9 +490,13 @@ newLDFIT  <- function (position, deps, half = 6480.306)
     )
 }
 
-#' newFC
+#' Create a fold change prediction object
+#'
 #' 
-#' TODO: Description
+#' @param deps is a vector of integer referring to the feature used for the predicton.
+#'             The values should be either -1 for an unpredicted features or in 1:length(deps).
+#'             
+#' @param beta is a vector of double. The fold change will be predicted as FCy = beta * FCx.
 #' 
 #' @export
 newFC  <- function (deps, beta)
@@ -506,7 +511,6 @@ newFC  <- function (deps, beta)
 }
 
 
-## TODO: improve this template to really be compatible
 #' Drop in replacement for original R function
 #'
 #' `RRHO` function preserve the compatibility with the original package but

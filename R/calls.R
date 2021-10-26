@@ -1,10 +1,15 @@
 ## SEXP rrho_r_rectangle(SEXP i, SEXP j, SEXP ilen, SEXP jlen, SEXP m, SEXP n, SEXP a, SEXP b, SEXP mode, SEXP log_flag)
+#' @useDynLib RedRibbon rrho_r_rectangle
+#' @export
 rrho_rectangle  <- function (i, j, i.len, j.len, m, n, a, b, mode=c("hyper"), LOG=FALSE)
 {
     .Call("rrho_r_rectangle", as.integer(i), as.integer(j), as.integer(i.len), as.integer(j.len),
           as.integer(m), as.integer(n), as.double(a), as.double(b), as.character(mode), as.logical(LOG))
 }
 
+
+#' @useDynLib RedRibbon rrho_r_rectangle_min
+#' @export
 rrho_rectangle_min  <- function (i, j, i.len, j.len, m, n, a, b, mode=c("hyper"), direction="enrichment")
 {
     .Call("rrho_r_rectangle_min", as.integer(i), as.integer(j), as.integer(i.len), as.integer(j.len),
@@ -12,6 +17,8 @@ rrho_rectangle_min  <- function (i, j, i.len, j.len, m, n, a, b, mode=c("hyper")
 }
 
 
+#' @useDynLib RedRibbon rrho_r_rectangle_min_ea
+#' @export
 rrho_rectangle_min_ea  <- function (i, j, i.len, j.len, a, b, mode=c("hyper"), direction="enrichment")
 {
     .Call("rrho_r_rectangle_min_ea", as.integer(i), as.integer(j), as.integer(i.len), as.integer(j.len),
@@ -59,7 +66,7 @@ rrho_permutation <- function (i, j, i.len, j.len, a, b, algo_params=NULL, mode=c
 
 #' RedRibbon rrho_ij
 #' 
-#' TODO: Description
+#' 
 #' @useDynLib RedRibbon rrho_r_rrho
 #' @export
 rrho_ij  <- function (i, j, a, b, mode=c("hyper"))
@@ -71,7 +78,7 @@ rrho_ij  <- function (i, j, a, b, mode=c("hyper"))
 
 #' RedRibbon rrho_intersect
 #' 
-#' TODO: Description
+#' 
 #' @useDynLib RedRibbon rrho_r_intersect
 #' @export
 rrho_intersect  <- function (i, j, a, b, directions=c("downdown"))
@@ -84,7 +91,9 @@ rrho_intersect  <- function (i, j, a, b, directions=c("downdown"))
 #' RedRibbon rrho_r_expression_prediction
 #' 
 #' @param mat an expression matrix
+#' 
 #' @return correlation between gene to pass to RedRibbon(..., correlation=...) as correlation paramter
+#' 
 #' @useDynLib RedRibbon rrho_r_expression_prediction
 #' @export
 rrho_expression_prediction <- function (mat, nbr.tested = -1)
@@ -96,7 +105,7 @@ rrho_expression_prediction <- function (mat, nbr.tested = -1)
 
 #' RedRibbon rrho_ldfit_prediction
 #' 
-#' TODO: Description
+#' 
 #' @useDynLib RedRibbon rrho_r_ldfit_prediction
 #' @export
 rrho_ldfit_prediction <- function (half, pval, position)
@@ -108,7 +117,7 @@ rrho_ldfit_prediction <- function (half, pval, position)
 
 #' RedRibbon rrho_normalize
 #' 
-#' TODO: Description
+#' 
 #' @useDynLib RedRibbon rrho_r_normalize
 #' @export
 rrho_normalize <- function (mat, ref, mode="poisson")
