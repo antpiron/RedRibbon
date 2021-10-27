@@ -120,5 +120,55 @@ compat$hypermat %>%
   kable_styling()
 ```
 
+# Using and computing correlation between genes to compute adjusted p-value
+
+Create an artificial expression matrix of n.genes by n.samples with a some fold change between
+non treated and treated conditions. Add r genes correlated,
+
+```{r correlation dataset} 
+gen.expression.matrix <- function (n.genes, n.samples, fc=NULL, r = NULL)
+{
+	n.treated <- n.samples %/% 2
+	n.non.treated <- n.samples - n.treated
+	
+	mat.non.treated <- matrix( rnorm(n.genes * n.non.treated, sd=10), nrow = n.genes)
+	mat.fc <- if (is.null(fc)) 0 else mat.non.treated * fc
+	mat.treated <- matrix(mat.fc + rnorm(n.genes * n.non.treated, sd=10) , nrow = n.genes)
+	mat <- cbind(
+		         mat.non.treated,
+		         mat.treated)
+	if ( ! is.null(r) )
+		mat[1:length(r), ] <- tail(mat, length(r)) * r + (1-abs(r)) * head(mat, length(r))
+    mat
+}
+
+n <- 50
+n.frac <- 5
+fc_a <- c(rnorm(n-n.frac), rep(-2, n.frac))
+fc_b <- c(rnorm(n-n.frac), rep(-2, n.frac))
+df <- data.frame(a=fc_a, b=fc_b)
+
+mat_b <- gen.expression.matrix(n, 6, fc=fc_b, r=c(1, -1))
+```
+
+To compute the correlation,
+
+```{r correlation compute} 
+correlation <- rrho_expression_prediction(mat_b)
+c.obj <- newFC(correlation$index, correlation$beta[,2])
+c.obj
+```
+
+Now, use it in RedRibbon,
+
+```{r use correlation} 
+rr <- RedRibbon(df, enrichment_mode="hyper-two-tailed", correlation=c.obj)
+quad <- quadrants(rr, algorithm="ea", permutation=TRUE, whole=FALSE)
+gg <- ggplot(rr, quadrants=quad) + coord_fixed(ratio = 1)
+gg
+
+```
+
+
 
 
