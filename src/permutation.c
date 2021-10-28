@@ -228,7 +228,7 @@ rrho_r_permutation(SEXP i, SEXP j, SEXP ilen, SEXP jlen, SEXP a, SEXP b, SEXP al
 	      
 	      for (size_t i = 0 ; i < length_b ; i++)
 		predict_ld_cls.r[i] = REAL(r_sexp)[i];
-	      predict_ld_fit_cls.permutation = &permutation;
+	      predict_ld_cls.permutation = &permutation;
 
 	      stats_permutation_dependencies(&permutation, deps,  predict_fc, &predict_ld_cls);
 	    }
