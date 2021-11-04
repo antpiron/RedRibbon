@@ -74,7 +74,7 @@ enrichment <- function (self, ...)
 #' library(RedRibbon)
 #' rr <- RedRibbon(data.frame(id=c("gene1", "gene2", "gene3", "gene4"),
 #'                            a=c(0.5, 0.7,0.3, 0.8),
-#'                            b=c(0.6,0.6,0.4,0.7))
+#'                            b=c(0.6,0.6,0.4,0.7)))
 #' 
 #' @method RedRibbon data.frame
 #' @export
