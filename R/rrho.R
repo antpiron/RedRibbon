@@ -490,6 +490,31 @@ newLDFIT  <- function (position, deps, half = 6480.306)
     )
 }
 
+#' newLD
+#' 
+#' TODO: Description
+#' 
+#' @export
+newLD  <- function (r)
+{
+    structure(
+        list(r = as.double(r)
+             ),
+        class = "ld"
+    )
+}
+
+#' newP
+#' 
+#' TODO: Description
+#' 
+#' @export
+newP  <- function (r)
+{
+    newLD(r)
+}
+
+
 #' Create a fold change prediction object
 #'
 #' 
