@@ -120,7 +120,11 @@ rrho_ldfit_prediction <- function (half, pval, position)
 #' 
 #' @useDynLib RedRibbon rrho_r_normalize
 #' @export
-rrho_normalize <- function (mat, ref, mode="poisson")
+rrho_normalize <- function (mat, ref, mode=c("poisson", "ls_mean", "ls_variance", "geometric_mean"))
 {
-    .Call("rrho_r_normalize", as.matrix(mat), as.integer(ref), as.character(mode))
+    if (! mode %in% c("poisson", "ls_mean", "ls_variance", "geometric_mean") )
+        stop("`mode` should be either poisson, ls_mean, ls_variance or geometric_mean")
+
+
+    .Call("rrho_r_normalize", as.matrix(mat), as.integer(ref), as.character(mode[1]))
 }
