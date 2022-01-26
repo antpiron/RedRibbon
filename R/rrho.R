@@ -267,7 +267,8 @@ quadrants.rrho <- function(self, m=NULL, n=NULL,
 #' @return A \code{ggplot} object.
 #' @method ggplot rrho
 #' @export
-ggplot.rrho <- function (self, n = NULL, labels = c("a", "b"), show.quadrants=TRUE, quadrants=NULL, show.pval=TRUE,
+ggplot.rrho <- function (self, n = NULL, labels = c("a", "b"), show.quadrants=TRUE, quadrants=NULL, 
+                         show.pval=TRUE,
                          repel.force=150, base_size=20)
 {
     len <- length(self$data$a)

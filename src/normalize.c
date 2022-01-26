@@ -19,7 +19,7 @@ rrho_r_normalize(SEXP mat, SEXP ref, SEXP mode)
   size_t m = nrows(mat);
   size_t n = ncols(mat);
   size_t r = length(ref);
-  int int_mode = STATS_POISSON;
+  int int_mode = STATS_NORM_POISSON;
 
   if (r > m)
     error("Normalization error: ref length should be less or equal than mat row number.");
@@ -34,13 +34,13 @@ rrho_r_normalize(SEXP mat, SEXP ref, SEXP mode)
     {
       const char *str_mode = CHAR(STRING_PTR(mode)[0]);
       if ( 0 == strcmp("geometric_mean", str_mode) )
-	int_mode = STATS_GEOM_MEAN;
+	int_mode = STATS_NORM_GEOM_MEAN;
       else if ( 0 == strcmp("poisson", str_mode) )
-	int_mode = STATS_POISSON;
+	int_mode = STATS_NORM_POISSON;
       else if ( 0 == strcmp("ls_mean", str_mode) )
-	int_mode = STATS_LS_MEAN;
+	int_mode = STATS_NORM_LS_MEAN;
       else if ( 0 == strcmp("ls_variance", str_mode) )
-	int_mode = STATS_LS_VARIANCE;
+	int_mode = STATS_NORM_LS_VARIANCE;
       else
 	error("Mode parameter should be 'geometric_mean', 'poisson', 'ls_mean', or 'ls_variance'.");
     } 
@@ -63,11 +63,10 @@ rrho_r_normalize(SEXP mat, SEXP ref, SEXP mode)
 
   alg_transpose(n, m, mat_r, mat_c);
 
-  //  STATS_LS_MEAN = 0,
-  //  STATS_LS_VARIANCE,
-  //  STATS_POISSON
-  //   STATS_GEOM_MEAN
-  // TODO: add other modes
+  //  STATS_NORM_LS_MEAN,
+  //  STATS_NORM_LS_VARIANCE,
+  //  STATS_NORM_POISSON
+  //   STATS_NORM_GEOM_MEAN
   int err = stats_normalize_beta(m, n, r, mat_c, ref_c, beta_c, int_mode);
   if ( 0 <= err )
     {

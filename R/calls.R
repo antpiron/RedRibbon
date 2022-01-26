@@ -122,7 +122,7 @@ rrho_ldfit_prediction <- function (half, pval, position)
 #' @export
 rrho_normalize <- function (mat, ref, mode=c("poisson", "ls_mean", "ls_variance", "geometric_mean"))
 {
-    if (! mode %in% c("poisson", "ls_mean", "ls_variance", "geometric_mean") )
+    if (! mode[1] %in% c("poisson", "ls_mean", "ls_variance", "geometric_mean") )
         stop("`mode` should be either poisson, ls_mean, ls_variance or geometric_mean")
 
 
