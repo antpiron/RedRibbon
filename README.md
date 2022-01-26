@@ -1,6 +1,6 @@
 # Description
 
-RedRibbon: a rank-rank hypergeometric overlap library
+RedRibbon: a rank-rank hypergeometric overlap library.
 
 # Installation
 
@@ -9,10 +9,10 @@ This procedure have been tested on debian/ubuntu but should work on any linux di
 ## Dependencies
 
 Download official release of the [`ale`]( https://github.com/antpiron/ale) and
-[`cRedRibbon`](https://github.com/antpiron/ale) libraries.
+[`cRedRibbon`](https://github.com/antpiron/ale) C libraries.
 
 
-Install `ale` c library
+Install `ale` C library
 
 ```
 tar xvzf ale-1.0.tar.gz
@@ -22,7 +22,7 @@ make
 sudo make install
 ```
 
-Install `cRedRibbon` c library
+Install `cRedRibbon` C library
 
 ```
 tar xvzf credribbon-1.0.tar.gz
@@ -32,7 +32,7 @@ make
 sudo make install
 ```
 
-Rermark: if the librairies are not automaticaly detected, `sudo ldconfig /usr/local/lib/` might be necessary to run to update links and cache of the shared libraries.
+Rermark: if the librairies are not automaticaly detected, `sudo ldconfig /usr/local/lib/` might be necessary to run in order to update links and cache to the shared libraries.
 
 ## R package
 
