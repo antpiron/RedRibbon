@@ -6,6 +6,16 @@ RedRibbon: a rank-rank hypergeometric overlap library.
 
 This procedure have been tested on debian/ubuntu but should work on any linux distribution.
 
+## Recommended dependencies
+
+We recommend the installation of GCC OpenMP support, the `GOMP` library. For Debian/Ubuntu:
+
+```
+sudo apt-get install libgomp1
+```
+
+If not installed, while the libraries will be totally functionnal, no parallel execution will be available.
+
 ## Dependencies
 
 Download official release of the [`ale`]( https://github.com/antpiron/ale) and
