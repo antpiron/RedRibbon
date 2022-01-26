@@ -1,5 +1,5 @@
 ---
-title: "RedRibbon: a rank-rank hypergeometric overlap libray"
+title: "RedRibbon: a rank-rank hypergeometric overlap library"
 author: "Anthony Piron"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette

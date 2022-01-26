@@ -1,29 +1,37 @@
 # Description
-TODO
 
-# Install
-## How to build
-First, install both cRedRibbon and ale.
+RedRibbon: a rank-rank hypergeometric overlap library
+
+# Installation
+
+## Dependencies
+
+Download official release of the [`ale`]( https://github.com/antpiron/ale) and
+[`cRedRibbon`](from  https://github.com/antpiron/ale ) libraries.
+
+
+Install `ale` c library
 
 ```
-git clone <remote-repo> # TODO
-cd <remote-repo> # TODO
-autoconf
-autoheader
-```
-
-## Check the package (requires devtools/roxygen2)
-You may check the package:
-```
-R -e 'devtools::check()'
-```
-
-## Build the package from source
-```
-R -e 'devtools::build()'
+tar xvzf ale-1.0.tar.gz
+cd ale-1.0
+./configure
+make
+sudo make install
 ```
 
-Then install the package:
+Install `cRedRibbon` c library
+
 ```
-R CMD INSTALL RedRibbon_x.y-z.tar.gz
+tar xvzf credribbon-1.0.tar.gz
+cd credribbon-1.0
+./configure
+make
+sudo make install
+```
+
+## R package
+
+```
+sudo R CMD INSTALL RedRibbon_0.1-1.tar.gz
 ```
