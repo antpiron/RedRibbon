@@ -19,7 +19,7 @@ If not installed, while the libraries will be totally functionnal, no parallel e
 ## Dependencies
 
 Download official release of the [`ale`]( https://github.com/antpiron/ale) and
-[`cRedRibbon`](https://github.com/antpiron/ale) C libraries.
+[`cRedRibbon`](https://github.com/antpiron/cRedRibbon) C libraries.
 
 
 Install `ale` C library
