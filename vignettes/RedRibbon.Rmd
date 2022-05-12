@@ -22,7 +22,7 @@ knitr::opts_chunk$set(
 
 First, we prepare a synthetic dataset in a data.frame `df` for demonstration purpose. RedRibbon will be applied to this dataset in this vignette.
 
-The column `a` and `b` are mandatory. Those column are the two lists over which the rank-rank hyper-geometric is run.
+The column `a` and `b` are mandatory. Those column are the two lists over which the rank-rank hyper-geometric overlap is run.
 
 ```{r dataset, results='hide'}
 n <- 1000
@@ -38,7 +38,7 @@ df <- data.frame(
 	b = b)
 ```
 
-`df` contains half features perfectly matching perfectly between `a` and `b` and the remaining elements are random, `head(df)` gives
+`df` data frame contains half features perfectly matching perfectly between `a` and `b` and the remaining elements are random, `head(df)` gives
 	
 ```{r df, echo=FALSE}
 head(df) %>%
