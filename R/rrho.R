@@ -1,53 +1,78 @@
 ### S3 Methods RedRibbon
 
-#' RedRibbon generic
+#' RedRibbon S3 object constructor
+#'
+#' Pass a `data.frame or a two vectors of numerics to call either `RedRibbon.data.frame` or RedRibbon.numeric`.
 #' 
-#' TODO: Description
+#' @param self a data.frame or vector
+#' @param ... The rest of the parameters
+#' 
 #' @export
 RedRibbon <- function (self, ...)
 {
     UseMethod("RedRibbon")
 }
 
-#' setoptions generic
+
+#' Set RedRibbon options on a RedRibbon S3 object
+#'
+#' See `setoptions.rrho` for full documentation.
 #' 
-#' TODO: Description
+#' @param self a RedRibbon S3 object
+#' @param ... The rest of the parameters
+#' 
 #' @export
 setoptions <- function (self, ...)
 {
     UseMethod("setoptions")
 }
 
-#' quadrants generic
-#' 
-#' TODO: Description
+#' Compute the best coordinates of a RedRibbon S3 object.
+#'
+#' See `quadrants.rrho` for full documentation.
+#'
+#' @param self is a RedRibbon object created by `RedRibbon` constructor
+#' @param ... The rest of the parameters
+#'
 #' @export
 quadrants <- function (self, ...)
 {
     UseMethod("quadrants")
 }
 
-#' rectangle_min generic
+#' Search for the minimal P-value enrichment in a rectangle
+#'
+#' See `rectangle_min.rrho` for full documentation.
 #' 
-#' TODO: Description
+#' @param self is a RedRibbon S3 object
+#' @param ... The rest of the parameters
+#' 
 #' @export
 rectangle_min <- function (self, ...)
 {
     UseMethod("rectangle_min")
 }
 
-#' permutation generic
+#' Compute the adjusted P-value in a rectangle.
 #' 
-#' TODO: Description
+#' See `permutation.rrho` for full documentation.
+#'
+#' @param self is a RedRibbon S3 object
+#' @param ... The rest of the parameters
+#' 
 #' @export
 permutation <- function (self, ...)
 {
     UseMethod("permutation")
 }
 
-#' enrichment generic
+#' Compute the overlap
+#'
+#' See `enrichment.rrho` for full documentation.
 #' 
-#' TODO: Description
+#' @param self is a RedRibbon S3 object
+#' @param ... The rest of the parameters
+#'
 #' @export
 enrichment <- function (self, ...)
 {
@@ -105,6 +130,8 @@ RedRibbon.data.frame <- function (df, enrichment_mode=c("hyper", "hyper-two-tail
 #' 
 #' @param a is a vector of double.
 #' @param b is a vector of double.
+#' @param ... see documentation of `RedRibbon.data.frame`
+#' 
 #' @return A rrho S3 object.
 #' 
 #' @examples
@@ -132,19 +159,22 @@ RedRibbon.numeric <- function (a, b, ...)
 #'    \item{"enrichment"} {for one tailed hypergeometric test}
 #'    \item{"hyper-two-tailed"} {for one tailed hypergeometric test, "hyper-two-tailed-old", for the original R package two tailed test.}
 #' }
-#' [TODO] Describe pros and cons of each method (time, efficacity, ...), what happens is there is no method specified? Set a default?
+#'
 #' @param ggplot_colours is the color palette used for the plots. The default is
 #'    \code{
 #'    colfunc <- grDevices::colorRampPalette(c("#eb3434", "#eb9334", "#ebeb34", "#49eb34", "#34eba5", "#34b4eb", "#3446eb"))
 #'    colors  <-  colfunc(1000)
 #'    ggplot_colours = c(colors, rev(colors))
 #'    }
+#' 
 #' @return A RedRibbon S3 object with updated parameters.
+#' 
 #' @examples
 #' library(magrittr)
 #' library(RedRibbon)
 #' RedRibbon(c(0.5, 0.7,0.3, 0.8), c(0.6,0.6,0.4,0.7)) %>% 
 #'  setoptions(enrichment_mode="hyper-two-tailed")
+#' 
 #' @method setoptions rrho
 #' @export
 setoptions.rrho <- function(self, enrichment_mode=NULL, ggplot_colours = NULL)
@@ -158,9 +188,10 @@ setoptions.rrho <- function(self, enrichment_mode=NULL, ggplot_colours = NULL)
     return(self)
 }
 
-#' Compute the best coordinates.
+#' Compute the best coordinates of a RedRibbon S3 object.
 #' 
-#' TODO: Description
+#'
+#' @param self is a RedRibbon object created by `RedRibbon` constructor
 #' @param m is the number of coordinates to compute on the y axis (b)
 #' @param n is the number of coordinates to compute on the x axis (a)
 #' @param whole if TRUE run the whole list otherwise run by quadrants.
@@ -173,7 +204,9 @@ setoptions.rrho <- function(self, enrichment_mode=NULL, ggplot_colours = NULL)
 #' }
 #' @param permutation is TRUE if the permutation mode is run.
 #' @param niter is the number of iteration for the permutation mode.
+#' 
 #' @return A list of coordinates, one by quadrant.
+#' 
 #' @examples
 #' library(RedRibbon)
 #' 
@@ -182,6 +215,7 @@ setoptions.rrho <- function(self, enrichment_mode=NULL, ggplot_colours = NULL)
 #' rr <- RedRibbon(a, b)
 #' 
 #' quad <- quadrants(rr, m=1000, n=1000)
+#' 
 #' @method quadrants rrho
 #' @export
 quadrants.rrho <- function(self, m=NULL, n=NULL,
@@ -264,7 +298,9 @@ quadrants.rrho <- function(self, m=NULL, n=NULL,
 #' @param n is the number of coordinates to compute on the x and y axis (Default = sqrt(len))
 #' @param repel.force is the value of the repel force for the p-value ploting (default = 150)
 #' @param base_size is the size of the text fields (default = 20)
+#' 
 #' @return A \code{ggplot} object.
+#' 
 #' @method ggplot rrho
 #' @export
 ggplot.rrho <- function (self, n = NULL, labels = c("a", "b"), show.quadrants=TRUE, quadrants=NULL, 
@@ -390,9 +426,17 @@ ggplot.rrho <- function (self, n = NULL, labels = c("a", "b"), show.quadrants=TR
     return(gg)
 }
 
-#' rectangle_min
+#' Search for the minimal P-value enrichment in a rectangle
 #' 
-#' TODO: Description
+#' @param self is a RedRibbon S3 object
+#' @param i is the y coordinates of the rectangle (in the `b` vector)
+#' @param j is the x coordinates of the rectangle (in the `a` vector)
+#' @param i.len is the vertical length of the rectangle
+#' @param j.len is the horizontal length of the rectangle
+#' @param m is the number of P-values to compute between (i, .) and (i + i.len, .) (only used for `algorithm="classic"`)
+#' @param n is the number of P-values to compute between (., j) and (., j + j.lenn)
+#' @param direction is the enrichment mode if set to `enrichment` search for enrichment, otherwise search for underenrichment
+#' @param algorithm is the algorithm used either `classic` grid method or `ea` evolutionary algorithm
 #' 
 #' @export
 rectangle_min.rrho <- function(self, i, j, i.len, j.len, m=NULL, n=NULL, direction="enrichment", algorithm="classic")
@@ -436,9 +480,22 @@ rectangle_min.rrho <- function(self, i, j, i.len, j.len, m=NULL, n=NULL, directi
     return(result)
 }
 
-#' permutation
+#' Compute the adjusted P-value in a rectangle.
 #' 
-#' TODO: Description
+#' @param self is a RedRibbon S3 object
+#' @param i is the y coordinates of the rectangle (in the `b` vector)
+#' @param j is the x coordinates of the rectangle (in the `a` vector)
+#' @param i.len is the vertical length of the rectangle
+#' @param j.len is the horizontal length of the rectangle
+#' @param a is the first list
+#' @param b is the second list
+#' @param algo_param is a list if 2 elements named m and n representing the number of P-value to compute between in the rectangle (only used for `algorithm="classic"`)
+#' @param direction is the enrichment mode if set to `enrichment` search for enrichment, otherwise search for underenrichment
+#' @param algorithm is the algorithm used either `classic` grid method or `ea` evolutionary algorithm
+#' @param correlation is the correlation between the genes
+#' @param niter is the number of permutation
+#' @param pvalue_i is the y coordinate of the best P-value
+#' @param pvalue_j is the x coordinate of the best P-value
 #' 
 #' @export
 permutation.rrho <- function (self, i, j, i.len, j.len, a, b, algo_params=NULL, direction="enrichment", algorithm="classic", correlation=NULL, niter=96, pvalue_i, pvalue_j)
@@ -455,9 +512,14 @@ permutation.rrho <- function (self, i, j, i.len, j.len, a, b, algo_params=NULL, 
                      correlation=correlation, niter=niter, pvalue_i=pvalue_i, pvalue_j=pvalue_j)
 }
 
-#' enrichment
+#' Compute the overlap
+#'
+#' @param self is a RedRibbon S3 object
+#' @param i is the y coordinates of the rectangle (in the `b` vector)
+#' @param j is the x coordinates of the rectangle (in the `a` vector)
+#' @param directions is the direction in both list (a, b): "upup", "downup", "updown" or "downdown"
 #' 
-#' TODO: Description
+#' @return the enrichment
 #' 
 #' @export
 enrichment.rrho <- function(self, i, j, directions="downdown")
@@ -475,9 +537,11 @@ enrichment.rrho <- function(self, i, j, directions="downdown")
     return(res)
 }
 
-#' newLDFIT
+#' Create a correlation S3 object 
 #' 
-#' TODO: Description
+#' @param position is the position vector
+#' @param deps is the dependency vector
+#' @param half is the half distance for the fitted function
 #' 
 #' @export
 newLDFIT  <- function (position, deps, half = 6480.306)
@@ -491,28 +555,31 @@ newLDFIT  <- function (position, deps, half = 6480.306)
     )
 }
 
-#' newLD
+#' Create a correlation S3 object
 #' 
-#' TODO: Description
+#' @param r is the correlation coefficient
+#' @param deps is the dependency vector
 #' 
 #' @export
-newLD  <- function (r)
+newLD  <- function (deps, r)
 {
     structure(
-        list(r = as.double(r)
+        list(r = as.double(r),
+             deps = as.integer(deps)
              ),
         class = "ld"
     )
 }
 
-#' newP
+#' Create a correlation S3 object
 #' 
-#' TODO: Description
+#' @param r is the correlation coefficient
+#' @param deps is the dependency vector
 #' 
 #' @export
-newP  <- function (r)
+newP  <- function (deps, r)
 {
-    newLD(r)
+    newLD(deps, r)
 }
 
 
@@ -543,6 +610,16 @@ newFC  <- function (deps, beta)
 #' with the performance and accuracy of the new method. The stepsize parameter is
 #' used only to return the hypermat and ignored to determine the minimal p-values
 #' in the four quadrants as the evolutionary algorithm is used.
+#'
+#' @param list1 is the first list
+#' @param list2 is the second list 
+#' @param stepsize is the step size
+#' @param labels are the labels 
+#' @param alternative is 'two.sided' or  'enrichment'
+#' @param plots is a flag to plot
+#' @param outputdir is the output directory
+#' @param BY is the correction 
+#' @param log10.ind is the logarithm of the hypermat
 #' 
 #' @export
 RRHO  <- function (list1, list2,
