@@ -83,7 +83,6 @@ enrichment <- function (self, ...)
 
 #' Creates a RedRibbon object from 2 numeric vectors
 #' 
-#' TODO: Description
 #' @param df a data.frame. The real number columns a and b are mandatory.
 #' @param enrichment_mode 
 #'    \itemize{
@@ -224,7 +223,6 @@ quadrants.rrho <- function(self, m=NULL, n=NULL,
     len <- length(self$data$a)
 
     do.quadrant <- function (i, j, i.len, j.len, direction="enrichment", directions="downdown")
-    # [TODO] direction = "enrichment?" So we do not use the parameter?
     {
         ret  <- NA
         if ( is.null(m) )
