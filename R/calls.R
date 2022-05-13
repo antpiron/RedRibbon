@@ -5,10 +5,12 @@
 #' @param j is the x coordinates of the rectangle (in the `a` vector)
 #' @param i.len is the vertical length of the rectangle
 #' @param j.len is the horizontal length of the rectangle
+#' @param a is the first list
+#' @param b is the second list
 #' @param m is the number of P-values to compute between (i, .) and (i + i.len, .)
 #' @param n is the number of P-values to compute between (., j) and (., j + j.len)
 #' @param mode is the enrichment mode: "hyper", "hyper-two-tailed" or "hyper-two-tailed-old"
-#' @param direction is the enrichment mode if set to `enrichment` search for enrichment, otherwise search for underenrichment
+#' @param LOG is a flag if set return -log pval
 #'
 #' @useDynLib RedRibbon rrho_r_rectangle
 #' @export
@@ -21,7 +23,6 @@ rrho_rectangle  <- function (i, j, i.len, j.len, m, n, a, b, mode=c("hyper"), LO
 
 #' Call to C function (internal use): Search for the minimal P-value enrichment in a rectangle
 #' 
-#' @param self is a RedRibbon S3 object
 #' @param i is the y coordinates of the rectangle (in the `b` vector)
 #' @param j is the x coordinates of the rectangle (in the `a` vector)
 #' @param i.len is the vertical length of the rectangle
@@ -44,7 +45,6 @@ rrho_rectangle_min  <- function (i, j, i.len, j.len, m, n, a, b, mode=c("hyper")
 
 #' Call to C function (internal use): Search for the minimal P-value enrichment in a rectangle using evolutionnary algorithm
 #' 
-#' @param self is a RedRibbon S3 object
 #' @param i is the y coordinates of the rectangle (in the `b` vector)
 #' @param j is the x coordinates of the rectangle (in the `a` vector)
 #' @param i.len is the vertical length of the rectangle
@@ -76,7 +76,7 @@ rrho_rectangle_min_ea  <- function (i, j, i.len, j.len, a, b, mode=c("hyper"), d
 #' @param j.len is the horizontal length of the rectangle
 #' @param a is the first list
 #' @param b is the second list
-#' @param algo_param is a list if 2 elements named m and n representing the number of P-value to compute between in the rectangle (only used for `algorithm="classic"`)
+#' @param algo_params is a list if 2 elements named m and n representing the number of P-value to compute between in the rectangle (only used for `algorithm="classic"`)
 #' @param mode is the enrichment mode: "hyper", "hyper-two-tailed" or "hyper-two-tailed-old"
 #' @param direction is the enrichment mode if set to `enrichment` search for enrichment, otherwise search for underenrichment
 #' @param algorithm is the algorithm used either `classic` grid method or `ea` evolutionary algorithm

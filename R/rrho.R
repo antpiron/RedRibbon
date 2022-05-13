@@ -294,6 +294,10 @@ quadrants.rrho <- function(self, m=NULL, n=NULL,
 #' 
 #' @param self is the RedRibbon object
 #' @param n is the number of coordinates to compute on the x and y axis (Default = sqrt(len))
+#' @param labels is a list of labels of list a and b. Default is c("a", "b").
+#' @param show.quadrants is a flag if set the quadrants lines are drawn
+#' @param quadrants is the object returned by `quadrants()` method
+#' @param show.pval is a flag to show the P-values on the plot
 #' @param repel.force is the value of the repel force for the p-value ploting (default = 150)
 #' @param base_size is the size of the text fields (default = 20)
 #' 
@@ -487,7 +491,7 @@ rectangle_min.rrho <- function(self, i, j, i.len, j.len, m=NULL, n=NULL, directi
 #' @param j.len is the horizontal length of the rectangle
 #' @param a is the first list
 #' @param b is the second list
-#' @param algo_param is a list if 2 elements named m and n representing the number of P-value to compute between in the rectangle (only used for `algorithm="classic"`)
+#' @param algo_params is a list if 2 elements named m and n representing the number of P-value to compute between in the rectangle (only used for `algorithm="classic"`)
 #' @param direction is the enrichment mode if set to `enrichment` search for enrichment, otherwise search for underenrichment
 #' @param algorithm is the algorithm used either `classic` grid method or `ea` evolutionary algorithm
 #' @param correlation is the correlation between the genes
