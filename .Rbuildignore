@@ -2,7 +2,8 @@ src/.*\.o
 src/.*\.so
 .*~$
 .#.*$
-vignettes/.gitignore
+.gitignore
+.git
 ^LICENSE\.md$
 ^doc$
 ^Meta$
