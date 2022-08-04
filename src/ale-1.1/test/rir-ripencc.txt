@@ -1,0 +1,10 @@
+2|ripencc|1463954399|152073|19830705|20160522|+0200
+ripencc|*|ipv4|*|60546|summary
+ripencc|*|asn|*|33304|summary
+ripencc|*|ipv6|*|58223|summary
+ripencc|FR|ipv4|2.0.0.0|1048576|20100712|allocated|b91b2bb2-a39e-47b0-a2d1-c184d9404475
+ripencc|EU|ipv4|2.16.0.0|524288|20100910|allocated|1cf530a6-425f-4a70-851c-30b7a585ada8
+ripencc|GB|ipv4|2.24.0.0|524288|20100921|allocated|9a87aee3-d76d-4275-9aa9-5158c410b201
+ripencc|IT|ipv4|2.32.0.0|1048576|20100429|allocated|3e089f11-5f04-495d-9922-eb5838732962
+ripencc|AE|ipv4|2.48.0.0|262144|20100528|allocated|d5ac9085-9791-4970-83c7-15ba09cdec6d
+ripencc|IL|ipv4|2.52.0.0|262144|20100809|allocated|a2c120d6-838c-48eb-be98-ae0c09beaa37

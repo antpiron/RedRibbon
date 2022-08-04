@@ -1,4 +1,4 @@
-AC_INIT([RedRibbon], 0.1.0) dnl package name, version
+AC_INIT([RedRibbon], 0.2.0) dnl package name, version
 
 
 dnl Now find the compiler and compiler flags to use
@@ -14,16 +14,15 @@ LDFLAGS=`"${R_HOME}/bin/R" CMD config LDFLAGS`
 
 # Checks for library functions.
 
-AC_SEARCH_LIBS([stats_hyper_F], [ale],,[AC_MSG_ERROR([
--------------------------
- libale not found
--------------------------])])
+AC_SEARCH_LIBS([stats_hyper_F], [ale],
+		[LIBALE_SOURCES=],
+		[LIBALE_SOURCES='$(wildcard ale-*/src/*.c ale-*/src/*/*.c)'])
+AC_SUBST(LIBALE_SOURCES)
 
-AC_SEARCH_LIBS([rrho_init], [redribbon],,[AC_MSG_ERROR([
--------------------------
- libredribbon not found
--------------------------])])
-
+AC_SEARCH_LIBS([rrho_init], [redribbon],
+			    [],
+			    [LIBREDRIBBON_SOURCES='$(wildcard credribbon-*/src/*.c credribbon-*/src/*/*.c)'])
+AC_SUBST(LIBREDRIBBON_SOURCES)
 
 dnl substitute RODBC_CPPFLAGS and LIBS
 AC_SUBST([PKG_CFLAGS], ["${PKG_CFLAGS}"])
