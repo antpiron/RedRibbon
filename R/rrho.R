@@ -85,6 +85,7 @@ enrichment <- function (self, ...)
 #' see `ggRedRibbon.rrho` for full documentation
 #'
 #' @param self the RedRibbon object
+#' @param ... The rest of the parameters
 #' 
 #' @export
 ggRedRibbon <- function (self, ...)
@@ -104,6 +105,8 @@ ggRedRibbon <- function (self, ...)
 #'    \item{"hyper-two-tailed-old"} {for the original R package two tailed test.}
 #' }
 #' @param correlation the correlation vector (see newFC function).
+#' @param ... The rest of the parameters
+#' 
 #' @return A RedRibbon S3 object.
 #' 
 #' @examples
@@ -184,6 +187,8 @@ RedRibbon.numeric <- function (self, b, ...)
 #'    colors  <-  colfunc(1000)
 #'    ggplot_colours = c(colors, rev(colors))
 #'    }
+#' @param ... The rest of the parameters
+#' 
 #' 
 #' @return A RedRibbon S3 object with updated parameters.
 #' 
@@ -222,6 +227,7 @@ setoptions.rrho <- function(self, enrichment_mode=NULL, ggplot_colours = NULL, .
 #' }
 #' @param permutation is TRUE if the permutation mode is run.
 #' @param niter is the number of iteration for the permutation mode.
+#' @param ... The rest of the parameters
 #' 
 #' @return A list of coordinates, one by quadrant.
 #' 
@@ -319,6 +325,7 @@ quadrants.rrho <- function(self, m=NULL, n=NULL,
 #' @param show.pval is a flag to show the P-values on the plot
 #' @param repel.force is the value of the repel force for the p-value ploting (default = 150)
 #' @param base_size is the size of the text fields (default = 20)
+#' @param ... The rest of the parameters
 #' 
 #' @return A \code{ggplot} object.
 #' 
@@ -462,6 +469,7 @@ ggRedRibbon.rrho <- function (self, n = NULL, labels = c("a", "b"), show.quadran
 #' @param n is the number of P-values to compute between (., j) and (., j + j.lenn)
 #' @param direction is the enrichment mode if set to `enrichment` search for enrichment, otherwise search for underenrichment
 #' @param algorithm is the algorithm used either `classic` grid method or `ea` evolutionary algorithm
+#' @param ... The rest of the parameters
 #' 
 #' @export
 rectangle_min.rrho <- function(self, i, j, i.len, j.len, m=NULL, n=NULL, direction="enrichment", algorithm="classic", ...)
@@ -521,6 +529,7 @@ rectangle_min.rrho <- function(self, i, j, i.len, j.len, m=NULL, n=NULL, directi
 #' @param niter is the number of permutation
 #' @param pvalue_i is the y coordinate of the best P-value
 #' @param pvalue_j is the x coordinate of the best P-value
+#' @param ... The rest of the parameters
 #' 
 #' @export
 permutation.rrho <- function (self, i, j, i.len, j.len, a, b, algo_params=NULL, direction="enrichment", algorithm="classic", correlation=NULL, niter=96, pvalue_i, pvalue_j, ...)
@@ -543,6 +552,7 @@ permutation.rrho <- function (self, i, j, i.len, j.len, a, b, algo_params=NULL, 
 #' @param i is the y coordinates of the rectangle (in the `b` vector)
 #' @param j is the x coordinates of the rectangle (in the `a` vector)
 #' @param directions is the direction in both list (a, b): "upup", "downup", "updown" or "downdown"
+#' @param ... The rest of the parameters
 #' 
 #' @return the enrichment
 #' 
@@ -730,4 +740,36 @@ RRHO  <- function (list1, list2,
     }
 
     return (result)
+}
+
+
+#' ggplot
+#'
+#' @param data the data
+#' @param mapping the mapping
+#' @param ... all the parameters
+#' @param environment the environment
+#'
+#' @return A ggplot
+#'
+#' @export
+ggplot <- function (data = NULL, mapping = ggplot2::aes(), ..., environment = parent.frame()) 
+{
+    UseMethod("ggplot")
+}
+
+#' Compatibility function with old version (do NOT use in new software)
+#'
+#' @param data the data
+#' @param mapping the mapping
+#' @param ... all the parameters
+#' @param environment the environment
+#'
+#' @return A ggplot overlap map
+#'
+#' @method ggplot rrho
+#' @export
+ggplot.rrho <- function (data = NULL, mapping = ggplot2::aes(), ..., environment = parent.frame())
+{
+    ggRedRibbon(data, ...)
 }
