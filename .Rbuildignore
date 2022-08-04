@@ -7,3 +7,5 @@ src/.*\.so
 ^LICENSE\.md$
 ^doc$
 ^Meta$
+test/t-.*$
+lt~obsolete.m4$

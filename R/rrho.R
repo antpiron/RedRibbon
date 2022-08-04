@@ -79,11 +79,24 @@ enrichment <- function (self, ...)
     UseMethod("enrichment")
 }
 
+
+#' Plot the overlap
+#'
+#' see `ggRedRibbon.rrho` for full documentation
+#'
+#' @param self the RedRibbon object
+#' 
+#' @export
+ggRedRibbon <- function (self, ...)
+{
+     UseMethod("ggRedRibbon")
+}
+
 ### S3 Body
 
 #' Creates a RedRibbon object from 2 numeric vectors
 #' 
-#' @param df a data.frame. The real number columns a and b are mandatory.
+#' @param self a data.frame. The real number columns a and b are mandatory.
 #' @param enrichment_mode 
 #'    \itemize{
 #'    \item{"hyper"} {for one tailed hypergeometric test}
@@ -102,8 +115,13 @@ enrichment <- function (self, ...)
 #' 
 #' @method RedRibbon data.frame
 #' @export
-RedRibbon.data.frame <- function (df, enrichment_mode=c("hyper", "hyper-two-tailed", "hyper-two-tailed-old"), correlation=NULL)
+RedRibbon.data.frame <- function (self,
+                                  enrichment_mode=c("hyper", "hyper-two-tailed", "hyper-two-tailed-old"),
+                                  correlation=NULL,
+                                  ...)
 {
+    df <- self
+    
     if ( ! "a" %in% colnames(df))
         stop("Column 'a' is missing!")
     if ( ! "b" %in% colnames(df))
@@ -127,7 +145,7 @@ RedRibbon.data.frame <- function (df, enrichment_mode=c("hyper", "hyper-two-tail
 #' A helper function to check that \code{a} and \code{b} input parameters are of the same length.
 #' The function is equivalent to RedRibbon(data.frame(a=a, b=b), ...) (see ).
 #' 
-#' @param a is a vector of double.
+#' @param self is a vector of double.
 #' @param b is a vector of double.
 #' @param ... see documentation of `RedRibbon.data.frame`
 #' 
@@ -140,8 +158,9 @@ RedRibbon.data.frame <- function (df, enrichment_mode=c("hyper", "hyper-two-tail
 #' 
 #' @method RedRibbon numeric
 #' @export
-RedRibbon.numeric <- function (a, b, ...)
+RedRibbon.numeric <- function (self, b, ...)
 {
+    a <- self
     if (length(a) != length(b))
         stop("'a' and 'b' parameters should be of same length!")
     RedRibbon(data.frame(a=a, b=b), ...)
@@ -176,7 +195,7 @@ RedRibbon.numeric <- function (a, b, ...)
 #' 
 #' @method setoptions rrho
 #' @export
-setoptions.rrho <- function(self, enrichment_mode=NULL, ggplot_colours = NULL)
+setoptions.rrho <- function(self, enrichment_mode=NULL, ggplot_colours = NULL, ...)
 {
     if (! is.null(enrichment_mode) )
         self$enrichment_mode <- enrichment_mode
@@ -218,7 +237,7 @@ setoptions.rrho <- function(self, enrichment_mode=NULL, ggplot_colours = NULL)
 #' @method quadrants rrho
 #' @export
 quadrants.rrho <- function(self, m=NULL, n=NULL,
-                           whole=TRUE, whole.fraction = 1, algorithm="classic", permutation=FALSE, niter=96)
+                           whole=TRUE, whole.fraction = 1, algorithm="classic", permutation=FALSE, niter=96, ...)
 {
     len <- length(self$data$a)
 
@@ -303,11 +322,11 @@ quadrants.rrho <- function(self, m=NULL, n=NULL,
 #' 
 #' @return A \code{ggplot} object.
 #' 
-#' @method ggplot rrho
+#' @method ggRedRibbon rrho
 #' @export
-ggplot.rrho <- function (self, n = NULL, labels = c("a", "b"), show.quadrants=TRUE, quadrants=NULL, 
-                         show.pval=TRUE,
-                         repel.force=150, base_size=20)
+ggRedRibbon.rrho <- function (self, n = NULL, labels = c("a", "b"), show.quadrants=TRUE, quadrants=NULL, 
+                              show.pval=TRUE,
+                              repel.force=150, base_size=20, ...)
 {
     len <- length(self$data$a)
 
@@ -333,34 +352,38 @@ ggplot.rrho <- function (self, n = NULL, labels = c("a", "b"), show.quadrants=TR
     colors.values <- seq(0, len.colors) /  len.colors
 
 
+    ## Suppress warning RRHO: no visible binding for global variable ‘gg’
+    Var1 <- Var2 <- value <- i <- j <- pvalue <- NULL
+    
     gg <-  ggplot2::ggplot(reshape2::melt(rrho),  ggplot2::aes(Var1,Var2, fill=value)) +
         ggplot2::geom_raster() +
         ## ggplot2::scale_fill_gradientn(colours=self$ggplot_colours, name="-log p.val") +
-        ggplot2::scale_fill_gradientn(colors = self$ggplot_colours, breaks = ticks,
+        ggplot2::scale_fill_gradientn(colors = self$ggplot_colours,
+                                      breaks = ticks,
                                       labels = format(ticks),
                                       limits=ticks[c(1,3)],
                                       ##limits=b[c(1,length(colors))],
                                       name="-log p.val",
                                       values=colors.values) +
-        ggplot2::xlab(labels[1]) + ylab(labels[2]) +
+        ggplot2::xlab(labels[1]) + ggplot2::ylab(labels[2]) +
         ## scale_x_continuous(labels = label_percent(accuracy = 1, scale = 100/n.i)) +
         ## scale_y_continuous(labels = label_percent(accuracy = 1, scale = 100/n.j) ) +
         ggplot2::scale_x_continuous(breaks = c(0 + n * 0.1, n - n * 0.1), labels = c("down", "up"), expand = c(0, 0)) +
         ggplot2::scale_y_continuous(breaks = c(0 + n * 0.1, n - n * 0.1), labels = c("down", "up"), expand = c(0, 0)) +
         ## ggplot2::theme_bw() +
-        ggplot2::theme(axis.title=element_text(size=base_size,face="bold"),
-                       legend.title = element_text(size = base_size * 7 / 10),
-                       legend.text = element_text(size = base_size * 1 / 2),
+        ggplot2::theme(axis.title = ggplot2::element_text(size=base_size,face="bold"),
+                       legend.title = ggplot2::element_text(size = base_size * 7 / 10),
+                       legend.text = ggplot2::element_text(size = base_size * 1 / 2),
                        ) +
-        ggplot2::theme(axis.text.x=ggplot2::element_text(size=base_size* 7 / 10, face="bold"),
-                       axis.ticks.x=ggplot2::element_blank(),
-                       axis.text.y=ggplot2::element_text(size=base_size * 7 / 10, face="bold", angle=90),
-                       axis.ticks.y=ggplot2::element_blank(),
-                       axis.ticks.length = unit(0, "pt"),
+        ggplot2::theme(axis.text.x = ggplot2::element_text(size=base_size* 7 / 10, face="bold"),
+                       axis.ticks.x = ggplot2::element_blank(),
+                       axis.text.y = ggplot2::element_text(size=base_size * 7 / 10, face="bold", angle=90),
+                       axis.ticks.y = ggplot2::element_blank(),
+                       axis.ticks.length = ggplot2::unit(0, "pt"),
                        panel.grid.major = ggplot2::element_blank(),
                        panel.grid.minor = ggplot2::element_blank(), 
-                       panel.spacing = unit(0, "cm"),
-                       plot.margin = margin(0, 0, 0, 0, "cm"))
+                       panel.spacing = ggplot2::unit(0, "cm"),
+                       plot.margin = ggplot2::margin(0, 0, 0, 0, "cm"))
         
 
     ## find the middle of the plots
@@ -380,9 +403,9 @@ ggplot.rrho <- function (self, n = NULL, labels = c("a", "b"), show.quadrants=TR
         if (show.quadrants)
         {
             gg  <- gg +
-                ggplot2::geom_vline(aes(xintercept = x.ind * n.i / len), 
+                ggplot2::geom_vline(ggplot2::aes(xintercept = x.ind * n.i / len), 
                                     linetype = "dotted", colour = "gray10",size = 1) +
-                ggplot2::geom_hline(aes(yintercept = y.ind * n.j / len), 
+                ggplot2::geom_hline(ggplot2::aes(yintercept = y.ind * n.j / len), 
                                     linetype = "dotted", colour = "gray10",size = 1)
         }
         
@@ -415,7 +438,7 @@ ggplot.rrho <- function (self, n = NULL, labels = c("a", "b"), show.quadrants=TR
                 if ( nrow(quadrants_df) > 0 )
                     gg <- gg +
                         ggrepel::geom_text_repel(data=quadrants_df,
-                                                 aes(x=i * n.i / len, y=j * n.j / len,
+                                                 ggplot2::aes(x=i * n.i / len, y=j * n.j / len,
                                                      label=pvalue,
                                                      colour = "gray"),
                                                  hjust=1, vjust=1, colour = "black",
@@ -441,7 +464,7 @@ ggplot.rrho <- function (self, n = NULL, labels = c("a", "b"), show.quadrants=TR
 #' @param algorithm is the algorithm used either `classic` grid method or `ea` evolutionary algorithm
 #' 
 #' @export
-rectangle_min.rrho <- function(self, i, j, i.len, j.len, m=NULL, n=NULL, direction="enrichment", algorithm="classic")
+rectangle_min.rrho <- function(self, i, j, i.len, j.len, m=NULL, n=NULL, direction="enrichment", algorithm="classic", ...)
 {
     len <- length(self$data$a)
    
@@ -500,7 +523,7 @@ rectangle_min.rrho <- function(self, i, j, i.len, j.len, m=NULL, n=NULL, directi
 #' @param pvalue_j is the x coordinate of the best P-value
 #' 
 #' @export
-permutation.rrho <- function (self, i, j, i.len, j.len, a, b, algo_params=NULL, direction="enrichment", algorithm="classic", correlation=NULL, niter=96, pvalue_i, pvalue_j)
+permutation.rrho <- function (self, i, j, i.len, j.len, a, b, algo_params=NULL, direction="enrichment", algorithm="classic", correlation=NULL, niter=96, pvalue_i, pvalue_j, ...)
 {
     if ( is.null( algo_params ) )
         algo_params <- list()
@@ -524,7 +547,7 @@ permutation.rrho <- function (self, i, j, i.len, j.len, a, b, algo_params=NULL, 
 #' @return the enrichment
 #' 
 #' @export
-enrichment.rrho <- function(self, i, j, directions="downdown")
+enrichment.rrho <- function(self, i, j, directions="downdown", ...)
 {
     len <- length(self$data$a)
    
@@ -644,9 +667,9 @@ RRHO  <- function (list1, list2,
     if(! alternative[1] %in% c('two.sided', 'enrichment') )
         stop('Wrong alternative specified should be either `two.sided` or `enrichment`.')
 
-    dt1 <- data.table(list1[,1:2])
+    dt1 <- data.table::data.table(list1[,1:2])
     colnames(dt1) <- c("id", "a")
-    dt2 <- data.table(list2[,1:2])
+    dt2 <- data.table::data.table(list2[,1:2])
     colnames(dt2) <- c("id", "b")
     
     
@@ -671,13 +694,13 @@ RRHO  <- function (list1, list2,
 
     if (plots)
     {
-        result$gg <- ggplot(rr, quadrants=quad) + coord_fixed(ratio = 1)
+        result$gg <- ggRedRibbon(rr, quadrants=quad) + ggplot2::coord_fixed(ratio = 1)
 
 
         if (! is.null(outputdir) )
         {
             gg_fn <-file.path(outputdir, paste0("RRHOMap", labels[1], "_VS_", labels[2], ".jpg") )
-            ggsave(gg_fn, gg, width=8, height=8, units="in", quality=100, dpi=300)
+            ggplot2::ggsave(gg_fn, result$gg, width=8, height=8, units="in", quality=100, dpi=300)
         }
         
     }
@@ -690,7 +713,7 @@ RRHO  <- function (list1, list2,
             if ( ! is.null(quad[[direction]]) )
             {
                 ids <- dt[ quad[[direction]]$positions, ]$id
-                fwrite.table(ids, fn)
+                data.table::fwrite(ids, fn)
             }
         }
 

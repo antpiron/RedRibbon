@@ -12,16 +12,32 @@ CFLAGS=`"${R_HOME}/bin/R" CMD config CFLAGS`
 CPPFLAGS=`"${R_HOME}/bin/R" CMD config CPPFLAGS`
 LDFLAGS=`"${R_HOME}/bin/R" CMD config LDFLAGS`
 
-# Checks for library functions.
+# Options
+AC_ARG_ENABLE([ale], AS_HELP_STRING([--enable-ale], [Search for ale library  @<:@default=yes@:>@]),, [SEARCH_LIBALE=yes])
+AC_ARG_ENABLE([cRedRibbon], AS_HELP_STRING([--enable-cRedRibbon], [Search for RedRibbon library  @<:@default=yes@:>@]),, [SEARCH_LIBREDRIBBON=yes])
 
-AC_SEARCH_LIBS([stats_hyper_F], [ale],
-		[LIBALE_SOURCES=],
+
+
+# Checks for libraries.
+
+if test x"$SEARCH_LIBALE" == xyes ; then
+   AC_SEARCH_LIBS([stats_hyper_F], [ale],	
+   		[LIBALE_SOURCES=],
 		[LIBALE_SOURCES='$(wildcard ale-*/src/*.c ale-*/src/*/*.c)'])
-AC_SUBST(LIBALE_SOURCES)
+else
+	LIBALE_SOURCES='$(wildcard ale-*/src/*.c ale-*/src/*/*.c)'
+fi
 
-AC_SEARCH_LIBS([rrho_init], [redribbon],
-			    [],
-			    [LIBREDRIBBON_SOURCES='$(wildcard credribbon-*/src/*.c credribbon-*/src/*/*.c)'])
+if test x"$SEARCH_LIBREDRIBBON" == xyes ; then
+   AC_SEARCH_LIBS([rrho_init], [redribbon],
+	    	    [],
+		    [LIBREDRIBBON_SOURCES='$(wildcard credribbon-*/src/*.c credribbon-*/src/*/*.c)'])
+else
+	LIBREDRIBBON_SOURCES='$(wildcard credribbon-*/src/*.c credribbon-*/src/*/*.c)'	
+fi
+
+
+AC_SUBST(LIBALE_SOURCES)
 AC_SUBST(LIBREDRIBBON_SOURCES)
 
 dnl substitute RODBC_CPPFLAGS and LIBS
