@@ -1,12 +1,12 @@
 Package: RedRibbon
 Version: 0.2-1
 Date: 2022-08-03
-Title: A very fast rank-rank hypergeometric overlap implementation
+Title: A Very Fast Rank-Rank Hpergeometric Overlap Implementation
 Authors@R: c(person("Anthony", "Piron",
 	            role = c("aut", "cre"),
                     email = "anthony.piron@ulb.be"))
 Author: Anthony Piron [aut, cre]
-Maintainer: Anthony Piron <anthony.piron@ulb.ac.be>
+Maintainer: Anthony Piron <anthony.piron@ulb.be>
 Depends: R (>= 3.1.0), reshape2, scales, ggrepel, data.table, grDevices, ggplot2 
 Description: This package provides a very fast and accurate
   rank-rank hypergeometric overlap implementation.
