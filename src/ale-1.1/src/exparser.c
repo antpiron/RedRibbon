@@ -6,12 +6,11 @@
 
 #include "ale/exparser.h"
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunused-parameter"
 
 static struct ep_token 
 get_token(void *cls)
 {
+  (void) (cls);
   return (struct ep_token) { .token = EXPR_TOK_EOF, .ptr = NULL};
 }
 
@@ -27,6 +26,7 @@ consume(struct ep_parser *ep)
 static void 
 clean(void *cls)
 {
+  (void) (cls);
 }
 
 static void* expr(struct ep_parser *ep, int p);
@@ -62,6 +62,7 @@ expr_parser_init(struct ep_parser *ep)
 int 
 expr_parser_destroy(struct ep_parser *ep)
 {
+  (void) (ep);
 
   return ERR_SUCCESS;
 }
@@ -186,4 +187,3 @@ prod(struct ep_parser *ep)
 
   return t;
 }
-#pragma GCC diagnostic pop

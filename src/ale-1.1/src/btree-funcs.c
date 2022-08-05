@@ -11,12 +11,8 @@ bt_intptr_t_cmp(void *a, void *b)
   return (intptr_t) b -  (intptr_t) a;
 }
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunused-parameter"
 
-void bt_intptr_t_free(void *ptr) {}
-
-#pragma GCC diagnostic pop
+void bt_intptr_t_free(void *ptr) { (void) (ptr); }
 
 void* 
 bt_intptr_t_dup(void *a)

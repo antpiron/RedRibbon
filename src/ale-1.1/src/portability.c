@@ -13,16 +13,17 @@
 #include "ale/error.h"
 #include "ale/siphash24.h"
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunused-parameter"
+
 int 
 portability_posix_fadvise(int fd, off_t offset, off_t len, int advice)
 {
-  
+  (void) (fd);
+  (void) (offset);
+  (void) (len);
+  (void) (advice);
 
   return 0;
 }
-#pragma GCC diagnostic pop
 
 
 static void*
@@ -101,11 +102,10 @@ gen_key(uint8_t *key)
 }
 
 // Counter mode generator based on siphash
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunused-parameter"
 int
 portability_getrandom(void *buf, size_t buflen, unsigned int flags)
 {
+  (void) (flags);
   // TODO: make it thread safe
   uint8_t *ubuf = buf;
   static _Atomic uint64_t counter = 0;
@@ -130,7 +130,6 @@ portability_getrandom(void *buf, size_t buflen, unsigned int flags)
   
   return buflen;  
 }
-#pragma GCC diagnostic pop
 
 #ifdef HAVE_GETRANDOM_SYSCALL
 #include <linux/random.h>

@@ -2,10 +2,12 @@
 
 #' RedRibbon S3 object constructor
 #'
-#' Pass a `data.frame or a two vectors of numerics to call either `RedRibbon.data.frame` or RedRibbon.numeric`.
+#' Pass a 'data.frame or a two vectors of numerics to call either 'RedRibbon.data.frame' or 'RedRibbon.numeric'.
 #' 
 #' @param self a data.frame or vector
 #' @param ... The rest of the parameters
+#' 
+#' @import data.table ggplot2 scales ggrepel
 #' 
 #' @export
 RedRibbon <- function (self, ...)
@@ -16,7 +18,7 @@ RedRibbon <- function (self, ...)
 
 #' Set RedRibbon options on a RedRibbon S3 object
 #'
-#' See `setoptions.rrho` for full documentation.
+#' See 'setoptions.rrho' for full documentation.
 #' 
 #' @param self a RedRibbon S3 object
 #' @param ... The rest of the parameters
@@ -29,9 +31,9 @@ setoptions <- function (self, ...)
 
 #' Compute the best coordinates of a RedRibbon S3 object.
 #'
-#' See `quadrants.rrho` for full documentation.
+#' See 'quadrants.rrho' for full documentation.
 #'
-#' @param self is a RedRibbon object created by `RedRibbon` constructor
+#' @param self is a RedRibbon object created by 'RedRibbon' constructor
 #' @param ... The rest of the parameters
 #'
 #' @export
@@ -42,7 +44,7 @@ quadrants <- function (self, ...)
 
 #' Search for the minimal P-value enrichment in a rectangle
 #'
-#' See `rectangle_min.rrho` for full documentation.
+#' See 'rectangle_min.rrho' for full documentation.
 #' 
 #' @param self is a RedRibbon S3 object
 #' @param ... The rest of the parameters
@@ -55,7 +57,7 @@ rectangle_min <- function (self, ...)
 
 #' Compute the adjusted P-value in a rectangle.
 #' 
-#' See `permutation.rrho` for full documentation.
+#' See 'permutation.rrho' for full documentation.
 #'
 #' @param self is a RedRibbon S3 object
 #' @param ... The rest of the parameters
@@ -68,7 +70,7 @@ permutation <- function (self, ...)
 
 #' Compute the overlap
 #'
-#' See `enrichment.rrho` for full documentation.
+#' See 'enrichment.rrho' for full documentation.
 #' 
 #' @param self is a RedRibbon S3 object
 #' @param ... The rest of the parameters
@@ -82,7 +84,7 @@ enrichment <- function (self, ...)
 
 #' Plot the overlap
 #'
-#' see `ggRedRibbon.rrho` for full documentation
+#' see 'ggRedRibbon.rrho' for full documentation
 #'
 #' @param self the RedRibbon object
 #' @param ... The rest of the parameters
@@ -150,7 +152,7 @@ RedRibbon.data.frame <- function (self,
 #' 
 #' @param self is a vector of double.
 #' @param b is a vector of double.
-#' @param ... see documentation of `RedRibbon.data.frame`
+#' @param ... see documentation of 'RedRibbon.data.frame'
 #' 
 #' @return A rrho S3 object.
 #' 
@@ -214,11 +216,11 @@ setoptions.rrho <- function(self, enrichment_mode=NULL, ggplot_colours = NULL, .
 #' Compute the best coordinates of a RedRibbon S3 object.
 #' 
 #'
-#' @param self is a RedRibbon object created by `RedRibbon` constructor
+#' @param self is a RedRibbon object created by 'RedRibbon' constructor
 #' @param m is the number of coordinates to compute on the y axis (b)
 #' @param n is the number of coordinates to compute on the x axis (a)
 #' @param whole if TRUE run the whole list otherwise run by quadrants.
-#' @param whole.fraction is the fraction of the quadrant analysed in `whole` mode.
+#' @param whole.fraction is the fraction of the quadrant analysed in 'whole' mode.
 #' @param algorithm is the algorithm used to find the minimal p-value: 
 #' \itemize{
 #' 
@@ -313,6 +315,20 @@ quadrants.rrho <- function(self, m=NULL, n=NULL,
     return(quadrants)
 }
 
+melt.matrix <- function (data, ..., na.rm = FALSE, value.name = "value")
+{
+    dt <- as.data.table(data)
+    colnames(dt) <- as.character(1:ncol(dt))
+    dt[, rownames := 1:nrow(dt)]
+
+    melted_dt <- data.table::melt(dt, id.vars = "rownames", na.rm = na.rm, value.name = value.name)
+    colnames(melted_dt)  <- c("Var1", "Var2", "value")
+
+    
+    
+    return(melted_dt)
+}
+
 #' Render the RRHO map.
 #' 
 #' You can choose to render the RedRibbon level map using \code{ggplot2}. 
@@ -321,7 +337,7 @@ quadrants.rrho <- function(self, m=NULL, n=NULL,
 #' @param n is the number of coordinates to compute on the x and y axis (Default = sqrt(len))
 #' @param labels is a list of labels of list a and b. Default is c("a", "b").
 #' @param show.quadrants is a flag if set the quadrants lines are drawn
-#' @param quadrants is the object returned by `quadrants()` method
+#' @param quadrants is the object returned by 'quadrants()' method
 #' @param show.pval is a flag to show the P-values on the plot
 #' @param repel.force is the value of the repel force for the p-value ploting (default = 150)
 #' @param base_size is the size of the text fields (default = 20)
@@ -361,8 +377,8 @@ ggRedRibbon.rrho <- function (self, n = NULL, labels = c("a", "b"), show.quadran
 
     ## Suppress warning RRHO: no visible binding for global variable ‘gg’
     Var1 <- Var2 <- value <- i <- j <- pvalue <- NULL
-    
-    gg <-  ggplot2::ggplot(reshape2::melt(rrho),  ggplot2::aes(Var1,Var2, fill=value)) +
+
+    gg <-  ggplot2::ggplot(melt(rrho), ggplot2::aes(Var1,Var2, fill=value)) +
         ggplot2::geom_raster() +
         ## ggplot2::scale_fill_gradientn(colours=self$ggplot_colours, name="-log p.val") +
         ggplot2::scale_fill_gradientn(colors = self$ggplot_colours,
@@ -461,14 +477,14 @@ ggRedRibbon.rrho <- function (self, n = NULL, labels = c("a", "b"), show.quadran
 #' Search for the minimal P-value enrichment in a rectangle
 #' 
 #' @param self is a RedRibbon S3 object
-#' @param i is the y coordinates of the rectangle (in the `b` vector)
-#' @param j is the x coordinates of the rectangle (in the `a` vector)
+#' @param i is the y coordinates of the rectangle (in the 'b' vector)
+#' @param j is the x coordinates of the rectangle (in the 'a' vector)
 #' @param i.len is the vertical length of the rectangle
 #' @param j.len is the horizontal length of the rectangle
-#' @param m is the number of P-values to compute between (i, .) and (i + i.len, .) (only used for `algorithm="classic"`)
+#' @param m is the number of P-values to compute between (i, .) and (i + i.len, .) (only used for 'algorithm="classic"')
 #' @param n is the number of P-values to compute between (., j) and (., j + j.lenn)
-#' @param direction is the enrichment mode if set to `enrichment` search for enrichment, otherwise search for underenrichment
-#' @param algorithm is the algorithm used either `classic` grid method or `ea` evolutionary algorithm
+#' @param direction is the enrichment mode if set to 'enrichment' search for enrichment, otherwise search for underenrichment
+#' @param algorithm is the algorithm used either 'classic' grid method or 'ea' evolutionary algorithm
 #' @param ... The rest of the parameters
 #' 
 #' @export
@@ -516,15 +532,15 @@ rectangle_min.rrho <- function(self, i, j, i.len, j.len, m=NULL, n=NULL, directi
 #' Compute the adjusted P-value in a rectangle.
 #' 
 #' @param self is a RedRibbon S3 object
-#' @param i is the y coordinates of the rectangle (in the `b` vector)
-#' @param j is the x coordinates of the rectangle (in the `a` vector)
+#' @param i is the y coordinates of the rectangle (in the 'b' vector)
+#' @param j is the x coordinates of the rectangle (in the 'a' vector)
 #' @param i.len is the vertical length of the rectangle
 #' @param j.len is the horizontal length of the rectangle
 #' @param a is the first list
 #' @param b is the second list
-#' @param algo_params is a list if 2 elements named m and n representing the number of P-value to compute between in the rectangle (only used for `algorithm="classic"`)
-#' @param direction is the enrichment mode if set to `enrichment` search for enrichment, otherwise search for underenrichment
-#' @param algorithm is the algorithm used either `classic` grid method or `ea` evolutionary algorithm
+#' @param algo_params is a list if 2 elements named m and n representing the number of P-value to compute between in the rectangle (only used for 'algorithm="classic"')
+#' @param direction is the enrichment mode if set to 'enrichment' search for enrichment, otherwise search for underenrichment
+#' @param algorithm is the algorithm used either 'classic' grid method or 'ea' evolutionary algorithm
 #' @param correlation is the correlation between the genes
 #' @param niter is the number of permutation
 #' @param pvalue_i is the y coordinate of the best P-value
@@ -549,8 +565,8 @@ permutation.rrho <- function (self, i, j, i.len, j.len, a, b, algo_params=NULL, 
 #' Compute the overlap
 #'
 #' @param self is a RedRibbon S3 object
-#' @param i is the y coordinates of the rectangle (in the `b` vector)
-#' @param j is the x coordinates of the rectangle (in the `a` vector)
+#' @param i is the y coordinates of the rectangle (in the 'b' vector)
+#' @param j is the x coordinates of the rectangle (in the 'a' vector)
 #' @param directions is the direction in both list (a, b): "upup", "downup", "updown" or "downdown"
 #' @param ... The rest of the parameters
 #' 
@@ -641,7 +657,7 @@ newFC  <- function (deps, beta)
 
 #' Drop in replacement for original R function
 #'
-#' `RRHO` function preserve the compatibility with the original package but
+#' 'RRHO' function preserve the compatibility with the original package but
 #' with the performance and accuracy of the new method. The stepsize parameter is
 #' used only to return the hypermat and ignored to determine the minimal p-values
 #' in the four quadrants as the evolutionary algorithm is used.
@@ -675,7 +691,7 @@ RRHO  <- function (list1, list2,
         stop("list2 is not a data.frame")
     
     if(! alternative[1] %in% c('two.sided', 'enrichment') )
-        stop('Wrong alternative specified should be either `two.sided` or `enrichment`.')
+        stop("Wrong alternative specified should be either 'two.sided' or 'enrichment'.")
 
     dt1 <- data.table::data.table(list1[,1:2])
     colnames(dt1) <- c("id", "a")

@@ -7,7 +7,7 @@ Authors@R: c(person("Anthony", "Piron",
                     email = "anthony.piron@ulb.be"))
 Author: Anthony Piron [aut, cre]
 Maintainer: Anthony Piron <anthony.piron@ulb.be>
-Depends: R (>= 3.1.0), reshape2, scales, ggrepel, data.table, grDevices, ggplot2 
+Depends: R (>= 3.1.0), scales, ggrepel, data.table (>= 1.9.6), grDevices, ggplot2 
 Description: This package provides a very fast and accurate
   rank-rank hypergeometric overlap implementation.
 License: GPL (>= 3)

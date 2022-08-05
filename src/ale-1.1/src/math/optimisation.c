@@ -16,6 +16,7 @@
 					    void (*gradf)(TYPE *y, TYPE *x, void *cls), \
 					    void *cls)			\
   {									\
+    (void) (f);								\
     struct mem_pool pool;						\
     mem_init(&pool);							\
     TYPE *p = mem_malloc(&pool, sizeof(TYPE) * n);			\
@@ -63,8 +64,7 @@
 }
 
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunused-parameter"
+
 GENERIC_FUNC(,double)
 GENERIC_FUNC(l,long double)
-#pragma GCC diagnostic pop
+

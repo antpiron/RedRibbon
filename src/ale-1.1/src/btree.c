@@ -3,9 +3,6 @@
 #include "ale/error.h"
 #include "ale/btree.h"
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunused-parameter"
-
 struct btnode* 
 bt_mknode(int btorder, int type)
 {
@@ -205,6 +202,7 @@ BT_COPY_FROM_TOP_BUILDER(childs, childs.nodes)
 int
 bt_balance_left_internal_child(struct btree *bt, struct btnode *node, int index)
 {
+  (void) (bt);
   struct btnode *lnode = node->childs.nodes[index];
   struct btnode *rnode = node->childs.nodes[index+1];
   int lorder = lnode->order;
@@ -442,4 +440,4 @@ bt_print(struct btree *bt)
 {
   bt_print_rec(bt, bt->root, 0);
 }
-#pragma GCC diagnostic pop
+
