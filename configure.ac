@@ -20,6 +20,8 @@ AC_ARG_ENABLE([cRedRibbon], AS_HELP_STRING([--enable-cRedRibbon], [Search for Re
 
 # Checks for libraries.
 
+PKG_CFLAGS="$PKG_CFLAGS -I."
+
 LIBALE_SOURCES=$(cd src ; find  ale-*/src -name '*.c' | tr '\n' ' ')
 if test x"$SEARCH_LIBALE" == xyes ; then
    AC_SEARCH_LIBS([stats_hyper_F], [ale],	

@@ -1,4 +1,4 @@
-#include "config.h"
+#include <config.h>
 
 #include <R.h>
 #include <Rinternals.h>

@@ -1,5 +1,5 @@
 
-#include "config.h"
+#include <config.h>
 
 // #ifdef HAVE_R_H
 #include <ale/sort.h>
