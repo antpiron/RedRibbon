@@ -48,5 +48,5 @@ make
 sudo make install
 ```
 
-Rermark: if the librairies are not automaticaly detected, `sudo ldconfig /usr/local/lib/` might be necessary to run in order to update links and cache to the shared libraries.
+Rermark: if the libraries are not automaticaly detected, `sudo ldconfig /usr/local/lib/` might be necessary to run in order to update links and cache to the shared libraries.
 
