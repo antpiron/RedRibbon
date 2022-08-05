@@ -317,12 +317,16 @@ quadrants.rrho <- function(self, m=NULL, n=NULL,
 
 melt.matrix <- function (data, ..., na.rm = FALSE, value.name = "value")
 {
+    Var1 <- Var2 <- NULL
+    
     dt <- as.data.table(data)
     colnames(dt) <- as.character(1:ncol(dt))
     dt[, rownames := 1:nrow(dt)]
 
     melted_dt <- data.table::melt(dt, id.vars = "rownames", na.rm = na.rm, value.name = value.name)
     colnames(melted_dt)  <- c("Var1", "Var2", "value")
+    melted_dt[, Var1 := as.double(Var1)]
+    melted_dt[, Var2 := as.double(Var2)]
 
     
     
@@ -378,7 +382,7 @@ ggRedRibbon.rrho <- function (self, n = NULL, labels = c("a", "b"), show.quadran
     ## Suppress warning RRHO: no visible binding for global variable ‘gg’
     Var1 <- Var2 <- value <- i <- j <- pvalue <- NULL
 
-    gg <-  ggplot2::ggplot(melt(rrho), ggplot2::aes(Var1,Var2, fill=value)) +
+    gg <-  ggplot2::ggplot(melt.matrix(rrho), ggplot2::aes(Var1,Var2, fill=value)) +
         ggplot2::geom_raster() +
         ## ggplot2::scale_fill_gradientn(colours=self$ggplot_colours, name="-log p.val") +
         ggplot2::scale_fill_gradientn(colors = self$ggplot_colours,
