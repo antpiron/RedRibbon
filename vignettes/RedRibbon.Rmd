@@ -169,6 +169,8 @@ gg
 
 ```
 
+# sessionInfo()
 
-
-
+```{r sessionInfo} 
+sessionInfo()
+```
