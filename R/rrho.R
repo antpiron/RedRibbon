@@ -763,20 +763,14 @@ RRHO  <- function (list1, list2,
 }
 
 
-#' ggplot
-#'
-#' @param data the data
-#' @param mapping the mapping
-#' @param ... all the parameters
-#' @param environment the environment
-#'
-#' @return A ggplot
-#'
+#' @importFrom ggplot2 ggplot
 #' @export
-ggplot <- function (data = NULL, mapping = ggplot2::aes(), ..., environment = parent.frame()) 
-{
-    UseMethod("ggplot")
-}
+ggplot2::ggplot
+
+## ggplot <- function (data = NULL, mapping = ggplot2::aes(), ..., environment = parent.frame()) 
+## {
+##    UseMethod("ggplot")
+## }
 
 #' Compatibility function with old version (do NOT use in new software)
 #'
