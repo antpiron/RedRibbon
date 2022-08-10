@@ -16,6 +16,9 @@ knitr::opts_chunk$set(
   comment = "#>"
 )
 ```
+# Introduction
+
+RedRibbon is fast and accurate rank-rank hypergeometric overlap library. 
 
 # Synthetic dataset
 
