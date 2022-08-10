@@ -12,6 +12,8 @@
 #' @param mode is the enrichment mode: "hyper", "hyper-two-tailed" or "hyper-two-tailed-old"
 #' @param LOG is a flag if set return -log pval
 #'
+#' @return The hypergeometric p-values for a rectangle
+#' 
 #' @useDynLib RedRibbon rrho_r_rectangle
 #' @export
 rrho_rectangle  <- function (i, j, i.len, j.len, m, n, a, b, mode=c("hyper"), LOG=FALSE)
@@ -33,6 +35,8 @@ rrho_rectangle  <- function (i, j, i.len, j.len, m, n, a, b, mode=c("hyper"), LO
 #' @param b is the second list
 #' @param mode is the enrichment mode: "hyper", "hyper-two-tailed" or "hyper-two-tailed-old"
 #' @param direction is the enrichment mode if set to `enrichment` search for enrichment, otherwise search for underenrichment
+#'
+#' @return The minimal p-value and coordinate in a rectangle with the grid algorithm
 #' 
 #' @useDynLib RedRibbon rrho_r_rectangle_min
 #' @export
@@ -53,6 +57,8 @@ rrho_rectangle_min  <- function (i, j, i.len, j.len, m, n, a, b, mode=c("hyper")
 #' @param b is the second list
 #' @param mode is the enrichment mode: "hyper", "hyper-two-tailed" or "hyper-two-tailed-old"
 #' @param direction is the enrichment mode if set to `enrichment` search for enrichment, otherwise search for underenrichment
+#' 
+#' @return The minimal p-value and coordinate in a rectangle with the evolutionary algorithm
 #' 
 #' @useDynLib RedRibbon rrho_r_rectangle_min_ea
 #' @export
@@ -85,6 +91,8 @@ rrho_rectangle_min_ea  <- function (i, j, i.len, j.len, a, b, mode=c("hyper"), d
 #' @param pvalue_i is the y coordinate of the best P-value
 #' @param pvalue_j is the x coordinate of the best P-value
 #'
+#' @return an adjusted p-value
+#' 
 #' @useDynLib RedRibbon rrho_r_permutation
 #' @export
 rrho_permutation <- function (i, j, i.len, j.len, a, b, algo_params=NULL, mode=c("hyper"), direction="enrichment", algorithm="classic", correlation=NULL,
@@ -122,6 +130,8 @@ rrho_permutation <- function (i, j, i.len, j.len, a, b, algo_params=NULL, mode=c
 #' @param a is the first list
 #' @param b is the second list
 #' @param mode is the enrichment mode: "hyper", "hyper-two-tailed" or "hyper-two-tailed-old"
+#'
+#' @return the hypergeometric p-value
 #' 
 #' @useDynLib RedRibbon rrho_r_rrho
 #' @export
@@ -138,6 +148,8 @@ rrho_ij  <- function (i, j, a, b, mode=c("hyper"))
 #' @param a is the first list
 #' @param b is the second list
 #' @param directions is the direction in both list (a, b): "upup", "downup", "updown" or "downdown"
+#'
+#' @return the overlap
 #' 
 #' @useDynLib RedRibbon rrho_r_intersect
 #' @export
@@ -170,6 +182,8 @@ rrho_expression_prediction <- function (mat, nbr.tested = -1)
 #' @param half is the half distance for the fitted function
 #' @param pval are the pvalues
 #' @param position is the position vector
+#'
+#' @return the approximate dependencies
 #' 
 #' @examples
 #' 
@@ -190,6 +204,8 @@ rrho_ldfit_prediction <- function (half, pval, position)
 #' @param mat is a matrix of expression
 #' @param ref are the index of the reference
 #' @param mode "poisson", "ls_mean", "ls_variance", "geometric_mean"
+#' 
+#' @return a normalized expression matrix
 #' 
 #' @useDynLib RedRibbon rrho_r_normalize
 #' @export

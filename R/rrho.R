@@ -6,6 +6,8 @@
 #' 
 #' @param self a data.frame or vector
 #' @param ... The rest of the parameters
+#'
+#' @return a RedRibbon S3 object
 #' 
 #' @import data.table ggplot2 scales ggrepel
 #' 
@@ -22,6 +24,8 @@ RedRibbon <- function (self, ...)
 #' 
 #' @param self a RedRibbon S3 object
 #' @param ... The rest of the parameters
+#'
+#' @return a RedRibbon S3 object
 #' 
 #' @export
 setoptions <- function (self, ...)
@@ -36,6 +40,8 @@ setoptions <- function (self, ...)
 #' @param self is a RedRibbon object created by 'RedRibbon' constructor
 #' @param ... The rest of the parameters
 #'
+#' @return the overlap for each quadrant
+#' 
 #' @export
 quadrants <- function (self, ...)
 {
@@ -48,6 +54,8 @@ quadrants <- function (self, ...)
 #' 
 #' @param self is a RedRibbon S3 object
 #' @param ... The rest of the parameters
+#' 
+#' @return the minimum in a rectangle area
 #' 
 #' @export
 rectangle_min <- function (self, ...)
@@ -62,6 +70,8 @@ rectangle_min <- function (self, ...)
 #' @param self is a RedRibbon S3 object
 #' @param ... The rest of the parameters
 #' 
+#' @return the adjusted p-value
+#' 
 #' @export
 permutation <- function (self, ...)
 {
@@ -75,6 +85,8 @@ permutation <- function (self, ...)
 #' @param self is a RedRibbon S3 object
 #' @param ... The rest of the parameters
 #'
+#' @return the enrichment object
+#' 
 #' @export
 enrichment <- function (self, ...)
 {
@@ -88,6 +100,8 @@ enrichment <- function (self, ...)
 #'
 #' @param self the RedRibbon object
 #' @param ... The rest of the parameters
+#'
+#' @return a ggplot object
 #' 
 #' @export
 ggRedRibbon <- function (self, ...)
@@ -241,7 +255,7 @@ setoptions.rrho <- function(self, enrichment_mode=NULL, ggplot_colours = NULL, .
 #' rr <- RedRibbon(a, b)
 #' 
 #' quad <- quadrants(rr, m=1000, n=1000)
-#' 
+#'
 #' @method quadrants rrho
 #' @export
 quadrants.rrho <- function(self, m=NULL, n=NULL,
@@ -490,6 +504,8 @@ ggRedRibbon.rrho <- function (self, n = NULL, labels = c("a", "b"), show.quadran
 #' @param direction is the enrichment mode if set to 'enrichment' search for enrichment, otherwise search for underenrichment
 #' @param algorithm is the algorithm used either 'classic' grid method or 'ea' evolutionary algorithm
 #' @param ... The rest of the parameters
+#'
+#' @return the minimum in a rectangle
 #' 
 #' @export
 rectangle_min.rrho <- function(self, i, j, i.len, j.len, m=NULL, n=NULL, direction="enrichment", algorithm="classic", ...)
@@ -550,6 +566,8 @@ rectangle_min.rrho <- function(self, i, j, i.len, j.len, m=NULL, n=NULL, directi
 #' @param pvalue_i is the y coordinate of the best P-value
 #' @param pvalue_j is the x coordinate of the best P-value
 #' @param ... The rest of the parameters
+#'
+#' @return a permutation
 #' 
 #' @export
 permutation.rrho <- function (self, i, j, i.len, j.len, a, b, algo_params=NULL, direction="enrichment", algorithm="classic", correlation=NULL, niter=96, pvalue_i, pvalue_j, ...)
@@ -597,6 +615,8 @@ enrichment.rrho <- function(self, i, j, directions="downdown", ...)
 #' @param position is the position vector
 #' @param deps is the dependency vector
 #' @param half is the half distance for the fitted function
+#'
+#' @return a correlation object
 #' 
 #' @export
 newLDFIT  <- function (position, deps, half = 6480.306)
@@ -614,6 +634,8 @@ newLDFIT  <- function (position, deps, half = 6480.306)
 #' 
 #' @param r is the correlation coefficient
 #' @param deps is the dependency vector
+#'
+#' @return a correlation object
 #' 
 #' @export
 newLD  <- function (deps, r)
@@ -630,6 +652,8 @@ newLD  <- function (deps, r)
 #' 
 #' @param r is the correlation coefficient
 #' @param deps is the dependency vector
+#'
+#' @return a correlation object for P-Values
 #' 
 #' @export
 newP  <- function (deps, r)
@@ -645,6 +669,8 @@ newP  <- function (deps, r)
 #'             The values should be either -1 for an unpredicted features or in 1:length(deps).
 #'             
 #' @param beta is a vector of double. The fold change will be predicted as FCy = beta * FCx.
+#'
+#' @return The fold change prediction object
 #' 
 #' @export
 newFC  <- function (deps, beta)
@@ -675,7 +701,8 @@ newFC  <- function (deps, beta)
 #' @param outputdir is the output directory
 #' @param BY is the correction 
 #' @param log10.ind is the logarithm of the hypermat
-#' 
+#'
+#' @return the a list(rr = ..., quadrants = ...) with 'rr' the RedRibbon object and 'quadrants' the result of the overlap
 #' @export
 RRHO  <- function (list1, list2,
                    stepsize = NULL,
