@@ -26,14 +26,18 @@ LIBALE_SOURCES=$(cd src ; find  ale-*/src -name '*.c' | tr '\n' ' ')
 if test x"$SEARCH_LIBALE" == xyes ; then
    AC_SEARCH_LIBS([stats_hyper_F], [ale],	
    		[LIBALE_SOURCES=],
-		[])
+		[PKG_CFLAGS="$PKG_CFLAGS -I./ale-1.1/src/"])
+else
+	PKG_CFLAGS="$PKG_CFLAGS -I./ale-1.1/src/"
 fi
 
 LIBREDRIBBON_SOURCES=$(cd src ; find  credribbon-*/src -name '*.c' | tr '\n' ' ')
 if test x"$SEARCH_LIBREDRIBBON" == xyes ; then
    AC_SEARCH_LIBS([rrho_init], [redribbon],
 	    	    [LIBREDRIBBON_SOURCES=],
-		    [])
+		    [PKG_CFLAGS="$PKG_CFLAGS -I./credribbon-1.0/src/"])
+else
+	PKG_CFLAGS="$PKG_CFLAGS -I./credribbon-1.0/src/"
 fi
 
 PKG_SOURCES=$(cd src ; ls *.c | tr '\n' ' ')
