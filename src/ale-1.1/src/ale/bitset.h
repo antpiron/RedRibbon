@@ -93,7 +93,7 @@ bitset_grow(struct bitset *bs, size_t n)
 static inline int
 bitset_resize_n(struct bitset *bs, size_t n)
 {
-  int ret;
+  int ret = 0;
 
   if ( n < bs->n )
     {

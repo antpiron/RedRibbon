@@ -28,8 +28,13 @@
 #  define be64toh(x) betoh64(x)
 #endif
 
+#ifndef htonll
 #define htonll(x) htobe64(x)
+#endif
+
+#ifndef ntohll
 #define ntohll(x) be64toh(x)
+#endif
 
 // (Not in POSIX.1-2001.)  Print to stderr as well.
 #ifndef LOG_PERROR

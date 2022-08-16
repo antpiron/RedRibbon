@@ -34,11 +34,11 @@ MATH_GENERIC_HEADERS(l,long double)
   int									\
   ale_cmp_double##SUFFIX(TYPE a, TYPE b, TYPE eps)			\
   {									\
-    if ( isinf##SUFFIX(a) && isinf##SUFFIX(b) )				\
-      return isinf##SUFFIX(a) - isinf##SUFFIX(b);			\
-    if ( isinf##SUFFIX(a) )						\
+    if ( isinf(a) && isinf(b) )						\
+      return isinf(a) - isinf(b);					\
+    if ( isinf(a) )							\
       return 1;								\
-    if ( isinf##SUFFIX(b) )						\
+    if ( isinf(b) )							\
       return -1;							\
 									\
     TYPE diff = a - b;							\
