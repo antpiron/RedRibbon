@@ -11,7 +11,7 @@ Depends: R (>= 3.1.0), scales, ggrepel, data.table (>= 1.9.6), grDevices, ggplot
 Description: Compute a quadrant-wise Rank-Rank Hypergeometric Overlap of 2 lists with an
   fast and accurate evolutionary algorithm. The minimal p-values are corrected with a
   permutation scheme. The algorithm can be run over lists of million elements.
-License: GPL (>= 3)
+License: GPL-3
 Suggests: 
     testthat,
     knitr,
