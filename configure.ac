@@ -35,9 +35,9 @@ LIBREDRIBBON_SOURCES=$(cd src ; find  credribbon-*/src -name '*.c' | tr '\n' ' '
 if test x"$SEARCH_LIBREDRIBBON" == xyes ; then
    AC_SEARCH_LIBS([rrho_init], [redribbon],
 	    	    [LIBREDRIBBON_SOURCES=],
-		    [PKG_CFLAGS="$PKG_CFLAGS -I./credribbon-1.0/src/"])
+		    [PKG_CFLAGS="$PKG_CFLAGS -I./credribbon-1.1/src/"])
 else
-	PKG_CFLAGS="$PKG_CFLAGS -I./credribbon-1.0/src/"
+	PKG_CFLAGS="$PKG_CFLAGS -I./credribbon-1.1/src/"
 fi
 
 PKG_SOURCES=$(cd src ; ls *.c | tr '\n' ' ')
