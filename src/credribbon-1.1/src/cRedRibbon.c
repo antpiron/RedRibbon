@@ -2,6 +2,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <float.h>
+#include <math.h>
 
 #include "cRedRibbon.h"
 #include <ale.h>
@@ -236,11 +237,11 @@ mylogl(long double x)
   
   res = logl(x);
   
-  if ( isinfl(res) )
+  if ( isinf(res) )
     res = logl(LDBL_MIN);
   
   // LDBL_MIN == 3.36210314311209350626e-4932 (on x86); log = -4928.485
-  if ( isinfl(res) )
+  if ( isinf(res) )
     res = 4928.485;
 
   return res;
