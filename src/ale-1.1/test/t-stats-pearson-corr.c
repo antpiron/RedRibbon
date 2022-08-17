@@ -16,7 +16,7 @@ main(int argc, char *argv[argc])
   int ret;
 
   for (int i = 0 ; i < LEN ; i++)
-    x[i] = y[i] = 0.0d;
+    x[i] = y[i] = 0.0;
 
   ret = stats_pearson_corr(LEN, x, y, &res, &pvalue);
   ERROR_UNDEF_FATAL_FMT(-1 != ret, "FAIL: stats_stats_pearson_corr() == %d != -1\n", ret);

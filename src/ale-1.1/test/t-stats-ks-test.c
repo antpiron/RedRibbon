@@ -9,7 +9,7 @@
 double
 cdf(double x, void *cls)
 {
-  (cls);
+  (void)(cls);
   return stats_norm_F(x, 2, 1);
 }
 

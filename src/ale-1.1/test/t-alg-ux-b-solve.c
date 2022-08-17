@@ -32,7 +32,7 @@ main(int argc, char *argv[argc])
     for (size_t j = 0; j < n ; j++)
       {
 	double delta = fabs(((i == j)?1:0) - I[i][j]);
-	ERROR_UNDEF_FATAL_FMT(delta >= eps, "FAIL: alg_UX_B_solve() delta[%ld, %ld] != 0", i, j, delta);
+	ERROR_UNDEF_FATAL_FMT(delta >= eps, "FAIL: alg_UX_B_solve() delta[%zu, %zu] == %f != 0", i, j, delta);
       }
 
   return EXIT_SUCCESS;

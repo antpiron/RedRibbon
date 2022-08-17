@@ -49,6 +49,7 @@ process_popenp(const char *pathname, ...)
   size_t len;
   char *ptr = (char*) pathname;
   struct vector_ptr argv;
+  FILE *file;
   
   vector_ptr_init(&argv);
   
@@ -60,5 +61,8 @@ process_popenp(const char *pathname, ...)
     }
   va_end(ap);
 
-  return process_popenvp(pathname, argv.data);
+  file = process_popenvp(pathname, argv.data);
+  vector_ptr_destroy(&argv);
+  
+  return file;
 }

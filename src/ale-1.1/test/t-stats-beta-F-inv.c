@@ -5,7 +5,7 @@
 #include "ale/stats.h"
 #include "ale/math.h"
 
-const double eps = 0.00001d;
+const double eps = 0.00001;
 
 int
 main(int argc, char *argv[argc])

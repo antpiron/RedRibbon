@@ -29,7 +29,7 @@ main(int argc, char *argv[argc])
 
   next = string_split(&dst, next, ",", 0);
   ERROR_UNDEF_FATAL(next == NULL, "FATAL: string_split() returned NULL!\n");
-  ERROR_UNDEF_FATAL_FMT(*next != '\0', "FATAL: string_split() *next == %c != '\0' !\n", *next);
+  ERROR_UNDEF_FATAL_FMT(*next != '\0', "FATAL: string_split() *next == %c != '\\0' !\n", *next);
   ERROR_UNDEF_FATAL_FMT(0 != strcmp(dst.str, "cc"),
 			"FATAL: string_split() str == %s != 'cc' \n", dst.str);
 

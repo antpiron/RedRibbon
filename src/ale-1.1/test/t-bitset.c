@@ -91,7 +91,7 @@ main(int argc, char *argv[argc])
   bitset_cpy(&bs, &a);
   ERROR_FATAL_FMT(a.n != bs.n, "FAIL: bitset_cpy() a.n = %zu != %zu = bs.n", a.n, bs.n);
   for (int i = 0 ; i < (a.n + 63) / 64 ; i++)
-    ERROR_FATAL_FMT(a.buf[i] != bs.buf[i], "FAIL: bitset_cpy() a.buf[%zu] = %" PRId64 " != %" PRId64 " = bs.buf[%zu]\n", i, a.buf[i], bs.buf[i], i);
+    ERROR_FATAL_FMT(a.buf[i] != bs.buf[i], "FAIL: bitset_cpy() a.buf[%d] = %" PRId64 " != %" PRId64 " = bs.buf[%d]\n", i, a.buf[i], bs.buf[i], i);
 
   bitset_destroy(&bs);
   bitset_destroy(&a);
@@ -107,8 +107,8 @@ main(int argc, char *argv[argc])
   for (int i = 0 ; i < (a.n + 63) / 64 - 1 ; i++)
     {
       ERROR_FATAL_FMT(a.buf[i] != ~ bs.buf[i],
-		      "FAIL: bitset_not() a.buf[%zu] = %" PRIx64 " != ~ %" PRIx64 " = bs.buf[%zu] = %" PRIx64 "\n", i,
-		      a.buf[i], bs.buf[i],i, ~ bs.buf[i]);
+		      "FAIL: bitset_not() a.buf[%d] = %" PRIx64 " != ~ %" PRIx64 " = bs.buf[%d] = %" PRIx64 "\n", i,
+		      a.buf[i], bs.buf[i], i, ~ bs.buf[i]);
     }
   uint64_t exp = 0x00000000ffffffffull;
   ERROR_FATAL_FMT(bs.buf[last] != exp,
@@ -144,13 +144,13 @@ main(int argc, char *argv[argc])
 #define NBRSET (NBRBIT / 2)
   for (size_t i = 0 ; i < NBRSET ; i++)
     {
-      ERROR_FATAL_FMT( vec[i] >= NBRBIT, "FAIL: stats_shuffle() vec[%z] = %zu >= \n", i, vec[i], NBRBIT);
-      ERROR_FATAL_FMT( bitset_isset(&bs, vec[i]), "FAIL: stats_shuffle() vec[%z] is set.\n", i);
+      ERROR_FATAL_FMT( vec[i] >= NBRBIT, "FAIL: stats_shuffle() vec[%zu] = %zu >= %d\n", i, vec[i], NBRBIT);
+      ERROR_FATAL_FMT( bitset_isset(&bs, vec[i]), "FAIL: stats_shuffle() vec[%zu] is set.\n", i);
       bitset_set(&bs, vec[i]);
-      ERROR_FATAL_FMT( ! bitset_isset(&bs, vec[i]), "FAIL: stats_shuffle() vec[%z] is not set.\n", i);
+      ERROR_FATAL_FMT( ! bitset_isset(&bs, vec[i]), "FAIL: stats_shuffle() vec[%zu] is not set.\n", i);
     }
   ones = bitset_ones(&bs);
-  ERROR_FATAL_FMT(ones != NBRSET, "FAIL: bitset_iterate() bitset_ones = %z != %d\n", ones, NBRSET);
+  ERROR_FATAL_FMT(ones != NBRSET, "FAIL: bitset_iterate() bitset_ones = %zu != %d\n", ones, NBRSET);
   ones = 0;
   value = -1;
   while (1)

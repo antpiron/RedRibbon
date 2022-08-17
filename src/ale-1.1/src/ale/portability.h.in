@@ -52,7 +52,7 @@
 #ifndef M_PI
 # define M_PI 3.1415926535897932
 #endif
-  
+   
 int portability_posix_fadvise(int fd, off_t offset, off_t len, int advice);
 int portability_getrandom(void *buf, size_t buflen, unsigned int flags);
 

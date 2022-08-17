@@ -12,7 +12,7 @@ create_file(size_t m, size_t n, double mat[m][n])
 {
   FILE *file = tmpfile();
 
-  fprintf(file, "%s%zu", "col", 0);
+  fprintf(file, "%s%d", "col", 0);
   for (size_t j = 1 ; j < n ; j++)
     fprintf(file, "\t%s%zu", "col", j);
   fprintf(file, "\n");

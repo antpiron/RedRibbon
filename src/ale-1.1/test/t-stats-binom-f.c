@@ -33,7 +33,7 @@ main(int argc, char *argv[argc])
 
   res = stats_binom_f(250, 500, 0.5);
   ERROR_UNDEF_FATAL(isnan(res), "FAIL: stats_binom_f(250, 500, 0.5) == NaN\n");
-  exp = 3.56646455533490697176191019934776704758405685424805e-02d;
+  exp = 3.56646455533490697176191019934776704758405685424805e-02;
   delta = fabs(exp - res);
   ERROR_UNDEF_FATAL_FMT(delta >= eps, "FAIL: stats_binom_f(250, 500, 0.5) == %.30f != %.30f\n", res, exp);
 

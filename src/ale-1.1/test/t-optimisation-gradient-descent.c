@@ -52,8 +52,8 @@ main(int argc, char *argv[argc])
   ret = optimisation_gradient_descent(n, x, OPTIM_MIN, f, gradf, &shift);
   printf("shift = %e\n", shift);
   ERROR_FATAL(0 != ret, "FATAL:  optimisation_gradient_descent() != 0\n");
-  ERROR_UNDEF_FATAL_FMT(0 != ale_cmp_double(x[0], 0.0d, eps), "FATAL:  optimisation_gradient_descent() x[0] = %e != %e\n", x[0], shift);
-  ERROR_UNDEF_FATAL_FMT(0 != ale_cmp_double(x[1], 0.0d, eps), "FATAL:  optimisation_gradient_descent() x[1] = %e != %e\n", x[1], shift);
+  ERROR_UNDEF_FATAL_FMT(0 != ale_cmp_double(x[0], 0.0, eps), "FATAL:  optimisation_gradient_descent() x[0] = %e != %e\n", x[0], shift);
+  ERROR_UNDEF_FATAL_FMT(0 != ale_cmp_double(x[1], 0.0, eps), "FATAL:  optimisation_gradient_descent() x[1] = %e != %e\n", x[1], shift);
   printf("Solution: %e, %e\n", x[0], x[1]);
 
   shift = 1;

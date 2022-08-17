@@ -42,7 +42,7 @@ main(int argc, char *argv[argc])
   for (size_t i = 0 ; i < COUNT ; i++)
     {
       size_t k = stats_categorical_rand(LEN, cumul_p);
-      ERROR_UNDEF_FATAL_FMT(k >= LEN, "FAIL: stats_categorical_rand() = %zu >= %zu \n", k, LEN);
+      ERROR_UNDEF_FATAL_FMT(k >= LEN, "FAIL: stats_categorical_rand() = %zu >= %d \n", k, LEN);
       count[k]++;
       // printf("\n");
     }

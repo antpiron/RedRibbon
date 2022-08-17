@@ -81,12 +81,12 @@
   stats_beta_fit_mle_newton##SUFFIX(size_t n, const TYPE x[n], TYPE *alpha, TYPE *beta) \
   {									\
     TYPE grad[2], H[2][2], H1[2][2], p[2], y[2];			\
-    TYPE sum_ln_x = 0, sum_ln_1x = 0;					\
+    TYPE sum_ln_x = 0 /*, sum_ln_1x = 0 */;				\
 									\
     for (size_t i = 0 ; i < n ; i++)					\
       {									\
 	sum_ln_x += log(x[i]);						\
-	sum_ln_1x += log(1 - x[i]);					\
+	/* sum_ln_1x += log(1 - x[i]); */				\
       }									\
     									\
     stats_beta_fit_mm##SUFFIX(n, x, alpha, beta);			\

@@ -10,7 +10,7 @@
 #include <math.h>
 
 #define ORDER 16
-#define EPS (0.0000000001d)
+#define EPS (0.0000000001)
 
 double
 predict_1(size_t i, double x, void *cls)
@@ -60,7 +60,7 @@ main(int argc, char *argv[argc])
           sort_compar_double, NULL);
   // print_v(LEN, res);
   for (size_t i = 0 ; i < 4 ; i++) 
-    ERROR_UNDEF_FATAL_FMT(0 != ale_cmp_double(res[i], -1, EPS), "FAIL: 1, res.sorted[%zu] = %f != %f\n", i, res[i], -1); 
+    ERROR_UNDEF_FATAL_FMT(0 != ale_cmp_double(res[i], -1, EPS), "FAIL: 1, res.sorted[%zu] = %f != %d\n", i, res[i], -1); 
   for (size_t i = 4 ; i < LEN ; i++) 
     ERROR_UNDEF_FATAL_FMT(res[i] < 0 || res[i] >= LEN, "FAIL: 2, res.sorted[%zu] = %f\n", i, res[i]); 
 

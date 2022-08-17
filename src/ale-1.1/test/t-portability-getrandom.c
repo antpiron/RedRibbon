@@ -24,7 +24,7 @@ main(int argc, char *argv[argc])
     {
       ret = portability_getrandom(&r, sizeof(r), 0);
       ERROR_UNDEF_FATAL_FMT(ret != sizeof(r),
-			    "ret = %d != %d\n", sizeof(r), ret);
+			    "ret = %zu != %d\n", (size_t) sizeof(r), ret);
 
       sum[r >> SHIFT] += 1;
       sum[(r >> (SHIFT - BITS)) & 0xFFl ] += 1;

@@ -13,55 +13,55 @@ main(int argc, char *argv[argc])
 
   res = stats_hyper_F(5, 5, 5, 10);
   ERROR_UNDEF_FATAL(isnan(res), "FAIL: stats_hyper_F(5, 5, 5, 10) == NaN\n");
-  exp = 1.0d;
+  exp = 1.0;
   delta = fabs(exp - res);
   ERROR_UNDEF_FATAL_FMT(delta >= eps, "FAIL: stats_hyper_F(5, 5, 5, 10) == %f != %f\n", res, exp);
 
   res = stats_hyper_F(6, 5, 5, 10);
   ERROR_UNDEF_FATAL(isnan(res), "FAIL: stats_hyper_F(6, 5, 5, 10) == NaN\n");
-  exp = 1.0d;
+  exp = 1.0;
   delta = fabs(exp - res);
   ERROR_UNDEF_FATAL_FMT(delta >= eps, "FAIL: stats_hyper_F(6, 5, 5, 10) == %f != %f\n", res, exp);
 
   res = stats_hyper_F(-1, 5, 5, 10);
   ERROR_UNDEF_FATAL(isnan(res), "FAIL: stats_hyper_F(-1, 5, 5, 10) == NaN\n");
-  exp = 0.0d;
+  exp = 0.0;
   delta = fabs(exp - res);
   ERROR_UNDEF_FATAL_FMT(delta >= eps, "FAIL: stats_hyper_F(-1, 5, 5, 10) == %f != %f\n", res, exp);
 
   res = stats_hyper_F(0, 5, 5, 10);
   ERROR_UNDEF_FATAL(isnan(res), "FAIL: stats_hyper_F(0, 5, 5, 10) == NaN\n");
-  exp = 3.96825396825396803368590781246894039213657379150391e-03d;
+  exp = 3.96825396825396803368590781246894039213657379150391e-03;
   delta = fabs(exp - res);
   ERROR_UNDEF_FATAL_FMT(delta >= eps, "FAIL: stats_hyper_F(0, 5, 5, 10) == %.20f != %.20f\n", res, exp);
 
   res = stats_hyper_F(1, 5, 5, 10);
   ERROR_UNDEF_FATAL(isnan(res), "FAIL: stats_hyper_F(1, 5, 5, 10) == NaN\n");
-  exp = 1.03174603174603099486894564051908673718571662902832e-01d;
+  exp = 1.03174603174603099486894564051908673718571662902832e-01;
   delta = fabs(exp - res);
   ERROR_UNDEF_FATAL_FMT(delta >= eps, "FAIL: stats_hyper_F(1, 5, 5, 10) == %.20f != %.20f\n", res, exp);
 
   res = stats_hyper_F(2, 5, 5, 10);
   ERROR_UNDEF_FATAL(isnan(res), "FAIL: stats_hyper_F(2, 5, 5, 10) == NaN\n");
-  exp = 4.99999999999999833466546306226518936455249786376953e-01d;
+  exp = 4.99999999999999833466546306226518936455249786376953e-01;
   delta = fabs(exp - res);
   ERROR_UNDEF_FATAL_FMT(delta >= eps, "FAIL: stats_hyper_F(2, 5, 5, 10) == %.20f != %.20f\n", res, exp);
 
   res = stats_hyper_F(4, 5, 5, 10);
   ERROR_UNDEF_FATAL(isnan(res), "FAIL: stats_hyper_F(2, 5, 5, 10) == NaN\n");
-  exp = 9.96031746031746045844101900001987814903259277343750e-01d;
+  exp = 9.96031746031746045844101900001987814903259277343750e-01;
   delta = fabs(exp - res);
   ERROR_UNDEF_FATAL_FMT(delta >= eps, "FAIL: stats_hyper_F(4, 5, 5, 10) == %.20f != %.20f\n", res, exp);
 
   res = stats_hyper_F(10000000, 5, 1, 10000000);
   ERROR_UNDEF_FATAL(isnan(res), "FAIL: stats_hyper_F(10000000, 5, 1, 10000000) == NaN\n");
   delta = fabs(exp - res);
-  eps = 1.0d;
+  eps = 1.0;
   ERROR_UNDEF_FATAL_FMT(delta >= eps, "FAIL: stats_hyper_F(10000000, 5, 1, 10000000) == %.20f != %.20f\n", res, exp);
 
   res = stats_hyper_F(0, 5, 1, 10000000);
   ERROR_UNDEF_FATAL(isnan(res), "FAIL: stats_hyper_F(0, 5, 1, 10000000) == NaN\n");
-  exp = 0.9999995d;
+  exp = 0.9999995;
   delta = fabs(exp - res);
   eps = 1e-7;
   ERROR_UNDEF_FATAL_FMT(delta >= eps, "FAIL: stats_hyper_F(0, 5, 1, 10000000) == %.20f != %.20f\n", res, exp);

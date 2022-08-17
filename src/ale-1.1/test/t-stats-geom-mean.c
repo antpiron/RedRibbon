@@ -19,13 +19,13 @@ main(int argc, char *argv[argc])
     x[i] = 1;
   
   res = stats_geom_mean(LEN, x);
-  ERROR_UNDEF_FATAL_FMT(0 != ale_cmp_double(res, 1.0d, eps), "FAIL: stats_geom_mean(1) == %f != 0.0\n", res);
+  ERROR_UNDEF_FATAL_FMT(0 != ale_cmp_double(res, 1.0, eps), "FAIL: stats_geom_mean(1) == %f != 0.0\n", res);
 
   for (int i = 0 ; i < LEN ; i++)
     x[i] = exp(i + 1);
 
   res = stats_geom_mean(LEN, x);
-  expect = exp(LEN * (LEN + 1.0d) / 2.0d / LEN);
+  expect = exp(LEN * (LEN + 1.0) / 2.0 / LEN);
   ERROR_UNDEF_FATAL_FMT(0 != ale_cmp_double(res, expect, eps),
 			"FAIL: stats_geom_mean(i++) == %f != %f\n", res, expect);
   

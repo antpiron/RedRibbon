@@ -26,7 +26,7 @@ main(int argc, char *argv[argc])
       ERROR_UNDEF_FATAL_FMT(0 != (ret = hash_int_set(&hash, i, i, &val)), "FATAL: hash_int_set(%d) returned %d\n", i, ret);
     }
   clock_gettime(CLOCK_MONOTONIC, &et);
-  diff = (et.tv_sec - st.tv_sec) + (et.tv_nsec - st.tv_nsec) / 1e9d;
+  diff = (et.tv_sec - st.tv_sec) + (et.tv_nsec - st.tv_nsec) / 1e9;
   rate = MAX_INSERT / (diff * 1000 * 1000);
         
   printf("\nSet %12.2F MKeys/sec",rate);
@@ -39,7 +39,7 @@ main(int argc, char *argv[argc])
       ERROR_UNDEF_FATAL_FMT(i != val, "FATAL: hash_int_get(%d) value == %d != %d\n", i, val, i);
     }
   clock_gettime(CLOCK_MONOTONIC, &et);
-  diff = (et.tv_sec - st.tv_sec) + (et.tv_nsec - st.tv_nsec) / 1e9d;
+  diff = (et.tv_sec - st.tv_sec) + (et.tv_nsec - st.tv_nsec) / 1e9;
   rate = MAX_INSERT / (diff * 1000 * 1000);
         
   printf("\nGet %12.2F MKeys/sec", rate);
@@ -53,7 +53,7 @@ main(int argc, char *argv[argc])
       ERROR_UNDEF_FATAL_FMT(i != val, "FATAL: hash_int_delete(%d) value == %d != %d\n", i, val, i);
     }
   clock_gettime(CLOCK_MONOTONIC, &et);
-  diff = (et.tv_sec - st.tv_sec) + (et.tv_nsec - st.tv_nsec) / 1e9d;
+  diff = (et.tv_sec - st.tv_sec) + (et.tv_nsec - st.tv_nsec) / 1e9;
   rate = MAX_INSERT / (diff * 1000 * 1000);
         
   printf("\nDel %12.2F MKeys/sec",rate);

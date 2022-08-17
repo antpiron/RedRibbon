@@ -22,7 +22,7 @@ main(int argc, char *argv[argc])
       res += stats_unif_std_rand();
     }
   clock_gettime(CLOCK_MONOTONIC, &et);
-  diff = (et.tv_sec - st.tv_sec) + (et.tv_nsec - st.tv_nsec) / 1e9d;
+  diff = (et.tv_sec - st.tv_sec) + (et.tv_nsec - st.tv_nsec) / 1e9;
   rate = MAX_INSERT / (diff * 1000 * 1000);
         
   printf("\nGenerated %12.2F MNumbers/sec, mean = %6.3f\n", rate, res / MAX_INSERT);

@@ -25,7 +25,7 @@ main(int argc, char *argv[argc])
 
 
   for (ssize_t i = 0 ; i < SIZE ; i++)
-    ERROR_UNDEF_FATAL_FMT(index[i] >= SIZE, "FAIL: index[%zu] = %zu >= %zu\n", i, index[i], SIZE);
+    ERROR_UNDEF_FATAL_FMT(index[i] >= SIZE, "FAIL: index[%zd] = %zu >= %d\n", i, index[i], SIZE);
 
   for (ssize_t i = 1 ; i < SIZE ; i++)
     {
@@ -42,7 +42,7 @@ main(int argc, char *argv[argc])
 
 
   for (ssize_t i = 0 ; i < SIZE ; i++)
-    ERROR_UNDEF_FATAL_FMT(index[i] >= SIZE, "FAIL: index[%zu] = %zu >= %zu\n", i, index[i], SIZE);
+    ERROR_UNDEF_FATAL_FMT(index[i] >= SIZE, "FAIL: index[%zu] = %zu >= %d\n", i, index[i], SIZE);
 
   for (ssize_t i = 1 ; i < SIZE ; i++)
     {

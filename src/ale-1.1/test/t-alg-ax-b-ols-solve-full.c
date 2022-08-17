@@ -362,7 +362,7 @@ F-statistic: 0.3053 on 2 and 3 DF,  p-value: 0.7574
   gen_model("correlation with intercept", 20, 3, 3,
 	    ARG_INTERCEPT, 1,
 	    ARG_B_MODE, B_MODE_CORRELATED,
-	    ARG_ERROR_SD, 1.0d,
+	    ARG_ERROR_SD, 1.0,
 	    ARG_TEST_R2, (double[3]) { 1, 1, 1},
 	    ARG_TEST_FSTAT_PVALUE, (double[3]) { 0, 0, 0 },
 	    ARG_END);

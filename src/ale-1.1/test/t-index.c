@@ -34,7 +34,7 @@ main(int argc, char *argv[argc])
   
   res = index_get(&index, "Plop!");
   ERROR_UNDEF_FATAL(-1 == res, "FAIL: index_get(Plop!) res = -1\n");
-  ERROR_UNDEF_FATAL_FMT(0 != res, "FAIL: index_set(Plop!) res = %z != 0\n", res);
+  ERROR_UNDEF_FATAL_FMT(0 != res, "FAIL: index_set(Plop!) res = %zd != 0\n", res);
 
   res = index_get(&index, "Plip!");
   ERROR_UNDEF_FATAL(-1 == res, "FAIL: index_get(Plip!) res = -1\n");

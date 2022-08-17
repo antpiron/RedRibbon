@@ -77,7 +77,7 @@
   stats_poisson_rand_pa##SUFFIX(TYPE lambda)				\
   {									\
     const TYPE c = 0.767 - 3.36 / lambda;				\
-    const TYPE beta = M_PI##SUFFIX / sqrt##SUFFIX(3 * lambda);		\
+    const TYPE beta = M_PI / sqrt##SUFFIX(3 * lambda);			\
     const TYPE alpha = beta * lambda;					\
     const TYPE k = log##SUFFIX(c) - lambda - log##SUFFIX(beta);		\
     const TYPE llambda = log##SUFFIX(lambda);				\

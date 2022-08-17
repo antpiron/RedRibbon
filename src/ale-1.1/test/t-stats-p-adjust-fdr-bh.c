@@ -19,7 +19,7 @@ main(int argc, char *argv[argc])
     p[i] = p[i-1] + 0.001;
 
   res = stats_p_adjust_fdr_bh(LEN, p, padj);
-  ERROR_UNDEF_FATAL_FMT(res < 0, "FAIL: stats_p_adjust_fdr_bh()  res = %d != 0\n", res);
+  ERROR_UNDEF_FATAL_FMT(res < 0, "FAIL: stats_p_adjust_fdr_bh()  res = %f != 0\n", res);
   for (int i = 0 ; i < LEN ; i++)
     {
       printf("%f ", padj[i]);
@@ -34,7 +34,7 @@ main(int argc, char *argv[argc])
     p[i] = 0.1;
 
   res = stats_p_adjust_fdr_bh(LEN, p, padj);
-  ERROR_UNDEF_FATAL_FMT(res < 0, "FAIL: stats_p_adjust_fdr_bh()  res = %d != 0\n", res);
+  ERROR_UNDEF_FATAL_FMT(res < 0, "FAIL: stats_p_adjust_fdr_bh()  res = %f != 0\n", res);
 
   ERROR_UNDEF_FATAL_FMT(fabs(padj[0] - 0.5) > eps, "FAIL: stats_p_adjust_fdr_bh()  padj[0] = %f != \n", padj[0]);
   for (int i = 1 ; i < LEN ; i++)
@@ -42,7 +42,7 @@ main(int argc, char *argv[argc])
       printf("%f ", padj[i]);
       ERROR_UNDEF_FATAL_FMT(p[i] > padj[i] , "FAIL: stats_p_adjust_fdr_bh()  padj[%d] = %f < %f\n", i, padj[i], p[i]);
       ERROR_UNDEF_FATAL_FMT(padj[i] > 1 + eps, "FAIL: stats_p_adjust_fdr_bh()  padj[%d] = %f > 1\n", i, padj[i]);
-      exp = 0.1d * LEN / 99.0d;
+      exp = 0.1 * LEN / 99.0;
       ERROR_UNDEF_FATAL_FMT(fabs(padj[i] - exp) > eps,
 			    "FAIL: stats_p_adjust_fdr_bh()  padj[%d] = %f != %f\n", i, padj[i], exp);
     }
@@ -55,7 +55,7 @@ main(int argc, char *argv[argc])
     p[i] = p[i-1] + 0.001;
 
   res = stats_p_adjust_fdr_bh(n, p, padj);
-  ERROR_UNDEF_FATAL_FMT(res < 0, "FAIL: stats_p_adjust_fdr_bh()  res = %d != 0\n", res);
+  ERROR_UNDEF_FATAL_FMT(res < 0, "FAIL: stats_p_adjust_fdr_bh()  res = %f != 0\n", res);
 
   for (int i = 0 ; i < n && exp_val[i] >= 0 ; i++)
     {

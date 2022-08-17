@@ -24,18 +24,14 @@ main(int argc, char *argv[argc])
 			res);
 
   res = ale_ibeta(0.99999, 1, 3);
-  ERROR_UNDEF_FATAL_FMT(isnan(res),
-			"FAIL: ale_ibeta(0.99999,1,3) == NaN\n",
-			res);
+  ERROR_UNDEF_FATAL(isnan(res), "FAIL: ale_ibeta(0.99999,1,3) == NaN\n");
   delta = fabs(res-1);
   ERROR_UNDEF_FATAL_FMT(delta >= eps,
 			"FAIL: ale_ibeta(0.99999,1,3) == %f != 1\n",
 			res);
 
   res = ale_ibeta(0.000001, 1, 3);
-  ERROR_UNDEF_FATAL_FMT(isnan(res),
-			"FAIL: ale_ibeta(0.000001,1,3) == NaN\n",
-			res);
+  ERROR_UNDEF_FATAL(isnan(res), "FAIL: ale_ibeta(0.000001,1,3) == NaN\n");
   delta = fabs(res);
   ERROR_UNDEF_FATAL_FMT(delta >= eps,
 			"FAIL: ale_ibeta(0.000001,1,3) == %f != 0\n",
@@ -43,9 +39,7 @@ main(int argc, char *argv[argc])
 
   
   res = ale_ibeta(0.5, 1, 3);
-  ERROR_UNDEF_FATAL_FMT(isnan(res),
-			"FAIL: ale_ibeta(0.5,1,3) == NaN\n",
-			res);
+  ERROR_UNDEF_FATAL(isnan(res), "FAIL: ale_ibeta(0.5,1,3) == NaN\n");
   delta = fabs(res-0.875);
   ERROR_UNDEF_FATAL_FMT(delta >= eps,
 			"FAIL: ale_ibeta(0.5,1,3) == %f != 0.875\n",

@@ -19,7 +19,7 @@ main(int argc, char *argv[argc])
     p[i] = p[i-1] + 0.001;
 
   res = stats_p_adjust_fwer_bonf(LEN, p, padj);
-  ERROR_UNDEF_FATAL_FMT(res < 0, "FAIL: stats_p_adjust_fdr_bh()  res = %d != 0\n", res);
+  ERROR_UNDEF_FATAL_FMT(res < 0, "FAIL: stats_p_adjust_fdr_bh()  res = %f != 0\n", res);
   exp = 0;
   for (int i = 0 ; i < LEN ; i++)
     {
@@ -28,7 +28,7 @@ main(int argc, char *argv[argc])
       ERROR_UNDEF_FATAL_FMT(padj[i] > 1 + eps, "FAIL: stats_p_adjust_fwer_bonf()  padj[%d] = %f > 1\n", i, padj[i]);
 
       exp += 0.1;
-      exp = (exp > 1.0d)? 1.0d : exp;
+      exp = (exp > 1.0)? 1.0 : exp;
       diff = fabs(padj[i] - exp);
       ERROR_UNDEF_FATAL_FMT(diff > eps,
 			    "FAIL: stats_p_adjust_fwer_bonf()  padj[%d] = %f != 0.1\n", i, padj[i]);

@@ -47,7 +47,7 @@ main(int argc, char *argv[argc])
       ERROR_UNDEF_FATAL_FMT(ret < 0, "FAIL: alg_AX_B_OLS_solve() ret = %d\n != 0", ret);
       
       clock_gettime(CLOCK_MONOTONIC, &et);
-      diff = (et.tv_sec - st.tv_sec) + (et.tv_nsec - st.tv_nsec) / 1e9d;
+      diff = (et.tv_sec - st.tv_sec) + (et.tv_nsec - st.tv_nsec) / 1e9;
   
       printf("Solved A[%7zu, %3zu] X[%7zu, %3zu] = B[%7zu, %3zu] in %6.3f seconds\n", m, n, n, p, m, p, diff);
 

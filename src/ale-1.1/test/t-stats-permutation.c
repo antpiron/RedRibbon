@@ -8,7 +8,7 @@
 #include "ale/math.h"
 #include <math.h>
 
-#define EPS (0.0000000001d)
+#define EPS (0.0000000001)
 
 
 int

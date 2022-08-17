@@ -12,7 +12,7 @@ create_file(size_t m, size_t n, double mat[m][n])
 {
   FILE *file = tmpfile();
 
-  fprintf(file, "%s%zu", "col", 0);
+  fprintf(file, "%s%d", "col", 0);
   for (size_t j = 1 ; j < n ; j++)
     fprintf(file, "\t%s%zu", "col", j);
   fprintf(file, "\n");
@@ -66,8 +66,8 @@ main(int argc, char *argv[argc])
 
   ret = matrix_filter_rows(&dst, &src, filter, NULL);
   ERROR_FATAL(-1 == ret, "FAIL: matrix_filter_rows() returned -1\n");
-  ERROR_UNDEF_FATAL_FMT(2 != dst.m, "FAIL: matrix_filter_rows() dst.m = %zu != %zu\n", dst.m, 2);
-  ERROR_UNDEF_FATAL_FMT(3 != dst.n, "FAIL: matrix_filter_rows() dst.n = %zu != %zu\n", dst.n, 3);
+  ERROR_UNDEF_FATAL_FMT(2 != dst.m, "FAIL: matrix_filter_rows() dst.m = %zu != %d\n", dst.m, 2);
+  ERROR_UNDEF_FATAL_FMT(3 != dst.n, "FAIL: matrix_filter_rows() dst.n = %zu != %d\n", dst.n, 3);
 
   char *rowname = index_rget(&dst.rownames, 0);
   ERROR_UNDEF_FATAL(NULL == rowname, "FAIL: index_rget(0) = NULL\n");
@@ -78,11 +78,11 @@ main(int argc, char *argv[argc])
   ERROR_UNDEF_FATAL_FMT(0 != strcmp(rowname,"row2"), "FAIL: index_rget(1) = %s != 'row2'\n", rowname);
 
   ssize_t index = index_get(&dst.rownames, "row1");
-  ERROR_UNDEF_FATAL_FMT(-1 != index, "FAIL: index_get(row1) = %z != -1\n", index);
+  ERROR_UNDEF_FATAL_FMT(-1 != index, "FAIL: index_get(row1) = %zd != -1\n", index);
   index = index_get(&dst.rownames, "row0");
-  ERROR_UNDEF_FATAL_FMT(0 != index, "FAIL: index_get(row0) = %z != -1\n", index);
+  ERROR_UNDEF_FATAL_FMT(0 != index, "FAIL: index_get(row0) = %zd != -1\n", index);
   index = index_get(&dst.rownames, "row2");
-  ERROR_UNDEF_FATAL_FMT(1 != index, "FAIL: index_get(row2) = %z != -1\n", index);
+  ERROR_UNDEF_FATAL_FMT(1 != index, "FAIL: index_get(row2) = %zd != -1\n", index);
 
   for (size_t i = 0 ; i  < n ; i++)
     {

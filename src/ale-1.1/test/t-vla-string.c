@@ -38,7 +38,7 @@ main(int argc, char *argv[argc])
   ERROR_UNDEF_FATAL_FMT(4 != str1.len, "FATAL: string_append_c_raw() len = %zu != 4\n", str1.len);
   ERROR_UNDEF_FATAL_FMT(0 != memcmp(str1.str, "a\0b\0", 5),
 			"FATAL: string_append_c_raw() str1 = %*"SCNu8" != %*"SCNu8"\n",
-			str1.len, str1.str, 5, "a\0b\0");
+			(int) str1.len, *str1.str, 5, *"a\0b\0");
   
   string_destroy(&str1);
   string_destroy(&str2);
