@@ -24,7 +24,7 @@ R CMD INSTALL RedRibbon_0.2-1.tar.gz
 ```
 
 
-## For advanced user (For shared installation, required root)
+## For advanced user (For shared installation, require root)
 
 The two C librairies can independently be installed before installing the R package. The R package will automatically detect those dependencies if present.
 
