@@ -54,8 +54,8 @@ sudo make install
 Install `cRedRibbon` C library
 
 ```
-tar xvzf credribbon-1.0.tar.gz
-cd credribbon-1.0
+tar xvzf  credribbon-1.1.tar.gz
+cd credribbon-1.1
 ./configure
 make
 sudo make install
