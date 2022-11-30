@@ -37,7 +37,7 @@ sudo apt-get install libgomp1
 If not installed, while the libraries will be totally functionnal, no parallel execution will be available.
 
 
-Download official release of the [`ale`]( https://github.com/antpiron/ale) and
+Download official release of the [`ale`](https://github.com/antpiron/ale) and
 [`cRedRibbon`](https://github.com/antpiron/cRedRibbon) C libraries.
 
 
@@ -105,7 +105,7 @@ df[quad$downdown$positions,]
 
 # Citation
 
-Please cite the biorxiv pre-print
+Please cite the [biorxiv pre-print](https://doi.org/10.1101/2022.08.31.505818),
 
 ```
 RedRibbon: A new rank-rank hypergeometric overlap pipeline to compare gene and transcript expression signatures
