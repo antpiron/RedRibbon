@@ -65,7 +65,7 @@ Rermark: if the libraries are not automaticaly detected, `sudo ldconfig /usr/loc
 
 # Documentation
 
-A R vignette is available. for the whole documentation, run in R
+A R vignette is available. For the whole documentation with fully reproducible examples, run in R
 
 ```R
 vignette("RedRibbon")
