@@ -65,7 +65,7 @@ Rermark: if the libraries are not automaticaly detected, `sudo ldconfig /usr/loc
 
 # Documentation
 
-A R vignette is available. For the whole documentation with fully reproducible examples, run in R
+A [R vignette with fully reproducible examples is available here](https://antpiron.github.io/RedRibbon.html). You can also open it from R with
 
 ```R
 vignette("RedRibbon")
