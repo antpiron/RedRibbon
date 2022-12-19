@@ -125,7 +125,7 @@ compat$hypermat %>%
 # Using and computing correlation between genes to compute adjusted p-value
 
 Create an artificial expression matrix of n.genes by n.samples with a some fold change between
-non treated and treated conditions. Add r genes correlated,
+non treated and treated conditions. Add r correlated genes,
 
 ```{r correlation dataset} 
 gen.expression.matrix <- function (n.genes, n.samples, fc=NULL, r = NULL)
