@@ -20,12 +20,11 @@ knitr::opts_chunk$set(
 
 RedRibbon is fast and accurate rank-rank hypergeometric overlap library. 
 
-# Synthetic dataset
+# Synthetic data set
 
+RedRibbon will be applied to a synthetic data set (and later to a real data set see section `Real data set`) in this vignette for demonstration purpose.
 
-First, we prepare a synthetic dataset in a data.frame `df` for demonstration purpose. RedRibbon will be applied to this dataset in this vignette.
-
-The column `a` and `b` are mandatory. Those column are the two lists over which the rank-rank hyper-geometric overlap is run.
+We build a data.frame with the mandatory `a` and `b` columns. Those columns are the two lists over which the rank-rank hyper-geometric overlap is run.
 
 ```{r dataset, results='hide'}
 n <- 1000
@@ -171,6 +170,33 @@ gg <- ggRedRibbon(rr, quadrants=quad) + coord_fixed(ratio = 1)
 gg
 
 ```
+
+# Real data set
+
+We load a real dataset ([from this analysis](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE159984))
+
+```{r mergeT2DD8PG}
+data("T2D-D8PG", package = "RedRibbon")
+
+df.real <- merge(T2DvsCTL[, c("ensembl_id", "log2FoldChange")],
+                 D8PGvsCTL[, c("ensembl_id", "log2FoldChange")],
+		 by = "ensembl_id")
+colnames(df.real) <- c("id", "a", "b")
+head(df.real) %>%
+  kbl() %>%
+  kable_styling()
+```
+
+Then, RedRibbon is run
+
+```{r RedRibbonT2DD8PG}
+rr <- RedRibbon(df.real, enrichment_mode="hyper-two-tailed")
+quad <- quadrants(rr, algorithm="ea", permutation=TRUE, whole=FALSE)
+gg <- ggRedRibbon(rr, quadrants=quad, labels = c("T2D vs CTL", "D8PG vs CTL")) + coord_fixed(ratio = 1)
+gg
+
+```
+
 
 # sessionInfo()
 
