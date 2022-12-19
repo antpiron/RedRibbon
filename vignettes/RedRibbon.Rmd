@@ -13,7 +13,11 @@ vignette: >
 library(kableExtra)
 knitr::opts_chunk$set(
   collapse = TRUE,
-  comment = "#>"
+  comment = "#>",
+  out.width = "80%",
+  fig.width = 8,
+  fig.height = 8,
+  fig.align = "center"
 )
 ```
 # Introduction
@@ -166,7 +170,8 @@ Now, use it in RedRibbon,
 ```{r use correlation} 
 rr <- RedRibbon(df, enrichment_mode="hyper-two-tailed", correlation=c.obj)
 quad <- quadrants(rr, algorithm="ea", permutation=TRUE, whole=FALSE)
-gg <- ggRedRibbon(rr, quadrants=quad) + coord_fixed(ratio = 1)
+gg <- ggRedRibbon(rr, quadrants=quad) +
+   coord_fixed(ratio = 1)
 gg
 
 ```
@@ -192,7 +197,10 @@ Then, RedRibbon is run
 ```{r RedRibbonT2DD8PG}
 rr <- RedRibbon(df.real, enrichment_mode="hyper-two-tailed")
 quad <- quadrants(rr, algorithm="ea", permutation=TRUE, whole=FALSE)
-gg <- ggRedRibbon(rr, quadrants=quad, labels = c("T2D vs CTL", "D8PG vs CTL")) + coord_fixed(ratio = 1)
+gg <- ggRedRibbon(rr, quadrants=quad,
+      		  labels = c("T2D vs CTL", "D8PG vs CTL"),
+		  repel.force = 250) +
+   coord_fixed(ratio = 1, clip = "off")
 gg
 
 ```
