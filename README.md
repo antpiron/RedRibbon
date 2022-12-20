@@ -8,29 +8,29 @@ This procedure have been tested on debian/ubuntu but should work on any linux di
 
 ## Directly from Github
 
-In R, run
+In R, just run
 
-```
+```R
 devtools::install_github("antpiron/RedRibbon")
 ```
 
 
 ## Alternative installation method from the tar.gz released package
 
-In R, download RedRibbon_0.2-1.tar.gz on github, and then the run
+In R, download RedRibbon_0.3-1.tar.gz on github, and then the run
 
+```bash
+R CMD INSTALL RedRibbon_0.3-1.tar.gz
 ```
-R CMD INSTALL RedRibbon_0.2-1.tar.gz
-```
 
 
-## For advanced user (For shared installation, require root)
+## For advanced users only: C librairies if you plan to program in C (require root)
 
-The two C librairies can independently be installed before installing the R package. The R package will automatically detect those dependencies if present.
+If you plan to program in C, standalone librairies can be installed.
 
 We recommend the installation of GCC OpenMP support, the `GOMP` library. For Debian/Ubuntu:
 
-```
+```R
 sudo apt-get install libgomp1
 ```
 
@@ -43,7 +43,7 @@ Download official release of the [`ale`](https://github.com/antpiron/ale) and
 
 Install `ale` C library
 
-```
+```bash
 tar xvzf ale-1.1.tar.gz
 cd ale-1.1
 ./configure
@@ -53,13 +53,15 @@ sudo make install
 
 Install `cRedRibbon` C library
 
-```
+```bash
 tar xvzf  credribbon-1.1.tar.gz
 cd credribbon-1.1
 ./configure
 make
 sudo make install
 ```
+
+If the two C librairies are installed, the R package installation process will automatically detect those and link to those.
 
 Rermark: if the libraries are not automaticaly detected, `sudo ldconfig /usr/local/lib/` might be necessary to run in order to update links and cache to the shared libraries.
 
@@ -96,7 +98,7 @@ rr <- RedRibbon(df, enrichment_mode="hyper-two-tailed")
 quad <- quadrants(rr, algorithm="ea", permutation=TRUE, whole=FALSE)
 
 ## Plots the results
-ggRedRibbon(rr, quadrants=quad) + coord_fixed(ratio = 1)
+ggRedRibbon(rr, quadrants=quad) + coord_fixed(ratio = 1, clip = "off")
 
 ## Get the down-down quandrant list of genes
 df[quad$downdown$positions,]
@@ -107,7 +109,7 @@ df[quad$downdown$positions,]
 
 Please cite the [biorxiv pre-print](https://doi.org/10.1101/2022.08.31.505818),
 
-```
+```text
 RedRibbon: A new rank-rank hypergeometric overlap pipeline to compare gene and transcript expression signatures
 Anthony Piron, Florian Szymczak, Maria Inês Alvelos, Matthieu Defrance, Tom Lenaerts, Décio L. Eizirik, Miriam Cnop
 bioRxiv 2022.08.31.505818; doi: https://doi.org/10.1101/2022.08.31.505818 
