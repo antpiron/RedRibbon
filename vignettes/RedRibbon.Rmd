@@ -78,7 +78,9 @@ quad <- quadrants(rr, algorithm="ea", permutation=TRUE, whole=FALSE)
 Plots the results,
 
 ```{r ggplot}
-gg <- ggRedRibbon(rr, quadrants=quad) + coord_fixed(ratio = 1)
+gg <- ggRedRibbon(rr, quadrants=quad,
+		  repel.force = 250) +
+		  coord_fixed(ratio = 1, clip = "off")
 gg
 ```
 
@@ -170,8 +172,9 @@ Now, use it in RedRibbon,
 ```{r use correlation} 
 rr <- RedRibbon(df, enrichment_mode="hyper-two-tailed", correlation=c.obj)
 quad <- quadrants(rr, algorithm="ea", permutation=TRUE, whole=FALSE)
-gg <- ggRedRibbon(rr, quadrants=quad) +
-   coord_fixed(ratio = 1)
+gg <- ggRedRibbon(rr, quadrants=quad,
+		  repel.force = 250) +
+   coord_fixed(ratio = 1, clip = "off")
 gg
 
 ```
