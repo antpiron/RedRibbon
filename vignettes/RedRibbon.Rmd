@@ -133,14 +133,14 @@ compat$hypermat
 ```
 ```{r hypermat2, echo=FALSE}
 compat$hypermat %>%
-  kbl() %>%
+  kbl(digits = 2) %>%
   kable_styling()
 ```
 
 
 ## Using and computing correlation between genes
 
-To demonstrate how we use the correlation of expression between genes, we will generate an artificial expression matrix of `n.genes x n.samples` associated to a fold change between the 2 conditions (e.g., treated vs non-treated samples).
+To demonstrate how we use the correlation of expression between genes, we will generate an artificial expression matrix of `n.genes x n.samples` associated to a fold change between the 2 conditions (e.g., treated vs non-treated samples). The first five genes are perfectly correlated.
 
 ```{r correlation dataset} 
 gen.expression.matrix <- function (n.genes, n.samples, fc=NULL, r = NULL)
@@ -155,21 +155,25 @@ gen.expression.matrix <- function (n.genes, n.samples, fc=NULL, r = NULL)
 		         mat.non.treated,
 		         mat.treated)
 	if ( ! is.null(r) )
-		mat[1:length(r), ] <- tail(mat, length(r)) * r + (1-abs(r)) * head(mat, length(r))
+	{
+           for (i in 2:(length(r)+1) )
+	     {
+	        mat[i, ] <- mat[1,] * r[i-1] + (1-abs(r[i-1])) * mat[i, ]
+	     }	
+	}
     mat
 }
 
 n <- 50
 n.frac <- 5
-fc_a <- c(rnorm(n-n.frac), rep(-2, n.frac))
-fc_b <- c(rnorm(n-n.frac), rep(-2, n.frac))
+fc_a <- c(rep(-2, n.frac), runif(n-n.frac, -2, 2))
+fc_b <- c(rep(-2, n.frac), runif(n-n.frac, -2, 2))
 df <- data.frame(a=fc_a, b=fc_b)
 
-mat_b <- gen.expression.matrix(n, 6, fc=fc_b, r=c(1, -1))
+mat_b <- gen.expression.matrix(n, 6, fc=fc_b, r=c(1, 1, 1, 1))
 
 head(mat_b)
 ```
-
 We can then compute the correlation:
 
 ```{r correlation compute} 
@@ -189,6 +193,8 @@ gg <- ggRedRibbon(rr, quadrants=quad,
 gg
 
 ```
+
+Considering gene correlations, the adjusted p-value of the overlap is not significant. Hence, no minimal coordinate is shown on the map.
 
 <a name="realdataset"/>
 
