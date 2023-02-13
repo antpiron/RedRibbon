@@ -126,7 +126,7 @@ names(quad$downdown)
 
 ## Compatibility mode
 
-This mode only exists for compatibility with [RRHO](https://www.bioconductor.org/packages/release/bioc/html/RRHO.html) and is obsolete. Please use the new interface shown here above.
+This mode only exists for compatibility with [RRHO](https://www.bioconductor.org/packages/release/bioc/html/RRHO.html). Please use the new interface shown here above when possible.
 
 ```{r compat}
 compat <- RRHO(df[,c("id", "a")], df[,c("id", "b")], plots=TRUE, stepsize=n %/% 10)
