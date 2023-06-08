@@ -359,6 +359,7 @@ melt.matrix <- function (data, ..., na.rm = FALSE, value.name = "value")
 #' @param show.pval is a flag to show the P-values on the plot
 #' @param repel.force is the value of the repel force for the p-value ploting (default = 150)
 #' @param base_size is the size of the text fields (default = 20)
+#' @param .log10 output log10 pval (default = FALSE)
 #' @param ... The rest of the parameters
 #' 
 #' @return A \code{ggplot} object.
@@ -367,7 +368,7 @@ melt.matrix <- function (data, ..., na.rm = FALSE, value.name = "value")
 #' @export
 ggRedRibbon.rrho <- function (self, n = NULL, labels = c("a", "b"), show.quadrants=TRUE, quadrants=NULL, 
                               show.pval=TRUE,
-                              repel.force=150, base_size=20, ...)
+                              repel.force=150, base_size=20, .log10=FALSE, ...)
 {
     len <- length(self$data$a)
 
@@ -378,6 +379,10 @@ ggRedRibbon.rrho <- function (self, n = NULL, labels = c("a", "b"), show.quadran
     n.j <- n
 
     rrho <- rrho_rectangle(1, 1, len, len, n.i, n.j, self$data$a, self$data$b,  mode=self$enrichment_mode, LOG=TRUE)
+    if (.log10)
+    {
+        rrho <- rrho / log(10)
+    }
 
     max.log <- max(abs(rrho))
     if (0 == max.log)
@@ -463,12 +468,12 @@ ggRedRibbon.rrho <- function (self, n = NULL, labels = c("a", "b"), show.quadran
                                               if ( quadrant$pvalue > 0.05 || (! is.null(quadrant$padj) && quadrant$padj > 0.05) )
                                                   return(NULL)
                                               
-                                              pvalue <- quadrant$log_pvalue
+                                              pvalue <- if (.log10) quadrant$log_pvalue / log(10) else quadrant$log_pvalue
                                               pvalue.formatted <-  formatC(pvalue, format = "f", digits = 1)
                                               
                                               if (! is.null(quadrant$padj) )
                                               {
-                                                  padj <- quadrant$log_padj
+                                                  padj <- if (.log10) quadrant$log_padj / log(10) else quadrant$log_padj
                                                   pvalue.formatted <-  paste(pvalue.formatted,
                                                                              "(padj =", formatC(padj, format = "f", digits = 1), ")")
                                               }
