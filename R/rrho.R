@@ -383,6 +383,7 @@ ggRedRibbon.rrho <- function (self, n = NULL, labels = c("a", "b"), show.quadran
     {
         rrho <- rrho / log(10)
     }
+    log.label <- if (.log10) "log10" else "log"
 
     max.log <- max(abs(rrho))
     if (0 == max.log)
@@ -396,7 +397,7 @@ ggRedRibbon.rrho <- function (self, n = NULL, labels = c("a", "b"), show.quadran
     len.colors <- length(self$ggplot_colours)
     half.len.colors <- len.colors %/% 2
     colors.values <- seq(0, len.colors) /  len.colors
-
+ 
 
     ## Suppress warning RRHO: no visible binding for global variable ‘gg’
     Var1 <- Var2 <- value <- i <- j <- pvalue <- NULL
@@ -409,7 +410,7 @@ ggRedRibbon.rrho <- function (self, n = NULL, labels = c("a", "b"), show.quadran
                                       labels = format(ticks),
                                       limits=ticks[c(1,3)],
                                       ##limits=b[c(1,length(colors))],
-                                      name="-log p.val",
+                                      name=paste0("-", log.label, " p.val"),
                                       values=colors.values) +
         ggplot2::xlab(labels[1]) + ggplot2::ylab(labels[2]) +
         ## scale_x_continuous(labels = label_percent(accuracy = 1, scale = 100/n.i)) +
