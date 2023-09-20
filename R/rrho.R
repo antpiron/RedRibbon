@@ -238,8 +238,8 @@ setoptions.rrho <- function(self, enrichment_mode=NULL, ggplot_colours = NULL, .
 #' @param algorithm is the algorithm used to find the minimal p-value: 
 #' \itemize{
 #' 
-#' \item{"classic"} {Naive research} 
-#' \item{"ea"} {Evolutionary algorithm, faster but }.
+#' \item{"classic"} {Grid algorithm.} 
+#' \item{"ea"} {Evolutionary algorithm for the greatest accuracy (Default)}.
 #' }
 #' @param permutation is TRUE if the permutation mode is run.
 #' @param niter is the number of iteration for the permutation mode.
@@ -259,7 +259,7 @@ setoptions.rrho <- function(self, enrichment_mode=NULL, ggplot_colours = NULL, .
 #' @method quadrants rrho
 #' @export
 quadrants.rrho <- function(self, m=NULL, n=NULL,
-                           whole=TRUE, whole.fraction = 1, algorithm="classic", permutation=FALSE, niter=96, ...)
+                           whole=TRUE, whole.fraction = 1, algorithm="ea", permutation=FALSE, niter=96, ...)
 {
     len <- length(self$data$a)
 
