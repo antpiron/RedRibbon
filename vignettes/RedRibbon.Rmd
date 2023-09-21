@@ -253,8 +253,8 @@ Considering gene correlations, the adjusted p-value of the overlap is not signif
 ## Transcriptomic analyses overlap
 
 To demonstrate the capabilities of `RedRibbon`, we will use data from a ([real example.](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE159984)).
-The data contains the output from 2 different differential expression analysis obtained with `DeSeq2`. In this case, columns `a` and `b` contain log2FoldChange
-values corresponding to type 2 diabetes signatures and human islets threated with palmitate and glucose (D8PG) signatures. 
+The data contains the output from 2 different differential expression analysis obtained with `DESeq2`. In this case, columns `a` and `b` contain log2FoldChange
+values corresponding to type 2 diabetes signatures (`T2DvsCTL`) and human islets threated with palmitate and glucose signatures (`D8PGsCTL`) . 
 
 ```{r mergeT2DD8PG}
 data("T2D-D8PG", package = "RedRibbon")
@@ -283,6 +283,29 @@ gg
 ```
 
 ## Long read analysis compared to short read analysis
+
+```{r mergeCYT}
+data("CYT-Short-Long", package = "RedRibbon")
+
+df.genes <- merge(CYTvsCTL_short_genes[, c("ensg", "log2FoldChange")],
+                  CYTvsCTL_long_genes[, c("ensg", "log2FoldChange")],
+                 by = "ensg")
+colnames(df.genes) <- c("id", "a", "b")
+
+head(df.genes) %>%
+  kbl() %>%
+  kable_styling()
+```
+
+```{r RedRibbonCYT}
+sh_vs_l_genes <- RedRibbon(df.genes, enrichment_mode="hyper-two-tailed")
+quad <- quadrants(sh_vs_l_genes, algorithm="ea", permutation=TRUE, whole=FALSE)
+gg <- ggRedRibbon(sh_vs_l_genes, quadrants=quad,
+                  labels = c("short-reads CYT vs CTL", "long-reads CYT vs CTL"),
+			      repel.force = 250) +
+	coord_fixed(ratio = 1, clip = "off")
+gg
+```
 
 
 ## Proteomic analysis vs transcriptomic analysis
