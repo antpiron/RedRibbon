@@ -15,6 +15,8 @@ output:
     highlight: pygments
     toc: true
     fig_width: 5
+    toc_depth: 2
+    toc_float: true
 vignette: >
   %\VignetteIndexEntry{RedRibbon}
   %\VignetteEngine{knitr::knitr}
@@ -110,6 +112,7 @@ We also ask the computation of adjusted p-value with the `permutation` option to
 `whole`=`FALSE` splits the overlap map into four quadrants (i.e., down-down, up-up, down-up, up-down).
 
 <a name="ggRedRibbon"/>
+
 ## Plotting the level map
 
 Results can be plotted with the helper function `ggRedRibbon`. The overlap map of the two lists goes respectively in the same direction (both downregulated
@@ -323,6 +326,19 @@ gg <- ggRedRibbon(sh_vs_l_genes, quadrants=quad,
 gg
 ```
 
+At transcript level, 
+
+```{r mergeCYTtx}
+data("CYT-Short-Long-tx", package = "RedRibbon")
+df.tx <- merge(CYTvsCTL_short_tx[, c("enst", "log2FoldChange")],
+                  CYTvsCTL_long_tx[, c("enst", "log2FoldChange")],
+                 by = "enst")
+colnames(df.tx) <- c("id", "a", "b")
+
+head(df.tx) %>%
+  kbl() %>%
+  kable_styling()
+```
 
 ## Proteomic analysis vs transcriptomic analysis
 
