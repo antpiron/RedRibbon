@@ -354,9 +354,21 @@ gg
 
 ## Proteomic analysis vs transcriptomic analysis
 
+The method allows to compare diverse omic types. 
+One of the interesting overlap comparison is between transcriptome and proteome for the same cells and treatments.
+Doing so, it shows that the change seen in transcriptome recapitulate in the proteome (or not). 
+To illustrate this point, we re-analyzed the data set from [Lytrivi et al., 2020](https://bmcgenomics.biomedcentral.com/articles/10.1186/s12864-020-07003-0) for INS-1E cells treated with palmitate.
+
+The data set is loaded with
+
 ```{r mergePAL}
 data("PAL_MAvsProt", package = "RedRibbon")
+head(PAL_MAvsProt) %>%
+  kbl() %>%
+  kable_styling()
 ```
+
+The `RedRibbon`  overlap is done the usual way,
 
 ```{r RedRibbonPAL}
 rr <- RedRibbon(PAL_MAvsProt, enrichment_mode = "hyper-two-tailed")
@@ -368,6 +380,8 @@ gg <- ggRedRibbon(rr, quadrants=quad,
 gg
 ```
 
+An nice overlap is observed on the major diagonal showing that most changes observed at transcript level recapitulate at protein level. 
+Worth of note, in  [Lytrivi et al., 2020](https://bmcgenomics.biomedcentral.com/articles/10.1186/s12864-020-07003-0) with the original R RRHO package (Plaisier et al., 2010), we were unable to pinpoint the coordinate with the minimal hyper-geometric P-Value. Here, the improved accuracy of RedRibbon allows the detection of up-up quadrant overlap.
 
 # sessionInfo()
 
