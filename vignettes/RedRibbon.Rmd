@@ -248,13 +248,19 @@ Considering gene correlations, the adjusted p-value of the overlap is not signif
 
 # Analysis with real data sets
 
-
+To demonstrate the capabilities of `RedRibbon`, we will apply it to multiple and diverse omic data sets. 
+The method is agnostic to the underlying technology.
+Here, this robustness will be illustrated with RNA-Seq transcriptome (quantified at gene and transcript level), micro-array, and proteome.
 
 ## Transcriptomic analyses overlap
 
-To demonstrate the capabilities of `RedRibbon`, we will use data from a ([real example.](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE159984)).
-The data contains the output from 2 different differential expression analysis obtained with `DESeq2`. In this case, columns `a` and `b` contain log2FoldChange
-values corresponding to type 2 diabetes signatures (`T2DvsCTL`) and human islets threated with palmitate and glucose signatures (`D8PGsCTL`) . 
+To demonstrate the capabilities of `RedRibbon`, we will use data from a ([real example.](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE159984)). 
+This data set is has been analyzed in depth in the RedRibbon main manuscript.
+The data contains the output from 2 `DESeq2` differential expression analyses.
+In this case, columns `a` and `b` contain log2FoldChange
+values corresponding to type 2 diabetes signatures (`T2DvsCTL`) and human islets treated with palmitate and glucose signatures (`D8PGsCTL`). 
+
+First, we load the data set and appropriately name the mandatory columns (`id`, `a` and `b`),
 
 ```{r mergeT2DD8PG}
 data("T2D-D8PG", package = "RedRibbon")
@@ -268,12 +274,20 @@ head(df.real) %>%
   kable_styling()
 ```
 
-Once the data is formatted, we can run `RedRibbon`. `RedRibbon` function constructs the object, which  will be used by `quadrants` to compute the best coordinates.
-All the steps performed by `RedRibbon` and `quadrants` are described in the RedRibbon manuscript. `ggRedRibbon` will plot the RRHO map.
+Then, we run `RedRibbon`,
 
 ```{r RedRibbonT2DD8PG}
 rr <- RedRibbon(df.real, enrichment_mode="hyper-two-tailed")
 quad <- quadrants(rr, algorithm="ea", permutation=TRUE, whole=FALSE)
+```
+
+`RedRibbon` function constructs the object which  will be used by `quadrants` to compute the overlap in the four regulation quadrants.
+All the steps performed by `RedRibbon` and `quadrants` are described in the RedRibbon manuscript. 
+
+
+Then, `ggRedRibbon` is used to plot the overlap map.
+
+```{r RedRibbonT2DD8PGggplot2}
 gg <- ggRedRibbon(rr, quadrants=quad,
       		  labels = c("T2D vs CTL", "D8PG vs CTL"),
 		  repel.force = 250) +
@@ -281,6 +295,8 @@ gg <- ggRedRibbon(rr, quadrants=quad,
 gg
 
 ```
+
+`gg` is a standard `ggplot2` object. All the `ggplot2` methods can be applied on it. Here, the `coord_fixed` `ggplot2` method is called to guarantee a fixed square ratio.
 
 ## Long read analysis compared to short read analysis
 
@@ -309,6 +325,21 @@ gg
 
 
 ## Proteomic analysis vs transcriptomic analysis
+
+```{r mergePAL}
+data("PAL_MAvsProt", package = "RedRibbon")
+```
+
+```{r RedRibbonPAL}
+rr <- RedRibbon(PAL_MAvsProt, enrichment_mode = "hyper-two-tailed")
+quad <- quadrants(rr, algorithm="ea", permutation=TRUE, whole=FALSE)
+gg <- ggRedRibbon(rr, quadrants=quad,
+      		  labels = c("Proteome Palm 24h", "Microarray 14h"),
+		  repel.force = 250) +
+   coord_fixed(ratio = 1, clip = "off")
+gg
+```
+
 
 # sessionInfo()
 
