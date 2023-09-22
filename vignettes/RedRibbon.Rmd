@@ -303,7 +303,10 @@ gg
 
 ## Long read analysis compared to short read analysis
 
-RedRibbon is capable of handling both long and short reads. To illustrate this, we provide an example in which we compare the signatures of long against short reads derived from beta pancreatic cells exposed to cytokines. The dataset for the long reads treated with cytokines can be accessed via the following link: GSE--. Similarly, the dataset containing the short reads is available at ---. Here, we use directly the outcomes of the differential analysis between cytokines-treated and control beta pancreatic cells, which are stored in `CYT-Short-Long-gene` and `CYT-Short-Long-tx`, for the gene and transcript expression respectively.
+RedRibbon is capable of handling both long and short reads. To illustrate this, we provide an example in which we compare the signatures of long against short reads derived from beta pancreatic cells exposed to cytokines. 
+The dataset for the long reads treated with cytokines can be accessed via the following link: GSE--. 
+Similarly, the dataset containing the short reads is available at ---. 
+Here, we use directly the outcomes of the differential analysis between cytokines-treated and control beta pancreatic cells, which are stored in `CYT-Short-Long-gene` and `CYT-Short-Long-tx`, for the gene and transcript expression respectively.
 
 ```{r mergeCYT}
 data("CYT-Short-Long", package = "RedRibbon")
