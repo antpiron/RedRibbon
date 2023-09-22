@@ -257,7 +257,7 @@ Here, this robustness will be illustrated with RNA-Seq transcriptome (quantified
 
 ## Transcriptomic analyses overlap
 
-To demonstrate the capabilities of `RedRibbon`, we will use data from a ([real example.](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE159984)). 
+To demonstrate the capabilities of `RedRibbon`, we will use data from a ([real example](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE159984)). 
 This data set is has been analyzed in depth in the RedRibbon main manuscript.
 The data contains the output from 2 `DESeq2` differential expression analyses.
 In this case, columns `a` and `b` contain log2FoldChange
@@ -303,6 +303,8 @@ gg
 
 ## Long read analysis compared to short read analysis
 
+
+
 ```{r mergeCYT}
 data("CYT-Short-Long", package = "RedRibbon")
 
@@ -338,6 +340,16 @@ colnames(df.tx) <- c("id", "a", "b")
 head(df.tx) %>%
   kbl() %>%
   kable_styling()
+```
+
+```{r RedRibbonCYTtx}
+sh_vs_l_tx <- RedRibbon(df.tx, enrichment_mode="hyper-two-tailed")
+quad <- quadrants(sh_vs_l_tx, algorithm="ea", permutation=TRUE, whole=FALSE)
+gg <- ggRedRibbon(sh_vs_l_tx, quadrants=quad,
+                  labels = c("short-reads CYT vs CTL (transcript level)", "long-reads CYT vs CTL (transcript level)"),
+			      repel.force = 250) +
+	coord_fixed(ratio = 1, clip = "off")
+gg
 ```
 
 ## Proteomic analysis vs transcriptomic analysis
