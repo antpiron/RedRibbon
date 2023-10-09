@@ -337,9 +337,9 @@ At transcript level,
 
 ```{r mergeCYTtx}
 data("CYT-Short-Long-tx", package = "RedRibbon")
-df.tx <- merge(CYTvsCTL_short_tx[, c("enst", "log2FoldChange")],
-                  CYTvsCTL_long_tx[, c("enst", "log2FoldChange")],
-                 by = "enst")
+df.tx <- merge(CYTvsCTL_short_tx[, c("Row.names", "log2FoldChange")],
+                  CYTvsCTL_long_tx[, c("Row.names", "log2FoldChange")],
+                 by = "Row.names")
 colnames(df.tx) <- c("id", "a", "b")
 
 head(df.tx) %>%
