@@ -308,11 +308,11 @@ The dataset for the long reads treated with cytokines can be accessed via the fo
 Similarly, the dataset containing the short reads is available at ---. 
 Here, we use directly the outcomes of the differential analysis between cytokines-treated and control beta pancreatic cells, which are stored in `CYT-Short-Long-gene` and `CYT-Short-Long-tx`, for the gene and transcript expression respectively.
 
-```{r mergeCYT}
-data("CYT-Short-Long", package = "RedRibbon")
 
 We will first compare the gene expression signatures between short and long reads.
 
+```{r mergeCYT}
+data("CYT-Short-Long", package = "RedRibbon")
 df.genes <- merge(CYTvsCTL_short_genes[, c("ensg", "log2FoldChange")],
                   CYTvsCTL_long_genes[, c("ensg", "log2FoldChange")],
                  by = "ensg")
