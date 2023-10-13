@@ -304,9 +304,9 @@ gg
 ## Long read analysis compared to short read analysis
 
 RedRibbon is capable of handling both long and short reads differential analyses.
-To illustrate this, we will compare the signatures of long (GSE167223) and short reads (GSE137136) for pancreatic beta cells exposed to cytokines. 
+To illustrate this, we will compare the long (GSE167223) and short reads (GSE137136) signatures of pancreatic beta cells exposed to cytokines. 
 
-This dataset is included in package and can be loaded with
+This dataset is included in the package and can be loaded with
 
 ```{r mergeCYT}
 data("CYT-Short-Long", package = "RedRibbon")
@@ -350,7 +350,8 @@ head(df.tx) %>%
 sh_vs_l_tx <- RedRibbon(df.tx, enrichment_mode="hyper-two-tailed")
 quad <- quadrants(sh_vs_l_tx, algorithm="ea", permutation=TRUE, whole=FALSE)
 gg <- ggRedRibbon(sh_vs_l_tx, quadrants=quad,
-                  labels = c("short-reads CYT vs CTL (transcript level)", "long-reads CYT vs CTL (transcript level)"),
+                  labels = c("short-reads CYT vs CTL (transcript level)",
+                             "long-reads CYT vs CTL (transcript level)"),
 			      repel.force = 250) +
 	coord_fixed(ratio = 1, clip = "off")
 gg
@@ -384,7 +385,7 @@ gg
 ```
 
 An nice overlap is observed on the major diagonal showing that most changes observed at transcript level recapitulate at protein level. 
-Worth of note, in  [Lytrivi et al., 2020](https://bmcgenomics.biomedcentral.com/articles/10.1186/s12864-020-07003-0) with the original R RRHO package (Plaisier et al., 2010), we were unable to pinpoint the coordinate with the minimal hyper-geometric P-Value. Here, the improved accuracy of RedRibbon allows the detection of up-up quadrant overlap.
+Worth of note, in  [Lytrivi et al., 2020](https://bmcgenomics.biomedcentral.com/articles/10.1186/s12864-020-07003-0) with the original R RRHO package (Plaisier et al., 2010), we were unable to pinpoint the minimal hyper-geometric P-Value coordinate. Here, the improved accuracy of RedRibbon allows the detection of up-up quadrant overlap.
 
 # sessionInfo()
 
