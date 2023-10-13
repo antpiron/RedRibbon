@@ -303,13 +303,10 @@ gg
 
 ## Long read analysis compared to short read analysis
 
-RedRibbon is capable of handling both long and short reads. To illustrate this, we provide an example in which we compare the signatures of long against short reads derived from beta pancreatic cells exposed to cytokines. 
-The dataset for the long reads treated with cytokines can be accessed via the following link: GSE--. 
-Similarly, the dataset containing the short reads is available at ---. 
-Here, we use directly the outcomes of the differential analysis between cytokines-treated and control beta pancreatic cells, which are stored in `CYT-Short-Long-gene` and `CYT-Short-Long-tx`, for the gene and transcript expression respectively.
+RedRibbon is capable of handling both long and short reads differential analyses.
+To illustrate this, we will compare the signatures of long (GSE167223) and short reads (GSE137136) for pancreatic beta cells exposed to cytokines. 
 
-
-We will first compare the gene expression signatures between short and long reads.
+This dataset is included in package and can be loaded with
 
 ```{r mergeCYT}
 data("CYT-Short-Long", package = "RedRibbon")
@@ -323,6 +320,8 @@ head(df.genes) %>%
   kable_styling()
 ```
 
+And then, we run RedRibbon analysis over the `df.genes` merged table,
+
 ```{r RedRibbonCYT}
 sh_vs_l_genes <- RedRibbon(df.genes, enrichment_mode="hyper-two-tailed")
 quad <- quadrants(sh_vs_l_genes, algorithm="ea", permutation=TRUE, whole=FALSE)
@@ -333,7 +332,7 @@ gg <- ggRedRibbon(sh_vs_l_genes, quadrants=quad,
 gg
 ```
 
-At transcript level, 
+At transcript level, we have
 
 ```{r mergeCYTtx}
 data("CYT-Short-Long-tx", package = "RedRibbon")
@@ -360,8 +359,7 @@ gg
 ## Proteomic analysis vs transcriptomic analysis
 
 The method allows to compare diverse omic types. 
-One of the interesting overlap comparison is between transcriptome and proteome for the same cells and treatments.
-Doing so, it shows that the change seen in transcriptome recapitulate in the proteome (or not). 
+One of the interesting overlap comparison is between transcriptome and proteome for the same cells and treatments as it allows to see if changes in transcriptome recapitulate in the proteome. 
 To illustrate this point, we re-analyzed the data set from [Lytrivi et al., 2020](https://bmcgenomics.biomedcentral.com/articles/10.1186/s12864-020-07003-0) for INS-1E cells treated with palmitate.
 
 The data set is loaded with
