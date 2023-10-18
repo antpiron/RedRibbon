@@ -1,19 +1,22 @@
 ---
 title: "RedRibbon: a rank-rank hypergeometric overlap library"
-author: "Anthony Piron"
+author: "Anthony Piron, Theodora Papadopoulou"
 date: "`r Sys.Date()`"
 abstract: >
   High throughput omics technologies have generated a wealth of large protein, gene and transcript datasets 
   that have exacerbated the need for new methods to analyse and compare big datasets. Rank-rank hypergeometric 
   overlap is an important threshold-free method to combine and visualize two ranked lists of P-values or fold-changes, 
   usually from differential gene expression analyses. Here, we introduce a new rank-rank hypergeometric overlap-based 
-  method aimed at both gene level and alternative splicing analyses at transcript or exon level, 
-  hitherto unreachable as transcript numbers are an order of magnitude larger than gene numbers.
+  method aimed at gene, transcript, exon and protein level capable of taking into account alternative splicing phenomena.
+  It offers the possibility to compare these levels to each other, hitherto unreachable as transcript and protein numbers
+  are an order of magnitude larger than gene numbers.
 output:
   rmarkdown::html_document:
     highlight: pygments
     toc: true
     fig_width: 5
+    toc_depth: 2
+    toc_float: true
   rmarkdown::pdf_document:
     toc: true
     fig_pos: H
@@ -23,6 +26,7 @@ vignette: >
   %\VignetteEngine{knitr::knitr}
   %\VignetteEncoding{UTF-8}
 ---
+
 
 ```{r setup, include = FALSE}
 library(kableExtra)
@@ -37,13 +41,30 @@ knitr::opts_chunk$set(
 )
 ```
 
-# Analysis with a synthetic dataset
 
-To demonstrate RedRibbon's basic workflow, we will first work with synthetic dataset (For real data, skip to section [Real data set](#realdataset)).
+RedRibbon is a comparative analysis tool of omics differential analyses. 
+It allows to determine the features overlapping between two differential studies. 
+It features high performance, accuracy and simplicity in use. RedRibbon has been optimized to be efficient regardless of the length of the lists given as input. 
+The input data for RedRibbon are two labelled ranked lists of real numbers under comparison. 
+These two lists could contain proteins, gene or transcript ranked by a statistic such as log fold change or direction signed P-value. 
+Optionally, the minimal P-value can be adjusted considering expression level correlation between genes or transcripts.
 
-## Generate a synthetic dataset
+If you have issues with the `RedRibbon` package, please submit it on the [RedRibbon github issue reporting system](https://github.com/antpiron/RedRibbon/issues) and
+we will make our best to address your problems. 
 
-We build a `data.frame` with the mandatory `a` and `b` columns. Those columns are the two lists over which the rank-rank hyper-geometric overlap is run.
+To demonstrate RedRibbon's basic workflow, we will first generate and use a synthetic data set. Next, the tool will be applied on [real data sets](#realdataset). 
+We recommend you to read first this simple experimental section to familiarize yourself with the tool before applying it to your real data.
+Each of the functions or methods described in this R vignette is fully documented. 
+This documentation can be access the usual way in R with the question mark prefixing the function name (e.g., `?RedRibbon.data.frame`).
+
+# Synthetic data set
+
+The synthetic data set is composed of two labeled lists of numbers. A `data.frame`, called `df`, will contain these lists. 
+This `data.frame` is composed of columns `a` and `b`, the two lists of numbers and `id`, a list of labels. 
+Those columns are mandatory to run RedRibbon rank-rank hyper-geometric overlap. The synthetic lists have
+one quarter perfectly overlapping at the bottom of the list, one quarter at the top of the list, and the remaining elements are random. 
+
+The code to generate those lists in the `data.frame` `df` is 
 
 ```{r dataset, results='hide'}
 set.seed(42)
@@ -60,7 +81,7 @@ df <- data.frame(
 	b = b)
 ```
 
-`df` data frame contains half features perfectly matching perfectly between `a` and `b` and the remaining elements are random, `head(df)` gives
+The first lines of the `data.frame` (as given by `head(df)`) are
 	
 ```{r df, echo=FALSE}
 head(df) %>%
@@ -68,29 +89,40 @@ head(df) %>%
   kable_styling(latex_options = "hold_position")
 ```
 
-## Synopsis
+## Overlapping
 
-Load the library with
+We will now compute an overlap with RedRibbon for this synthetic data set. First, the library is loaded with
 
 ```{r Library loading}
 library(RedRibbon)
 ```
 
-Create an S3 RedRibbon object,
+Then, we create an S3 RedRibbon object with the `RedRibbon` function,
 
 ```{r s3, results='hide'}
 rr <- RedRibbon(df, enrichment_mode="hyper-two-tailed")
 ```
 
-Compute the enrichment and adjusted p-value with the `permutation` option set to compute the adjusted p-value and `whole` to split the overlap map into four quadrants (i.e., down-down, up-up, down-up, up-down),
+We set the parameter `enrichment_mode` to use two-tailed test. 
+This way, we will simultaneously detect enrichment in correlated (up/up and down/down) and anti-correlated (up/down and down/up) genes.
+
+Next, we localize the minimal P-value in the four quadrants with the `quadrants` method on the RedRibbon object,
 
 ```{r enrichment, results='hide'}
 quad <- quadrants(rr, algorithm="ea", permutation=TRUE, whole=FALSE)
 ```
 
+We use the evolutionary algorithm (`algorithm="ea"`) to locate the minimal p-value coordinates with the highest accuracy).
+We also ask the computation of adjusted p-value with the `permutation` option to `TRUE`. 
+`whole`=`FALSE` splits the overlap map into four quadrants (i.e., down-down, up-up, down-up, up-down).
+
+<a name="ggRedRibbon"/>
+
 ## Plotting the level map
 
-Results can be plotted with the helper function `ggRedRibbon`:
+Results can be plotted with the helper function `ggRedRibbon`. The overlap map of the two lists goes respectively in the same direction (both downregulated
+or both upregulated in the 2 lists). The maximal log P-values and the permutation adjusted P-values are shown for each quadrant. The horizontal and vertical
+dotted lines split the downregulation and upregulation where the log fold change is zero. The code to produce the map is straightforward,
 
 ```{r ggplot}
 gg <- ggRedRibbon(rr, quadrants=quad,
@@ -99,22 +131,32 @@ gg <- ggRedRibbon(rr, quadrants=quad,
 gg
 ```
 
+In the overlap map, the hypergeometric P-value are signed negatively for depletion (anti-correlation) and positive for enrichment (correlation).
+
 The `gg` variable contains a standard ggplot2 object,
+
 ```{r class ggplot}
 class(gg)
 ```
 
-It can be manipulated as such. For example, in this vignette we used `+ coord_fixed(ratio = 1)` to obtain a fixed scale of coordinates (see `ggplot2::coord_fixed`).
+Hence, this object can be manipulated as any ggplot object.
+For example, in this vignette we used `+ coord_fixed(ratio = 1)` to obtain a fixed scale of coordinates (see `?ggplot2::coord_fixed`).
 
 
 ## Enrichment statistics
 
-List(s) of enriched genes can be accessed within the `RedRibbon` object. For example, you may access the list of genes enriched in the down-down direction with `df[quad$downdown$positions,]`
+The lists of overlapping genes are returned by the `quadrants` method. 
+The list of genes enriched in the down-down direction is given by `df[quad$downdown$positions,]`
+
 ```{r genes, echo=FALSE}
 head(df[quad$downdown$positions,])  %>%
   kbl() %>%
   kable_styling(latex_options = "hold_position")
 ```
+
+`quad$downdown$positions` is a vector of indices in the `df` `data.frame`. 
+The other quadrants indices are given in `quad$upup$positions`, `quad$downup$positions`, and `quad$updown$positions`.
+
 
 You may also easily access to all the statistics generated by the analysis:
 
@@ -122,11 +164,16 @@ You may also easily access to all the statistics generated by the analysis:
 names(quad$downdown)
 ```
 
-`(i , j)` is the  minimal p-value coordinate on the enrichment map, `pvalue` and `log_pvalue` are the minimal p-value, `direction` is the direction of the enrichment (same direction is postive -- up-up, down-down --, opposite is negative -- down-up, up-down) and `count` is the number of genes overlapping.
+```{r values}
+quad$downdown[c("i", "j", "pvalue", "log_pvalue", "count", "direction")]
+```
+
+`(i , j)` is the  minimal p-value coordinate on the enrichment map, `pvalue` and `log_pvalue` are the minimal p-value, `direction` is the direction of the enrichment.
+`count` is the number of genes overlapping.
 
 ## Compatibility mode
 
-This mode only exists for compatibility with [RRHO](https://www.bioconductor.org/packages/release/bioc/html/RRHO.html) and is obsolete. Please use the new interface shown here above.
+This mode only exists for compatibility with [RRHO](https://www.bioconductor.org/packages/release/bioc/html/RRHO.html). Please use the new interface shown above when possible.
 
 ```{r compat}
 compat <- RRHO(df[,c("id", "a")], df[,c("id", "b")], plots=TRUE, stepsize=n %/% 10)
@@ -136,16 +183,19 @@ compat$gg
 ```{r hypermat, results='hide'}
 compat$hypermat
 ```
+
 ```{r hypermat2, echo=FALSE}
 compat$hypermat %>%
   kbl(digits = 2) %>%
   kable_styling(latex_options = "hold_position")
 ```
 
+For the description of these field and parameters, we refer the reader to the `RRHO` package documentation.
 
 ## Using and computing correlation between genes
 
-To demonstrate how we use the correlation of expression between genes, we will generate an artificial expression matrix of `n.genes x n.samples` associated to a fold change between the 2 conditions (e.g., treated vs non-treated samples). The first five genes are perfectly correlated.
+To demonstrate how we use the correlation of expression between genes, we will generate an artificial expression matrix of `n.genes x n.samples` associated to a fold change between
+the 2 conditions (e.g., treated vs non-treated samples). The first five genes are perfectly correlated.
 
 ```{r correlation dataset} 
 gen.expression.matrix <- function (n.genes, n.samples, fc=NULL, r = NULL)
@@ -179,7 +229,8 @@ mat_b <- gen.expression.matrix(n, 6, fc=fc_b, r=c(1, 1, 1, 1))
 
 head(mat_b)
 ```
-We can then compute the correlation:
+
+We can then compute the correlation,
 
 ```{r correlation compute} 
 correlation <- rrho_expression_prediction(mat_b)
@@ -203,9 +254,21 @@ Considering gene correlations, the adjusted p-value of the overlap is not signif
 
 <a name="realdataset"/>
 
-# Analysis with a real dataset
+# Analysis with real data sets
 
-To demonstrate the capabilities of `RedRibbon`, we will use the data from a ([real example.](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE159984)) Briefly, the data contains the output from 2 different differential expression analysis obtained with `DeSeq2`.
+To demonstrate the capabilities of `RedRibbon`, we will apply it to multiple and diverse omic data sets. 
+The method is agnostic to the underlying technology.
+Here, this robustness will be illustrated with RNA-Seq transcriptome (quantified at gene and transcript level), micro-array, and proteome.
+
+## Transcriptomic analyses overlap
+
+To demonstrate the capabilities of `RedRibbon`, we will use data from a ([real example](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE159984)). 
+This data set is has been analyzed in depth in the RedRibbon main manuscript.
+The data contains the output from 2 `DESeq2` differential expression analyses.
+In this case, columns `a` and `b` contain log2FoldChange
+values corresponding to type 2 diabetes signatures (`T2DvsCTL`) and human islets treated with palmitate and glucose signatures (`D8PGsCTL`). 
+
+First, we load the data set and appropriately name the mandatory columns (`id`, `a` and `b`),
 
 ```{r mergeT2DD8PG}
 data("T2D-D8PG", package = "RedRibbon")
@@ -219,11 +282,20 @@ head(df.real) %>%
   kable_styling(latex_options = "hold_position")
 ```
 
-Once the data is formatted, we can run `RedRibbon`:
+Then, we run `RedRibbon`,
 
 ```{r RedRibbonT2DD8PG}
 rr <- RedRibbon(df.real, enrichment_mode="hyper-two-tailed")
 quad <- quadrants(rr, algorithm="ea", permutation=TRUE, whole=FALSE)
+```
+
+`RedRibbon` function constructs the object which  will be used by `quadrants` to compute the overlap in the four regulation quadrants.
+All the steps performed by `RedRibbon` and `quadrants` are described in the RedRibbon manuscript. 
+
+
+Then, `ggRedRibbon` is used to plot the overlap map.
+
+```{r RedRibbonT2DD8PGggplot2}
 gg <- ggRedRibbon(rr, quadrants=quad,
       		  labels = c("T2D vs CTL", "D8PG vs CTL"),
 		  repel.force = 250) +
@@ -231,6 +303,94 @@ gg <- ggRedRibbon(rr, quadrants=quad,
 gg
 
 ```
+
+`gg` is a standard `ggplot2` object. All the `ggplot2` methods can be applied on it. Here, the `coord_fixed` `ggplot2` method is called to guarantee a fixed square ratio.
+
+## Long read analysis compared to short read analysis
+
+RedRibbon is capable of handling both long and short reads differential analyses.
+To illustrate this, we will compare the long (GSE167223) and short reads (GSE137136) signatures of pancreatic beta cells exposed to cytokines. 
+
+This dataset is included in the package and can be loaded with
+
+```{r mergeCYT}
+data("CYT-Short-Long", package = "RedRibbon")
+df.genes <- merge(CYTvsCTL_short_genes[, c("ensg", "log2FoldChange")],
+                  CYTvsCTL_long_genes[, c("ensg", "log2FoldChange")],
+                 by = "ensg")
+colnames(df.genes) <- c("id", "a", "b")
+
+head(df.genes) %>%
+  kbl() %>%
+  kable_styling()
+```
+
+And then, we run RedRibbon analysis over the `df.genes` merged table,
+
+```{r RedRibbonCYT}
+sh_vs_l_genes <- RedRibbon(df.genes, enrichment_mode="hyper-two-tailed")
+quad <- quadrants(sh_vs_l_genes, algorithm="ea", permutation=TRUE, whole=FALSE)
+gg <- ggRedRibbon(sh_vs_l_genes, quadrants=quad,
+                  labels = c("short-reads CYT vs CTL", "long-reads CYT vs CTL"),
+			      repel.force = 250) +
+	coord_fixed(ratio = 1, clip = "off")
+gg
+```
+
+At transcript level, we have
+
+```{r mergeCYTtx}
+data("CYT-Short-Long-tx", package = "RedRibbon")
+df.tx <- merge(CYTvsCTL_short_tx[, c("Row.names", "log2FoldChange")],
+                  CYTvsCTL_long_tx[, c("Row.names", "log2FoldChange")],
+                 by = "Row.names")
+colnames(df.tx) <- c("id", "a", "b")
+
+head(df.tx) %>%
+  kbl() %>%
+  kable_styling()
+```
+
+```{r RedRibbonCYTtx}
+sh_vs_l_tx <- RedRibbon(df.tx, enrichment_mode="hyper-two-tailed")
+quad <- quadrants(sh_vs_l_tx, algorithm="ea", permutation=TRUE, whole=FALSE)
+gg <- ggRedRibbon(sh_vs_l_tx, quadrants=quad,
+                  labels = c("short-reads CYT vs CTL (transcript level)",
+                             "long-reads CYT vs CTL (transcript level)"),
+			      repel.force = 250) +
+	coord_fixed(ratio = 1, clip = "off")
+gg
+```
+
+## Proteomic analysis vs transcriptomic analysis
+
+The method allows to compare diverse omic types. 
+One of the interesting overlap comparison is between transcriptome and proteome for the same cells and treatments as it allows to see if changes in transcriptome recapitulate in the proteome. 
+To illustrate this point, we re-analyzed the data set from [Lytrivi et al., 2020](https://bmcgenomics.biomedcentral.com/articles/10.1186/s12864-020-07003-0) for INS-1E cells treated with palmitate.
+
+The data set is loaded with
+
+```{r mergePAL}
+data("PAL_MAvsProt", package = "RedRibbon")
+head(PAL_MAvsProt) %>%
+  kbl() %>%
+  kable_styling()
+```
+
+The `RedRibbon`  overlap is done the usual way,
+
+```{r RedRibbonPAL}
+rr <- RedRibbon(PAL_MAvsProt, enrichment_mode = "hyper-two-tailed")
+quad <- quadrants(rr, algorithm="ea", permutation=TRUE, whole=FALSE)
+gg <- ggRedRibbon(rr, quadrants=quad,
+      		  labels = c("Proteome Palm 24h", "Microarray 14h"),
+		  repel.force = 250) +
+   coord_fixed(ratio = 1, clip = "off")
+gg
+```
+
+An nice overlap is observed on the major diagonal showing that most changes observed at transcript level recapitulate at protein level. 
+Worth of note, in  [Lytrivi et al., 2020](https://bmcgenomics.biomedcentral.com/articles/10.1186/s12864-020-07003-0) with the original R RRHO package (Plaisier et al., 2010), we were unable to pinpoint the minimal hyper-geometric P-Value coordinate. Here, the improved accuracy of RedRibbon allows the detection of up-up quadrant overlap.
 
 # sessionInfo()
 

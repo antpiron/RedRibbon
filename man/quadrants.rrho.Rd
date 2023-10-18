@@ -10,7 +10,7 @@
   n = NULL,
   whole = TRUE,
   whole.fraction = 1,
-  algorithm = "classic",
+  algorithm = "ea",
   permutation = FALSE,
   niter = 96,
   ...
@@ -30,8 +30,8 @@
 \item{algorithm}{is the algorithm used to find the minimal p-value: 
 \itemize{
 
-\item{"classic"} {Naive research} 
-\item{"ea"} {Evolutionary algorithm, faster but }.
+\item{"classic"} {Grid algorithm.} 
+\item{"ea"} {Evolutionary algorithm for the greatest accuracy (Default)}.
 }}
 
 \item{permutation}{is TRUE if the permutation mode is run.}
