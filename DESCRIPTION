@@ -1,6 +1,6 @@
 Package: RedRibbon
-Version: 0.4-1
-Date: 2023-09-25
+Version: 0.5-1
+Date: 2023-10-18
 Title: A Very Fast and Accurate Rank-Rank Hypergeometric Overlap Implementation
 Authors@R: c(person("Anthony", "Piron",
 	            role = c("aut", "cre"),
