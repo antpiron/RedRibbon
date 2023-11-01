@@ -17,10 +17,10 @@ devtools::install_github("antpiron/RedRibbon")
 
 ## Alternative installation method from the tar.gz released package
 
-In R, download RedRibbon_0.4-1.tar.gz on github, and then the run
+In R, download RedRibbon_1.0-1.tar.gz on github, and then the run
 
 ```bash
-R CMD INSTALL RedRibbon_0.4-1.tar.gz
+R CMD INSTALL RedRibbon_1.0-1.tar.gz
 ```
 
 
