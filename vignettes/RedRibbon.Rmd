@@ -352,7 +352,7 @@ gg <- ggRedRibbon(sh_vs_l_tx, quadrants=quad,
 gg
 ```
 
-**Remark:** The hypergeometric *P*-values on this figure can be slightly different than the same figure in the RedRibbon manuscript, the evolutionary algorithm being non-deterministic. In this specific case, it caused by diffuse signal around the minimal *P*-value coordinate. Hence, multiple coordinates have nearly identical *P*-value. The coordinate being close, this non-determinism have nearly consequence on the returned overlap.
+**Remark:** The hypergeometric *P*-values on this figure can be slightly different than the same figure in the RedRibbon manuscript, the evolutionary algorithm being non-deterministic. In this specific case, it is caused by diffuse signal around the minimal *P*-value coordinate. Hence, multiple coordinates have nearly identical *P*-value. The coordinate being close, this non-determinism have nearly no consequence on the returned overlap.
 
 ## Proteomic analysis vs transcriptomic analysis
 
