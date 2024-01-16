@@ -107,10 +107,10 @@ df[quad$downdown$positions,]
 
 # Citation
 
-Please cite the [biorxiv pre-print](https://doi.org/10.1101/2022.08.31.505818),
+Please cite our [Life Science Alliance publication](https://doi.org/10.26508/lsa.202302203),
 
 ```text
-RedRibbon: A new rank-rank hypergeometric overlap pipeline to compare gene and transcript expression signatures
-Anthony Piron, Florian Szymczak, Maria Inês Alvelos, Matthieu Defrance, Tom Lenaerts, Décio L. Eizirik, Miriam Cnop
-bioRxiv 2022.08.31.505818; doi: https://doi.org/10.1101/2022.08.31.505818 
+Anthony Piron, Florian Szymczak, Theodora Papadopoulou, Maria Inês Alvelos, Matthieu Defrance, Tom Lenaerts, Décio L Eizirik, Miriam Cnop.
+RedRibbon: A new rank-rank hypergeometric overlap for gene and transcript expression signatures.
+Life Science Alliance. 2023 Dec 8;7(2):e202302203. doi: 10.26508/lsa.202302203. PMID: 38081640; PMCID: PMC10709657.
 ```
