@@ -17,10 +17,10 @@ devtools::install_github("antpiron/RedRibbon")
 
 ## Alternative installation method from the tar.gz released package
 
-In R, download RedRibbon_0.3-1.tar.gz on github, and then the run
+In R, download RedRibbon_1.0-1.tar.gz on github, and then the run
 
 ```bash
-R CMD INSTALL RedRibbon_0.3-1.tar.gz
+R CMD INSTALL RedRibbon_1.0-1.tar.gz
 ```
 
 
@@ -37,7 +37,7 @@ sudo apt-get install libgomp1
 If not installed, while the libraries will be totally functionnal, no parallel execution will be available.
 
 
-Download official release of the [`ale`](https://github.com/antpiron/ale) and
+Download latest official release of the [`ale`](https://github.com/antpiron/ale) and
 [`cRedRibbon`](https://github.com/antpiron/cRedRibbon) C libraries.
 
 
@@ -61,7 +61,7 @@ make
 sudo make install
 ```
 
-If the two C librairies are installed, the R package installation process will automatically detect those and link to those.
+If the two C librairies are installed, the R package installation process will automatically detect those and dynamically link to those.
 
 Rermark: if the libraries are not automaticaly detected, `sudo ldconfig /usr/local/lib/` might be necessary to run in order to update links and cache to the shared libraries.
 
