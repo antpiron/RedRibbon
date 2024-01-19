@@ -1,0 +1,18 @@
+## R package reference generated from DESCRIPTION metadata
+citation(auto = meta)
+
+bibentry(bibtype = "Article",
+         title = "RedRibbon: A new rank-rank hypergeometric overlap for gene and transcript expression signatures",
+         author = c(person(c("Anthony"), "Piron"),
+		    person(c("Florian"), "Szymczak"),
+		    person(c("Theodora"), "Papadopoulou"),
+		    person(c("Maria", "In\\^es"), "Alvelos"),
+		    person(c("Matthieu"), "Defrance"),
+		    person(c("Tom"), "Lenaerts"),
+		    person(c("D\\'ecio", "L"), "Eizirik"),
+		    person(c("Miriam"), "Cnop")),
+	 journal = "Life Science Alliance",
+         year = "2023", 
+	 month = "dec",
+         doi = "10.26508/lsa.202302203")
+
