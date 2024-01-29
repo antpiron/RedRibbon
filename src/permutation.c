@@ -147,9 +147,9 @@ rrho_r_permutation(SEXP i, SEXP j, SEXP ilen, SEXP jlen, SEXP a, SEXP b, SEXP al
      error("pvalue_j should be >= j.");
   
   if ( c.pvalue_i >= c.i + c.ilen )
-     error("pvalue_i should be < i + ilen - 1.");
+    error("%d == pvalue_i should be < i + ilen - 1 == %d.", c.pvalue_i, c.i + c.ilen);
   if ( c.pvalue_j >= c.j + c.jlen )
-     error("pvalue_j should < j + ilen - 1.");
+    error("%d == pvalue_j should < j + ilen - 1 == %d.",  c.pvalue_j, c.j + c.jlen);
   
   /* enum {
       RRHO_HYPER = 0,
