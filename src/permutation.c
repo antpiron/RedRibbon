@@ -121,7 +121,7 @@ rrho_r_permutation(SEXP i, SEXP j, SEXP ilen, SEXP jlen, SEXP a, SEXP b, SEXP al
      .i = INTEGER(i)[0] - 1, .j = INTEGER(j)[0] - 1,
      .ilen = INTEGER(ilen)[0], .jlen = INTEGER(jlen)[0],
      .a = REAL(a), .b = REAL(b),
-     .pvalue_i = INTEGER(pvalue_i)[0], .pvalue_j = INTEGER(pvalue_j)[0],
+     .pvalue_i = INTEGER(pvalue_i)[0] - 1, .pvalue_j = INTEGER(pvalue_j)[0] - 1,
      .niter = INTEGER(niter)[0],
      .strmode = CHAR(STRING_PTR(mode)[0]),
      .mode = RRHO_HYPER,
@@ -132,13 +132,25 @@ rrho_r_permutation(SEXP i, SEXP j, SEXP ilen, SEXP jlen, SEXP a, SEXP b, SEXP al
     };
 
   if ( c.i < 0 )
-    error("i should be  greater or equal of 1.");
+    error("i should be greater or equal than 1.");
   if ( c.j < 0 )
-    error("j should be  greater or equal of 1.");
-  if ( c.m > c.ilen )
-    error("m should be less than ilen.");
-  if ( c.n > c.jlen )
-    error("n should be less than jlen.");
+    error("j should be greater or equal than 1.");
+  
+  if ( length_a < c.ilen + c.i )
+    error("%d == length(a) should be >= ilen + i - 1 == %d.",  length_a, c.ilen + c.i);
+  if ( length_b < c.jlen + c.j )
+    error("%d == length(b) should be >= jlen + j - 1 == %d.", length_b, c.jlen + c.j);
+
+  if ( c.pvalue_i < c.i )
+     error("pvalue_i should be >= i.");
+  if ( c.pvalue_j < c.j )
+     error("pvalue_j should be >= j.");
+  
+  if ( c.pvalue_i >= c.i + c.ilen )
+    error("%d == pvalue_i should be < i + ilen - 1 == %d.", c.pvalue_i, c.i + c.ilen);
+  if ( c.pvalue_j >= c.j + c.jlen )
+    error("%d == pvalue_j should < j + ilen - 1 == %d.",  c.pvalue_j, c.j + c.jlen);
+  
   /* enum {
       RRHO_HYPER = 0,
       RRHO_HYPER_TWO_TAILED,
