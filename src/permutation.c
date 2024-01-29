@@ -136,10 +136,10 @@ rrho_r_permutation(SEXP i, SEXP j, SEXP ilen, SEXP jlen, SEXP a, SEXP b, SEXP al
   if ( c.j < 0 )
     error("j should be greater or equal than 1.");
   
-  if ( c.m < c.ilen + c.i )
-    error("m should be >= ilen + i - 1.");
-  if ( c.n < c.jlen + c.j )
-    error("n should be >= jlen + j - 1.");
+  if ( length_a < c.ilen + c.i )
+    error("%d == length(a) should be >= ilen + i - 1 == %d.",  length_a, c.ilen + c.i);
+  if ( length_b < c.jlen + c.j )
+    error("%d == length(b) should be >= jlen + j - 1 == %d.", length_b, c.jlen + c.j);
 
   if ( c.pvalue_i < c.i )
      error("pvalue_i should be >= i.");
