@@ -1,4 +1,4 @@
-AC_INIT([RedRibbon], 0.2.0) dnl package name, version
+AC_INIT([RedRibbon], 1.3.0) dnl package name, version
 
 
 dnl Now find the compiler and compiler flags to use
@@ -26,18 +26,18 @@ LIBALE_SOURCES=$(cd src ; find  ale-*/src -name '*.c' | tr '\n' ' ')
 if test x"$SEARCH_LIBALE" == xyes ; then
    AC_SEARCH_LIBS([stats_hyper_F], [ale],	
    		[LIBALE_SOURCES=],
-		[PKG_CFLAGS="$PKG_CFLAGS -I./ale-1.1/src/"])
+		[PKG_CFLAGS="$PKG_CFLAGS -I./ale-1.3/src/"])
 else
-	PKG_CFLAGS="$PKG_CFLAGS -I./ale-1.1/src/"
+	PKG_CFLAGS="$PKG_CFLAGS -I./ale-1.3/src/"
 fi
 
 LIBREDRIBBON_SOURCES=$(cd src ; find  credribbon-*/src -name '*.c' | tr '\n' ' ')
 if test x"$SEARCH_LIBREDRIBBON" == xyes ; then
    AC_SEARCH_LIBS([rrho_init], [redribbon],
 	    	    [LIBREDRIBBON_SOURCES=],
-		    [PKG_CFLAGS="$PKG_CFLAGS -I./credribbon-1.1/src/"])
+		    [PKG_CFLAGS="$PKG_CFLAGS -I./credribbon-1.3/src/"])
 else
-	PKG_CFLAGS="$PKG_CFLAGS -I./credribbon-1.1/src/"
+	PKG_CFLAGS="$PKG_CFLAGS -I./credribbon-1.3/src/"
 fi
 
 PKG_SOURCES=$(cd src ; ls *.c | tr '\n' ' ')
@@ -128,5 +128,5 @@ AC_SUBST([PKG_CFLAGS], ["${PKG_CFLAGS}"])
 AC_SUBST(LIBS)
 AC_CONFIG_HEADERS([src/config.h])
 dnl and do substitution in the src/Makevars.in and src/config.h
-AC_CONFIG_FILES([src/Makevars src/ale-1.1/src/ale/portability.h])
+AC_CONFIG_FILES([src/Makevars src/ale-1.3/src/ale/portability.h])
 AC_OUTPUT
