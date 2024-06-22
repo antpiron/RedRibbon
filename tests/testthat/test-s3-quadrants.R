@@ -6,7 +6,7 @@ library(RedRibbon)
 EPS  <- 0.000001
 
 a <- as.double(1:1000) - 450
-b <- as.double(1:1000) - 460
+b <- as.double(1:1000) - 450
 
 rr <- RedRibbon(a, b)
 
