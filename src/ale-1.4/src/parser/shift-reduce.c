@@ -190,42 +190,46 @@ parser_shift_reduce(struct parser_shift_reduce *sr, void *value, void *cls)
       switch (action->type)
 	{
 	case PARSER_ACTION_SHIFT:
-	  size_t alloc_size = sizeof(char) * (strlen(token->str) + 1);
-	  char *str = mem_malloc(&sr->pool, alloc_size);
-	  memcpy(str, token->str, alloc_size);
-
-	  stack_push(&stack, (struct stack_elem) { .state = action->shift.next_state,
+	  {
+	    size_t alloc_size = sizeof(char) * (strlen(token->str) + 1);
+	    char *str = mem_malloc(&sr->pool, alloc_size);
+	    memcpy(str, token->str, alloc_size);
+	    
+	    stack_push(&stack, (struct stack_elem) { .state = action->shift.next_state,
 						   .value = str});
-	  token = sr->next_token(top->state, cls);
+	    token = sr->next_token(top->state, cls);
 
 	  // printf("%zu: S%zu <<< %s\n", top->state, action->shift.next_state, str);
+	  }
 	  break;
 	  
 	case PARSER_ACTION_REDUCE:
-	  if (NULL != action->reduce.callback)
-	    {
-	      struct stack_elem *elems = stack_topn(&stack, action->reduce.rhs_n);
-
-	      for (size_t i = 0 ; i <  action->reduce.rhs_n ; i++)
-		vector_voidptr_set(&voidptr, i, elems[i].value);
+	  {
+	    if (NULL != action->reduce.callback)
+	      {
+		struct stack_elem *elems = stack_topn(&stack, action->reduce.rhs_n);
+		
+		for (size_t i = 0 ; i <  action->reduce.rhs_n ; i++)
+		  vector_voidptr_set(&voidptr, i, elems[i].value);
 	      
-	      value = action->reduce.callback(action->reduce.rhs_n, voidptr.data, cls);
-	    }
-	  
-	  int err = stack_popn(&stack, action->reduce.rhs_n);
-	  ERROR_CUSTOM_GOTO(err < 0, PARSER_ERROR_STACK_TOO_SMALL, ERROR_OUT_OF_LOOP);
+		value = action->reduce.callback(action->reduce.rhs_n, voidptr.data, cls);
+	      }
+	    
+	    int err = stack_popn(&stack, action->reduce.rhs_n);
+	    ERROR_CUSTOM_GOTO(err < 0, PARSER_ERROR_STACK_TOO_SMALL, ERROR_OUT_OF_LOOP);
 
-	  // printf("%zu: R%zu goto ", top->state, action->reduce.lhs);
-	  
-	  top = stack_top(&stack);
-	  ERROR_CUSTOM_GOTO(NULL == top, PARSER_ERROR_EMPTY_STACK, ERROR_OUT_OF_LOOP);
-
-	  ssize_t goto_dst = sr->goto_table(top->state, action->reduce.lhs, cls);
-	  ERROR_CUSTOM_GOTO(goto_dst < 0, PARSER_ERROR_REDUCE, ERROR_OUT_OF_LOOP);
-	  stack_push(&stack,
-		     (struct stack_elem) { .state = goto_dst,
-					   .value = value } );
-	  // printf("%zu\n", goto_dst);
+	    // printf("%zu: R%zu goto ", top->state, action->reduce.lhs);
+	    
+	    top = stack_top(&stack);
+	    ERROR_CUSTOM_GOTO(NULL == top, PARSER_ERROR_EMPTY_STACK, ERROR_OUT_OF_LOOP);
+	    
+	    ssize_t goto_dst = sr->goto_table(top->state, action->reduce.lhs, cls);
+	    ERROR_CUSTOM_GOTO(goto_dst < 0, PARSER_ERROR_REDUCE, ERROR_OUT_OF_LOOP);
+	    stack_push(&stack,
+		       (struct stack_elem) { .state = goto_dst,
+					     .value = value } );
+	    // printf("%zu\n", goto_dst);
+	  }
 	  break;
 	  
 	case PARSER_ACTION_ACCEPT:

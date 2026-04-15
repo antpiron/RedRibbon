@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.71])
-AC_INIT([ale],[1.3],[BUG-REPORT-ADDRESS])
+AC_INIT([ale],[1.4],[BUG-REPORT-ADDRESS])
 AM_INIT_AUTOMAKE([subdir-objects])
 AM_SILENT_RULES([yes])
 
