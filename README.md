@@ -17,10 +17,10 @@ devtools::install_github("antpiron/RedRibbon")
 
 ## Alternative installation method from the tar.gz released package
 
-In R, download RedRibbon_1.0-1.tar.gz on github, and then the run
+In R, download RedRibbon_1.4-1.tar.gz on github, and then the run
 
 ```bash
-R CMD INSTALL RedRibbon_1.0-1.tar.gz
+R CMD INSTALL RedRibbon_1.4-1.tar.gz
 ```
 
 
@@ -44,8 +44,8 @@ Download latest official release of the [`ale`](https://github.com/antpiron/ale)
 Install `ale` C library
 
 ```bash
-tar xvzf ale-1.1.tar.gz
-cd ale-1.1
+tar xvzf ale-1.4.tar.gz
+cd ale-1.4
 ./configure
 make
 sudo make install
@@ -54,8 +54,8 @@ sudo make install
 Install `cRedRibbon` C library
 
 ```bash
-tar xvzf  credribbon-1.1.tar.gz
-cd credribbon-1.1
+tar xvzf  credribbon-1.3.tar.gz
+cd credribbon-1.3
 ./configure
 make
 sudo make install
