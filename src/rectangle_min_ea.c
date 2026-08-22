@@ -45,8 +45,8 @@ rrho_r_rectangle_min_ea(SEXP i, SEXP j, SEXP ilen, SEXP jlen, SEXP a, SEXP b, SE
      .i = INTEGER(i)[0] - 1, .j = INTEGER(j)[0] - 1,
      .ilen = INTEGER(ilen)[0], .jlen = INTEGER(jlen)[0],
      .a = REAL(a), .b = REAL(b),
-     .strmode = CHAR(STRING_PTR(mode)[0]),
-     .strdirection = CHAR(STRING_PTR(direction)[0]),
+     .strmode = CHAR(STRING_ELT(mode, 0)),
+     .strdirection = CHAR(STRING_ELT(direction, 0)),
      .mode = RRHO_HYPER,
      .direction = 1
     };

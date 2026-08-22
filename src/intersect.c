@@ -35,7 +35,7 @@ rrho_r_intersect(SEXP i, SEXP j, SEXP a, SEXP b, SEXP directions)
     {
      .i = INTEGER(i)[0] - 1, .j = INTEGER(j)[0] - 1,
      .a = REAL(a), .b = REAL(b),
-     .strdirection = CHAR(STRING_PTR(directions)[0]),
+     .strdirection = CHAR(STRING_ELT(directions, 0)),
      .direction = RRHO_DOWN_DOWN
     };
 

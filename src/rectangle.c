@@ -42,7 +42,7 @@ rrho_r_rectangle(SEXP i, SEXP j, SEXP ilen, SEXP jlen, SEXP m, SEXP n, SEXP a, S
      .ilen = INTEGER(ilen)[0], .jlen = INTEGER(jlen)[0],
      .m = INTEGER(m)[0], .n = INTEGER(n)[0],
      .a = REAL(a), .b = REAL(b),
-     .strmode = CHAR(STRING_PTR(mode)[0]),
+     .strmode = CHAR(STRING_ELT(mode, 0)),
      .mode = RRHO_HYPER,
      .log = LOGICAL(log_flag)[0]
     };
