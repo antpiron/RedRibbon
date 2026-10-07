@@ -123,11 +123,11 @@ rrho_r_permutation(SEXP i, SEXP j, SEXP ilen, SEXP jlen, SEXP a, SEXP b, SEXP al
      .a = REAL(a), .b = REAL(b),
      .pvalue_i = INTEGER(pvalue_i)[0] - 1, .pvalue_j = INTEGER(pvalue_j)[0] - 1,
      .niter = INTEGER(niter)[0],
-     .strmode = CHAR(STRING_PTR(mode)[0]),
+     .strmode = CHAR(STRING_ELT(mode, 0)),
      .mode = RRHO_HYPER,
-     .strdirection = CHAR(STRING_PTR(direction)[0]),
+     .strdirection = CHAR(STRING_ELT(direction, 0)),
      .direction = 1,
-     .stralgorithm = CHAR(STRING_PTR(algorithm)[0]),
+     .stralgorithm = CHAR(STRING_ELT(algorithm, 0)),
      .algorithm = RRHO_CLASSIC
     };
 

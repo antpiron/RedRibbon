@@ -32,7 +32,7 @@ rrho_r_normalize(SEXP mat, SEXP ref, SEXP mode)
  
   if (! isNull(mode) )
     {
-      const char *str_mode = CHAR(STRING_PTR(mode)[0]);
+      const char *str_mode = CHAR(STRING_ELT(mode, 0));
       if ( 0 == strcmp("geometric_mean", str_mode) )
 	int_mode = STATS_NORM_GEOM_MEAN;
       else if ( 0 == strcmp("poisson", str_mode) )

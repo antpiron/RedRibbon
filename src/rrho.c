@@ -38,7 +38,7 @@ rrho_r_rrho(SEXP i, SEXP j, SEXP a, SEXP b, SEXP mode)
     {
      .i = INTEGER(i)[0] - 1, .j = INTEGER(j)[0] - 1,
      .a = REAL(a), .b = REAL(b),
-     .strmode = CHAR(STRING_PTR(mode)[0]),
+     .strmode = CHAR(STRING_ELT(mode, 0)),
       .mode = RRHO_HYPER
     };
 
